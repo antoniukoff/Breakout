@@ -1,6 +1,6 @@
 [submodule "vertex-forge/vendor/imgui/imgui"]
-	path = vertex-forge/vendor/imgui/imgui/
+	path = vertex-forge/vendor/imgui/imgui
 	url = https://github.com/ocornut/imgui
 [submodule "vertex-forge/vendor/stb/stb"]
-	path = vertex-forge/vendor/stb/stb/
+	path = vertex-forge/vendor/stb/stb
 	url = https://github.com/nothings/stb

@@ -1,3 +1,5 @@
+os.execute("git submodule update --init --recursive")
+
 workspace "vertex-forge"
     configurations { "Debug", "Release" }
     architecture "x64"
