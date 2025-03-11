@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1546CF4B-01A9-5EF0-AA2E-97A696702A73}</ProjectGuid>
+    <ProjectGuid>{A3562DD7-8FB9-BC7B-383F-F531248188FE}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>vertex_forge</RootNamespace>
+    <RootNamespace>vertex-forge</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -42,16 +42,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\-Debug-x86_64\vertex_forge\</OutDir>
-    <IntDir>..\bin-int\-Debug-x86_64\vertex_forge\</IntDir>
-    <TargetName>vertex_forge</TargetName>
+    <OutDir>..\bin\windows-Debug-x86_64\vertex-forge\</OutDir>
+    <IntDir>..\bin-int\windows-Debug-x86_64\vertex-forge\</IntDir>
+    <TargetName>vertex-forge</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\-Release-x86_64\vertex_forge\</OutDir>
-    <IntDir>..\bin-int\-Release-x86_64\vertex_forge\</IntDir>
-    <TargetName>vertex_forge</TargetName>
+    <OutDir>..\bin\windows-Release-x86_64\vertex-forge\</OutDir>
+    <IntDir>..\bin-int\windows-Release-x86_64\vertex-forge\</IntDir>
+    <TargetName>vertex-forge</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Entry.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\UI.cpp" />
@@ -115,7 +116,6 @@
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\math\mat4.cpp" />
     <ClCompile Include="src\math\vec3.cpp" />
-    <ClCompile Include="src\vertex_forge.cpp" />
     <ClCompile Include="vendor\imgui\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="vendor\imgui\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="vendor\imgui\imgui\imgui.cpp" />

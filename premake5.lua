@@ -2,13 +2,13 @@ workspace "vertex-forge"
     configurations { "Debug", "Release" }
     architecture "x64"
 
-    outputdir = "%{cfg.platform}-%{cfg.buildcfg}-%{cfg.architecture}"
+    outputdir = "%{cfg.system}-%{cfg.buildcfg}-%{cfg.architecture}"
     vendordir = "%{prj.name}/vendor"
 
-    project "vertex_forge"
+    project "vertex-forge"
         kind "ConsoleApp"
         language "C++"
-        location "vertex_forge"
+        location "vertex-forge"
 
         targetdir ("bin/" .. outputdir .. "/%{prj.name}")
         objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
