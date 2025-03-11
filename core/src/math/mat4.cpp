@@ -1,4 +1,4 @@
-#include "mat4.h"
+#include "math/mat4.h"
 #include <iostream> 
 
 mat4 mat4::translate(vec3 pos)

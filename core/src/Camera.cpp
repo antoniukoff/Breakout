@@ -2,8 +2,8 @@
 #include "EventSystem.h"
 #include <GLFW/glfw3.h>
 
-Camera::Camera(vec3 eye, vec3 to, vec3 up) : 
-	m_camera_pos(eye)
+Camera::Camera(vec3 eye, vec3 to, vec3 up) 
+	: m_camera_pos(eye)
 	, m_target(to)
 	, m_up(up)
 {}

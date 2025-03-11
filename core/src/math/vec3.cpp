@@ -1,4 +1,4 @@
-#include "vec3.h"
+#include "math/vec3.h"
 #include <cmath>
 
 vec3 vec3::operator*(float scalar)
