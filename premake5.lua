@@ -46,10 +46,10 @@ workspace "Breakout"
         }
 
         vpaths {
-            ["Headers/*"] = "%{prj.name}/include/**.h",
-            ["Sources/*"] = {"%{prj.name}/src/**.cpp"},
-            ["Vendor/Headers"] = {"%{prj.name}/vendor/**.h"},
-            ["Vendor/Sources"] = {"%{prj.name}/vendor/**.cpp"}
+            ["Headers/*"] = "core/include/**.h",
+            ["Sources/*"] = "core/src/**.cpp",
+            ["Vendor/Headers/*"] = {"core/vendor/**.h"},
+            ["Vendor/Sources/*"] = {"core/vendor/**.cpp"}
          }
 
         filter "system:windows"
@@ -85,8 +85,8 @@ workspace "Breakout"
         }
 
         vpaths {
-            ["Headers/*"] = "%{prj.name}/src/**.h",
-            ["Sources/*"] = {"%{prj.name}/src/**.cpp"},
+            ["Headers/*"] = {"game/src/**.h"},
+            ["Sources/*"] = {"game/src/**.cpp"},
         }
 
         filter "system:windows"
