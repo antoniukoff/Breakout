@@ -1,5 +1,3 @@
-os.execute("git submodule update --init --recursive")
-
 workspace "vertex-forge"
     configurations { "Debug", "Release" }
     architecture "x64"
@@ -42,14 +40,21 @@ workspace "vertex-forge"
             (vendordir .. "/imgui/imgui/backends/imgui_impl_opengl3.h")
         }
 
+        vpaths {
+            ["Headers/*"] = "vertex-forge/src/**.h",
+            ["Sources/*"] = {"vertex-forge/src/**.cpp"},
+            ["Vendor/Headers"] = {"vertex-forge/vendor/**.h"},
+            ["Vendor/Sources"] = {"vertex-forge/vendor/**.cpp"}
+         }
+
         filter "system:windows"
             cppdialect "C++20"
             systemversion "latest"
 
-        filter "configurations:Debug64"
+        filter "configurations:Debug"
             defines { "DEBUG" }
             symbols "On"
 
-        filter "configurations:Release64"
+        filter "configurations:Release"
             defines { "NDEBUG" }
             optimize "On"
