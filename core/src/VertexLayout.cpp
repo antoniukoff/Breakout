@@ -3,7 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
-VertexLayout::VertexLayout(const std::vector<VertexAttribute> attributes)
+
+VertexLayout::VertexLayout(std::initializer_list<VertexAttribute> attributes)
 	: m_attributes(attributes)
 {
 	create_layout();
@@ -22,17 +23,8 @@ void VertexLayout::create_layout()
 	{
 		attribute.offset = offset;
 
-		unsigned int attribute_size = attribute.count * gl_utils::gl_type_to_cpp_size(attribute.type);
-		offset += attribute_size;
-		stride += attribute_size;
-	}
-}
-
-void VertexLayout::enable_attributes() const
-{
-	for (auto& attribute : m_attributes)
-	{
-		glVertexAttribPointer(attribute.location, attribute.count, attribute.type, attribute.normalized, stride, (void*)attribute.offset);
-		glEnableVertexAttribArray(attribute.location);
+		uint32_t attribute_size = attribute.count * gl_utils::gl_type_to_cpp_size(attribute.type);
+		offset			+= attribute_size;
+		m_vertex_stride += attribute_size;
 	}
 }

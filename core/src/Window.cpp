@@ -6,15 +6,15 @@
 #include <iostream>
 
 Window::Window(float width, float height, const std::string& name) 
-	: width(width)
-	, height(height)
+	: m_width(width)
+	, m_height(height)
 {
 	if (glfwInit() == GLFW_FALSE)
 	{
 		std::cerr << "Failed to initialize glfw!" << std::endl;
 	};
 
-	window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+	m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 	glViewport(0, 0, width, height);
 	glfwSwapInterval(1);
 
@@ -28,7 +28,7 @@ void Window::initialize_context(int major, int minor, bool use_core)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE - use_core);
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(m_window);
 
 	glewExperimental = use_core;
 	if (glewInit() != GLEW_OK)
@@ -44,11 +44,16 @@ void Window::poll_events()
 
 void Window::swap()
 {
-	glfwSwapBuffers(window);
+	glfwSwapBuffers(m_window);
+}
+
+float Window::get_aspect_ratio() const
+{
+	return m_width / m_height;
 }
 
 GLFWwindow* Window::get_handle() const
 {
-	return window;
+	return m_window;
 }
 

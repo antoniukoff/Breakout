@@ -2,11 +2,21 @@
 #include "EventSystem.h"
 #include <GLFW/glfw3.h>
 
-Camera::Camera(vec3 eye, vec3 to, vec3 up) 
-	: m_camera_pos(eye)
-	, m_target(to)
-	, m_up(up)
+Camera::Camera()
 {}
+
+void Camera::init_view(vec3 from, vec3 at, vec3 up)
+{
+	m_camera_pos = from;
+	m_target = at;
+	m_up = up;
+	m_view_matrix = mat4::calculate_view_matrix(from, at, up);
+}
+
+void Camera::init_projection(float aspect_ratio, float fov, float near, float far)
+{
+	m_projection_matrix = mat4::calculate_projection(aspect_ratio, fov, near, far);
+}
 
 const mat4& Camera::get_view_matrix()
 {

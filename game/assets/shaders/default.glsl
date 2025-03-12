@@ -8,15 +8,15 @@ layout(location = 2) in float i_opacity;
 out vec2 tex_coords;
 out float opacity;
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 model;
+uniform mat4 projection_matrix;
+uniform mat4 view_matrix;
+uniform mat4 model_matrix;
 
 void main()
 {
 	opacity = i_opacity;
 	tex_coords = uv_coords;
-	gl_Position = projection * view * model * vec4(position, 1.0);
+	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(position, 1.0);
 }
 
 #shader fragment
@@ -34,5 +34,5 @@ uniform sampler2D texture_1;
 void main()
 {
 	vec4 color = mix(texture(texture_0, tex_coords), texture(texture_1, tex_coords), 0.5);
-	frag_color = opacity * color;
+	frag_color = vec4(1.0f);
 }

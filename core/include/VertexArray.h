@@ -1,15 +1,19 @@
 #pragma once
 #include "VertexBuffer.h"
+#include <memory>
 
 class VertexArray
 {
 public:
 	VertexArray();
+	~VertexArray();
 
-	void bind();
-	void unbind();
-	void set_vbo(const VertexBuffer& vbo, const VertexLayout& layout);
+	void bind() const;
+	void unbind() const;
+	void complete_setup(std::unique_ptr<VertexBuffer> buffer, const VertexLayout& layout);
+
 private:
-	unsigned int m_id = 0;
+	uint32_t m_id = 0;
+	std::unique_ptr<VertexBuffer> m_vbo = nullptr;
 };
 

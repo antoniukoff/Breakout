@@ -17,9 +17,9 @@
 //
 //#define NORMALIZE_COLOR(color) color / 255.0f
 //
-//unsigned int load_texture(const std::string& file_name)
+//uint32_t load_texture(const std::string& file_name)
 //{
-//    unsigned int texture_id = 0;
+//    uint32_t texture_id = 0;
 //    glGenTextures(1, &texture_id);
 //    glBindTexture(GL_TEXTURE_2D, texture_id);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -30,7 +30,7 @@
 //    int width = 0;
 //    int height = 0;
 //    int n_channels = 0;
-//    unsigned char* data = stbi_load(file_name.c_str(), &width, &height, &n_channels, 0);
+//    uint32_t* data = stbi_load(file_name.c_str(), &width, &height, &n_channels, 0);
 //    if (!data)
 //    {
 //        glDeleteTextures(1, &texture_id);

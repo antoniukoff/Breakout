@@ -9,17 +9,17 @@ class Shader
 public:
 	Shader(const std::string& file_path);
 
-	void bind();
-	void unbind();
+	void bind() const;
+	void unbind() const;
 	void use_texture(Texture& texture, const std::string& sampler_name);
 
-	void upload_mat4(const std::string& uniform_name, const mat4& value);
+	void upload_mat4(const std::string& uniform_name, const mat4& value) const;
 
 	unsigned int get_id() const;
 private:
 
 	unsigned int find_available_texture_unit(int texture_type);
-	int	get_uniform(const std::string& name);
+	int	get_uniform(const std::string& name) const;
 
 	void									create_shader(const std::string& file_path);
 	std::tuple<std::string, std::string>	parse_shader(const std::string& file_path);
@@ -27,7 +27,7 @@ private:
 
 
 private:
-	std::unordered_map<std::string, int> m_uniform_map;
+	mutable std::unordered_map<std::string, int> m_uniform_map;
 	std::vector<TextureUnit> m_texture_units;
 	unsigned int m_id = 0;
 };

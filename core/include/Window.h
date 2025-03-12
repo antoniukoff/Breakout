@@ -17,11 +17,12 @@ public:
 	void poll_events();
 	void swap();
 
+	float get_aspect_ratio() const;
 	GLFWwindow* get_handle() const;
 
 private:
-	float width;
-	float height;
-	GLFWwindow* window = nullptr;
+	float m_width;
+	float m_height;
+	GLFWwindow* m_window = nullptr;
 };
 

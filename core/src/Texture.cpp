@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-Texture::Texture(const std::string& file_name, unsigned int type)
+Texture::Texture(const std::string& file_name, uint32_t type)
 	: m_type(type)
 {
 	load_texture(file_name);

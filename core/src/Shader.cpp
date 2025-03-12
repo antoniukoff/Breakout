@@ -17,17 +17,17 @@ Shader::Shader(const std::string& file_path)
 	m_texture_units.resize(max_texture_units);
 }
 
-void Shader::bind()
+void Shader::bind() const
 {
 	glUseProgram(m_id);
 }
 
-void Shader::unbind()
+void Shader::unbind() const
 {
 	glUseProgram(0);
 }
 
-void Shader::upload_mat4(const std::string& uniform_name, const mat4& value)
+void Shader::upload_mat4(const std::string& uniform_name, const mat4& value) const
 {
 	glUniformMatrix4fv(get_uniform(uniform_name), 1, GL_FALSE, &value(0, 0));
 }
@@ -37,7 +37,7 @@ unsigned int Shader::get_id() const
 	return m_id;
 }
 
-int Shader::get_uniform(const std::string& name)
+int Shader::get_uniform(const std::string& name) const
 {
 	if (m_uniform_map.contains(name))
 	{
@@ -103,8 +103,6 @@ std::tuple<std::string, std::string> Shader::parse_shader(const std::string& fil
 		}
 		ss[(int)type] << line << std::endl;
 	}
-
-	std::cout << ss[0].str() << ss[1].str() << std::endl;
 
 	return { ss[0].str(), ss[1].str() };
 }
@@ -172,11 +170,10 @@ unsigned int Shader::find_available_texture_unit(int texture_type)
 	for (int i = 0; i < m_texture_units.size(); ++i)
 	{
 		auto& current_unit = m_texture_units[i];
-		if (!current_unit.has_bound_texture(texture_type, EMPTY_TEXTURE_ID))
+		if (current_unit.has_bound_texture(texture_type, EMPTY_TEXTURE_ID))
 		{
-			continue;
+			return i;
 		}
-		return i;
 	}
 	return -1; /// Texture unit overflow
 }

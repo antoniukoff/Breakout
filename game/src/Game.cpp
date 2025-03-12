@@ -3,17 +3,12 @@
 #include <Window.h>
 #include <EventSystem.h>
 #include <Camera.h>
-#include <VertexBuffer.h>
-#include <VertexArray.h>
-#include <VertexLayout.h>
 #include <CubeTypes.h>
-
-#define NORMALIZE_COLOR(color) color / 255.0f
+#include <Renderer.h>
 
 vec3 camera_pos = { 0.0f, 0.0f, 0.5f };
 vec3 target_pos = { 0.0f, 0.0f, 0.0f };
 vec3 global_up = { 0.0f, 1.0f, 0.0f };
-
 
 class Game : public Application
 {
@@ -22,84 +17,43 @@ private:
 	EventSystem m_system;
 	Camera m_camera;
 	Shader shader;
-	Texture texture;
-	Texture texture_1;
-	VertexArray cube_vao;
+	Mesh cube;
+	Renderer renderer;
 
 public:
 	Game()
 		: m_window(800, 600, "VertexForge")
 		, m_system(m_window.get_handle())
-		, m_camera(camera_pos, target_pos, global_up)
 		, shader("assets/shaders/default.glsl")
-		, texture("assets/textures/wall.jpg", GL_TEXTURE_2D)
-		, texture_1("assets/textures/awesomeface.png", GL_TEXTURE_2D)
 	{
+		m_camera.init_view(camera_pos, target_pos, global_up);
+		m_camera.init_projection(m_window.get_aspect_ratio(), 90, 0.1f, 100.0f);
 
 		m_camera.register_key_events(m_system);
 		m_camera.register_mouse_events(m_system);
 
-		VertexBuffer cube_vbo;
-
-		cube_vbo.upload_data(get_textured_cube());
-
-		VertexLayout layout({
-			{0, 3, GL_FLOAT, GL_FALSE},
-			{1, 2, GL_FLOAT, GL_FALSE},
-			{2, 1, GL_FLOAT, GL_FALSE}
-			});
-
-
-		cube_vao.set_vbo(cube_vbo, layout);
-
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(NORMALIZE_COLOR(124.0f), NORMALIZE_COLOR(163.0f), NORMALIZE_COLOR(64.0f), NORMALIZE_COLOR(255.0f));
+		cube = Mesh(get_textured_cube());
 	}
 	void run() override
 	{
 		while (true)
 		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			static mat4 projection_matrix = mat4::calculate_projection(800.0f / 600.0f, 90.0f, 0.1f, 100.0f);
 			m_window.poll_events();
 			m_camera.update();
-			
-			shader.bind();
 
-			// Bind textures once per frame or when textures change
-			shader.use_texture(texture, "texture_0");
-			shader.use_texture(texture_1, "texture_1");
-
-			// Upload projection and view matrices once per frame
-			shader.upload_mat4("projection", projection_matrix);
-			shader.upload_mat4("view", m_camera.get_view_matrix());
-
-			// Bind VAO once for multiple draws
-			cube_vao.bind();
-
-			// Draw first cube
-			mat4 model_matrix = mat4::translate({ 0.0f, 0.0f, -20.0f });
-			shader.upload_mat4("model", model_matrix);
-			glDrawArrays(GL_TRIANGLES, 0, 216 / 6);
-
-			// Draw second cube (reuse same texture if possible)
-			model_matrix = mat4::translate({ -20.0f, 0.0f, -20.0f });
-			shader.upload_mat4("model", model_matrix);
-			glDrawArrays(GL_TRIANGLES, 0, 216 / 6);
-
-			// After all objects drawn
-			cube_vao.unbind();
-			shader.unbind();
+			renderer.begin_frame(m_camera);
+			mat4 cube_1 = mat4::translate({ 0.0f, 0.0f, -20.0f });
+			mat4 cube_2 = mat4::translate({ -20.0f, 0.0f, -20.0f });
+			renderer.submit(shader, cube, { cube_1, cube_2 });
 			
 			m_window.swap();
 		}
 	}
 };
 
-Application* create_application()
+std::unique_ptr<Application> create_application()
 {
-	return new Game();
+	return std::make_unique<Game>();
 }
 
 
@@ -122,9 +76,9 @@ Application* create_application()
 //
 //#define NORMALIZE_COLOR(color) color / 255.0f
 //
-//unsigned int load_texture(const std::string& file_name)
+//uint32_t load_texture(const std::string& file_name)
 //{
-//    unsigned int texture_id = 0;
+//    uint32_t texture_id = 0;
 //    glGenTextures(1, &texture_id);
 //    glBindTexture(GL_TEXTURE_2D, texture_id);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -135,7 +89,7 @@ Application* create_application()
 //    int width = 0;
 //    int height = 0;
 //    int n_channels = 0;
-//    unsigned char* data = stbi_load(file_name.c_str(), &width, &height, &n_channels, 0);
+//    uint32_t* data = stbi_load(file_name.c_str(), &width, &height, &n_channels, 0);
 //    if (!data)
 //    {
 //        glDeleteTextures(1, &texture_id);

@@ -1,24 +1,40 @@
 #include "VertexArray.h"
+#include <gl/glew.h>
 
 VertexArray::VertexArray()
 {
 	glGenVertexArrays(1, &m_id);
 }
 
-void VertexArray::set_vbo(const VertexBuffer& vbo, const VertexLayout& layout)
+VertexArray::~VertexArray()
 {
+	glDeleteVertexArrays(1, &m_id);
+}
+
+void VertexArray::complete_setup(std::unique_ptr<VertexBuffer> buffer, const VertexLayout& layout)
+{
+	m_vbo = std::move(buffer);
+
 	bind();
-	vbo.bind();
-	layout.enable_attributes();
+	m_vbo->bind();
+
+	uint32_t vertex_stride = layout.get_vertex_stride();
+	for (auto& attribute : layout)
+	{
+		glVertexAttribPointer(attribute.location, attribute.count, attribute.type, attribute.normalized, vertex_stride, (void*)attribute.offset);
+		glEnableVertexAttribArray(attribute.location);
+	}
 	unbind();
 }
 
-void VertexArray::bind()
+void VertexArray::bind() const
 {
 	glBindVertexArray(m_id);
 }
 
-void VertexArray::unbind()
+void VertexArray::unbind() const
 {
 	glBindVertexArray(0);
 }
+
+
