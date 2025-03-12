@@ -60,6 +60,11 @@ float vec3::mag() const
 	return sqrtf(x * x + y * y + z * z);
 }
 
+vec4 vec3::to_vec4() const
+{
+	return { x, y, z, 1.0f };
+}
+
 vec3 vec3::normalize(const vec3& vec)
 {
 	float mag = vec.mag();

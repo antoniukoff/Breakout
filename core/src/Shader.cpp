@@ -32,6 +32,22 @@ void Shader::upload_mat4(const std::string& uniform_name, const mat4& value) con
 	glUniformMatrix4fv(get_uniform(uniform_name), 1, GL_FALSE, &value(0, 0));
 }
 
+void Shader::upload_vec4(const std::string& uniform_name, const vec4& value) const
+{
+	glUniform4fv(get_uniform(uniform_name), 1, &value.x);
+}
+
+void Shader::upload_vec4(const std::string& uniform_name, const vec3& value) const
+{
+	vec4 v = value.to_vec4();
+	glUniform4fv(get_uniform(uniform_name), 1, &v.x);
+}
+
+void Shader::upload_vec3(const std::string& uniform_name, const vec3& value) const
+{
+	glUniform3fv(get_uniform(uniform_name), 1, &value.x);
+}
+
 unsigned int Shader::get_id() const
 {
 	return m_id;

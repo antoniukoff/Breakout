@@ -32,10 +32,19 @@ public:
 		m_camera.register_key_events(m_system);
 		m_camera.register_mouse_events(m_system);
 
-		cube = Mesh(get_textured_cube());
+		cube = Mesh(get_cube_with_normals());
 	}
 	void run() override
 	{
+		vec3 light_position = { -5.0f, 0.0f , 0.0f };
+		vec3 light_color = { 1.0f, 1.0f, 1.0f };
+		vec3 cube_color = { 0.0f, 0.34f, 0.47f };
+
+		shader.bind();
+		shader.upload_vec4("model_color", cube_color);
+		shader.upload_vec4("light_color", light_color);
+		shader.upload_vec3("light_position", light_position);
+
 		while (true)
 		{
 			m_window.poll_events();

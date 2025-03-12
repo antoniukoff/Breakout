@@ -14,6 +14,9 @@ public:
 	void use_texture(Texture& texture, const std::string& sampler_name);
 
 	void upload_mat4(const std::string& uniform_name, const mat4& value) const;
+	void upload_vec4(const std::string& uniform_name, const vec4& value) const;
+	void upload_vec4(const std::string& uniform_name, const vec3& value) const;
+	void upload_vec3(const std::string& uniform_name, const vec3& value) const;
 
 	unsigned int get_id() const;
 private:

@@ -18,8 +18,7 @@ Mesh::Mesh(const std::vector<float> data)
 	/// Create Layout
 	VertexLayout layout = {
 		{0, 3, GL_FLOAT, GL_FALSE},
-		{1, 2, GL_FLOAT, GL_FALSE},
-		{2, 1, GL_FLOAT, GL_FALSE}
+		{1, 3, GL_FLOAT, GL_FALSE},
 	};
 
 	m_vertex_count = buffer->get_attribute_count() * sizeof(float) / layout.get_vertex_stride();
