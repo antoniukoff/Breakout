@@ -5,13 +5,11 @@ VertexArray::VertexArray()
 	glGenVertexArrays(1, &m_id);
 }
 
-void VertexArray::set_vbo(const VertexBuffer& vbo)
+void VertexArray::set_vbo(const VertexBuffer& vbo, const VertexLayout& layout)
 {
-	this->vbo = vbo;
-
 	bind();
 	vbo.bind();
-	vbo.enable_layout();
+	layout.enable_attributes();
 	unbind();
 }
 

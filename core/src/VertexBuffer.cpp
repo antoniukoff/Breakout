@@ -15,15 +15,6 @@ void VertexBuffer::upload_data(const std::vector<float>& vertices)
 	unbind();
 }
 
-void VertexBuffer::set_layout(const VertexLayout& layout)
-{
-	m_layout = layout;
-}
-
-void VertexBuffer::enable_layout() const
-{
-	m_layout.enable_attributes();
-}
 
 void VertexBuffer::bind() const
 {

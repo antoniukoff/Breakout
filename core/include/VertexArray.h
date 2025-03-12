@@ -6,14 +6,10 @@ class VertexArray
 public:
 	VertexArray();
 
-	void set_vbo(const VertexBuffer& vbo);
-
 	void bind();
-
 	void unbind();
-
+	void set_vbo(const VertexBuffer& vbo, const VertexLayout& layout);
 private:
-	VertexBuffer vbo;
 	unsigned int m_id = 0;
 };
 

@@ -1,31 +1,30 @@
 #include "VertexLayout.h"
+#include "Utility.h"
+#include <iostream>
 #include <algorithm>
 
-void VertexLayout::create_layout(std::vector<VertexAttibute>&& attributes)
+VertexLayout::VertexLayout(const std::vector<VertexAttribute> attributes)
+	: m_attributes(attributes)
 {
-	std::sort(attributes.begin(), attributes.end(), [](const VertexAttibute& a1, const VertexAttibute& a2)
+	create_layout();
+}
+
+void VertexLayout::create_layout()
+{
+	std::sort(m_attributes.begin(), m_attributes.end(), [](const VertexAttribute& a1, const VertexAttribute& a2)
 		{
 			return a1.location < a2.location;
 		});
 
-	int total_bytes = 0;
+	int offset = 0;
 
-	for (const auto& attribute : attributes)
+	for (auto& attribute : m_attributes)
 	{
-		void* stride = (void*)(total_bytes);
+		attribute.offset = offset;
 
-		VertexAttibute a = {
-			.location = attribute.location,
-			.count = attribute.count,
-			.type = attribute.type,
-			.normalized = attribute.normalized,
-			.stride = stride
-		};
-
-		m_attributes.push_back(a);
 		unsigned int attribute_size = attribute.count * gl_utils::gl_type_to_cpp_size(attribute.type);
-		total_bytes += attribute_size;
-		byte_offset += attribute_size;
+		offset += attribute_size;
+		stride += attribute_size;
 	}
 }
 
@@ -33,7 +32,7 @@ void VertexLayout::enable_attributes() const
 {
 	for (auto& attribute : m_attributes)
 	{
-		glVertexAttribPointer(attribute.location, attribute.count, attribute.type, attribute.normalized, byte_offset, attribute.stride);
+		glVertexAttribPointer(attribute.location, attribute.count, attribute.type, attribute.normalized, stride, (void*)attribute.offset);
 		glEnableVertexAttribArray(attribute.location);
 	}
 }

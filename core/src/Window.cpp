@@ -17,6 +17,9 @@ Window::Window(float width, float height, const std::string& name)
 	window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 	glViewport(0, 0, width, height);
 	glfwSwapInterval(1);
+
+	initialize_context(3, 3, true);
+
 }
 
 void Window::initialize_context(int major, int minor, bool use_core)

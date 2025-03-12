@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Utility.h"
 
 #include <gl/glew.h>
 
@@ -9,6 +10,11 @@
 Shader::Shader(const std::string& file_path)
 {
 	create_shader(file_path);
+
+	int max_texture_units;
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+	
+	m_texture_units.resize(max_texture_units);
 }
 
 void Shader::bind()
@@ -125,5 +131,53 @@ int Shader::compile_shader(unsigned int type, const std::string& source)
 	}
 
 	return id;
+}
+
+void Shader::use_texture(Texture& texture, const std::string& sampler_name)
+{
+	auto texture_id   = texture.get_id();
+	auto texture_type = texture.get_type();
+
+	int sampler_id = get_uniform(sampler_name);
+	if (sampler_id == -1)
+	{
+		/// Uniform not found
+		return;
+	}
+
+	/// Check if the texture is bound to the unit
+	auto it = std::find_if(m_texture_units.begin(), m_texture_units.end(), [&](const TextureUnit& unit)
+		{
+			return unit.has_bound_texture(texture_type, texture_id);
+		});
+
+	if (it != m_texture_units.end())
+	{
+		return;
+	}
+	
+	/// Find available unit
+	unsigned int unit_index = find_available_texture_unit(texture_type);
+
+	m_texture_units[unit_index].assign_texture(texture_type, texture_id);
+
+	glActiveTexture(GL_TEXTURE0 + unit_index);
+	glBindTexture(texture_type, texture_id);
+
+	glUniform1i(sampler_id, unit_index);
+}
+
+unsigned int Shader::find_available_texture_unit(int texture_type)
+{
+	for (int i = 0; i < m_texture_units.size(); ++i)
+	{
+		auto& current_unit = m_texture_units[i];
+		if (!current_unit.has_bound_texture(texture_type, EMPTY_TEXTURE_ID))
+		{
+			continue;
+		}
+		return i;
+	}
+	return -1; /// Texture unit overflow
 }
 
