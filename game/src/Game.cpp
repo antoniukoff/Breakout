@@ -1,3 +1,6 @@
+#include <iostream>
+
+
 #include <Application.h>
 #include <Shader.h>
 #include <Window.h>
@@ -5,6 +8,8 @@
 #include <Camera.h>
 #include <CubeTypes.h>
 #include <Renderer.h>
+#include <registry.h>
+#include "Components.h"
 
 vec3 camera_pos = { 0.0f, 0.0f, 0.5f };
 vec3 target_pos = { 0.0f, 0.0f, 0.0f };
@@ -26,6 +31,21 @@ public:
 		, m_system(m_window.get_handle())
 		, shader("assets/shaders/default.glsl")
 	{
+		registry<Transform> m_registry;
+
+		auto e = m_registry.create_entity();
+		auto e1 = m_registry.create_entity();
+		m_registry.add<Transform>(e, 2.0f, 1.0f);
+		m_registry.add<Transform>(e1, 2.0f, 3.0f);
+		auto [transform] = m_registry.unpack<Transform>(e);
+		std::cout << transform.x() << transform.y() << std::endl;
+		m_registry.for_each<Transform>([&](entity_id e, component_handle<Transform> transform)
+		{
+			std::cout << transform.x() << transform.y() << std::endl;
+			m_registry.remove<Transform>(e);
+		});
+		std::cout << transform.x() << transform.y() << std::endl;
+
 		m_camera.init_view(camera_pos, target_pos, global_up);
 		m_camera.init_projection(m_window.get_aspect_ratio(), 90.0f, 0.1f, 100.0f);
 

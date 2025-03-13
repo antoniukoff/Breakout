@@ -16,7 +16,6 @@ public:
 	Mesh& operator=(Mesh&& other) noexcept;
 
 	void bind() const;
-
 	void unbind() const;
 
 	uint32_t get_vertex_count() const;

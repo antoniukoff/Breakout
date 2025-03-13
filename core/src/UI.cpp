@@ -2,7 +2,6 @@
 #include "imgui.h"
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
-#include "Light.h"
 #include "Material.h"
 
 void UI::initialize(GLFWwindow* window_handle)
@@ -39,13 +38,7 @@ void UI::present_ui(Light& light_properties, Material& material)
 {
 	ImGui::Begin("Scene Parameters");
 
-	ImGui::Text("Light Properties");
-	ImGui::Separator();
-	ImGui::SliderFloat("Light Ambient", &light_properties.ambient, 0.0f, 1.0f);
-	ImGui::SliderFloat("Light Diffuse", &light_properties.diffuse, 0.0f, 1.0f);
-	ImGui::SliderFloat("Light Specular", &light_properties.specular, 0.0f, 1.0f);
-	ImGui::ColorEdit4("Light Color", (float*)&light_properties.color);
-
+	
 	ImGui::Spacing(); // Adds some space before the next section
 	ImGui::Text("Cube Material Properties");
 	ImGui::Separator();

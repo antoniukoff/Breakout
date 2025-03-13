@@ -21,7 +21,6 @@ workspace "Breakout"
             (vendordir .. "/imgui/imgui"),
             (vendordir .. "/imgui/imgui/backends"),
             (vendordir .. "/stb"),
-            (vendordir .. "/reflecs/include"),
             "%{prj.name}/include"
         }
 
@@ -44,7 +43,6 @@ workspace "Breakout"
             (vendordir .. "/imgui/imgui/backends/imgui_impl_glfw.h"),
             (vendordir .. "/imgui/imgui/backends/imgui_impl_opengl3.cpp"),
             (vendordir .. "/imgui/imgui/backends/imgui_impl_opengl3.h"),
-            (vendordir .. "/reflecs/include/**.h"),
         }
 
         vpaths {
