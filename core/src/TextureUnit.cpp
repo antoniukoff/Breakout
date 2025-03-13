@@ -1,5 +1,5 @@
 #include "TextureUnit.h"
-#include "Utility.h"
+#include "GLUtils.h"
 
 TextureUnit::TextureUnit()
 {

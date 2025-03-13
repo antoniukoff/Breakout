@@ -1,5 +1,5 @@
 #include "VertexLayout.h"
-#include "Utility.h"
+#include "GLUtils.h"
 #include <iostream>
 #include <algorithm>
 
