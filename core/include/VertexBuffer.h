@@ -1,5 +1,17 @@
 #pragma once
 #include "VertexLayout.h"
+#include "math/vec3.h"
+#include "math/vec2.h"
+
+struct Face
+{
+	struct Vertex
+	{
+		vec3 position;
+		vec2 uv;
+		vec3 normal;
+	} v[3];
+};
 
 class VertexBuffer
 {
@@ -8,13 +20,10 @@ public:
     ~VertexBuffer();
 
     void upload_data(const std::vector<float>& vertices);
+    void upload_data(const std::vector<Face>& faces);
     void bind() const;
     void unbind();
 
-    inline uint32_t get_attribute_count() const
-    {
-        return m_total_count;
-    }
 
     inline uint32_t get_id() const
     {
@@ -23,6 +32,5 @@ public:
 
 private:
     uint32_t m_id = 0;
-    uint32_t m_total_count = 0;
 };
 

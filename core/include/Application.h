@@ -4,8 +4,7 @@
 class Application
 {
 public:
-	virtual void run()
-	{};
+	virtual void run() = 0;
 };
 
 

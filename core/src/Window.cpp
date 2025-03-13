@@ -19,7 +19,6 @@ Window::Window(float width, float height, const std::string& name)
 	glfwSwapInterval(1);
 
 	initialize_context(3, 3, true);
-
 }
 
 void Window::initialize_context(int major, int minor, bool use_core)

@@ -7,6 +7,7 @@
 class Shader
 {
 public:
+	Shader() = default;
 	Shader(const std::string& file_path);
 
 	void bind() const;
