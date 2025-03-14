@@ -2,7 +2,11 @@
 
 #define TO_RAD(degrees) degrees * (3.14159265358979323846 / 180)
 
-struct vec4;
+struct vec4
+{
+	float x, y, z;
+	float w = 1.0f;
+};
 
 struct vec3
 {
@@ -28,8 +32,4 @@ struct vec3
     static float dot(const vec3& left, const vec3& right);
 };
 
-struct vec4
-{
-    float x, y, z;
-    float w = 1.0f;
-};
+

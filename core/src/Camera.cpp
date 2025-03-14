@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "EventSystem.h"
-#include <GLFW/glfw3.h>
+#include "Input.h"
 
 Camera::Camera()
 {}

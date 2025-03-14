@@ -75,7 +75,9 @@ workspace "Breakout"
         targetdir ("bin/" .. outputdir .. "/%{prj.name}")
         objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-        includedirs "core/include"
+        includedirs {
+            "core/include"
+        }    
 
         links "core"
 

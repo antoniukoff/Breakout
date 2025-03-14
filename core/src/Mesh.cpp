@@ -21,6 +21,7 @@ Mesh::Mesh(const std::vector<float> data)
 	/// Create Layout
 	VertexLayout layout = {
 		{0, 3, GL_FLOAT, GL_FALSE},
+		{1, 2, GL_FLOAT, GL_FALSE},
 		{2, 3, GL_FLOAT, GL_FALSE},
 	};
 

@@ -39,13 +39,7 @@ void UI::present_ui(Light& light_properties, Material& material)
 	ImGui::Begin("Scene Parameters");
 
 	
-	ImGui::Spacing(); // Adds some space before the next section
-	ImGui::Text("Cube Material Properties");
-	ImGui::Separator();
-	ImGui::ColorEdit3("Material Ambient", (float*)&material.ambient);
-	ImGui::ColorEdit3("Material Diffuse", (float*)&material.diffuse);
-	ImGui::ColorEdit3("Material Specular", (float*)&material.specular);
-	ImGui::SliderFloat("Material Shininess", &material.shininess, 1.0f, 500.0f);
+	
 
 	ImGui::End();
 

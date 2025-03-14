@@ -1,16 +1,16 @@
 #include "Texture.h"
-#include "GLUtils.h"
+#include <GL/glew.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include <algorithm>
 
-Texture::Texture(const std::string& file_name, uint32_t type)
+Texture::Texture(const std::string& file_name, unsigned int type)
 	: m_type(type)
 {
 	load_texture(file_name);
 }
+
 
 Texture::~Texture()
 {

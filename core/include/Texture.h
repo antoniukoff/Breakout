@@ -1,12 +1,11 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <GL/glew.h>
-#include "TextureUnit.h"
 
 class Texture
 {
 public:
+	Texture() = default;
 	Texture(const std::string& file_name, unsigned int type);
 	~Texture();
 
@@ -24,7 +23,7 @@ private:
 	void load_texture(const std::string& file_name);
 
 private:
-	unsigned int m_type = GL_TEXTURE_2D;
+	unsigned int m_type;
 	unsigned int m_id = 0;
 };
 

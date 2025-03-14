@@ -14,7 +14,6 @@ Shader::Shader(const std::string& file_path)
 	int max_texture_units;
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 	
-	m_texture_units.resize(max_texture_units);
 }
 
 void Shader::bind() const
@@ -27,25 +26,30 @@ void Shader::unbind() const
 	glUseProgram(0);
 }
 
-void Shader::upload_mat4(const std::string& uniform_name, const mat4& value) const
+void Shader::upload_mat4(const std::string& uniform_name, const mat4& value) 
 {
 	glUniformMatrix4fv(get_uniform(uniform_name), 1, GL_FALSE, &value(0, 0));
 }
 
-void Shader::upload_vec4(const std::string& uniform_name, const vec4& value) const
+void Shader::upload_vec4(const std::string& uniform_name, const vec4& value) 
 {
 	glUniform4fv(get_uniform(uniform_name), 1, &value.x);
 }
 
-void Shader::upload_vec4(const std::string& uniform_name, const vec3& value) const
+void Shader::upload_vec4(const std::string& uniform_name, const vec3& value) 
 {
 	vec4 v = value.to_vec4();
 	glUniform4fv(get_uniform(uniform_name), 1, &v.x);
 }
 
-void Shader::upload_vec3(const std::string& uniform_name, const vec3& value) const
+void Shader::upload_vec3(const std::string& uniform_name, const vec3& value) 
 {
 	glUniform3fv(get_uniform(uniform_name), 1, &value.x);
+}
+
+void Shader::upload_float(const std::string& uniform_name, float value)
+{
+	glUniform1f(get_uniform(uniform_name), value);
 }
 
 unsigned int Shader::get_id() const
@@ -53,7 +57,7 @@ unsigned int Shader::get_id() const
 	return m_id;
 }
 
-int Shader::get_uniform(const std::string& name) const
+int Shader::get_uniform(const std::string& name) 
 {
 	if (m_uniform_map.contains(name))
 	{
@@ -63,6 +67,7 @@ int Shader::get_uniform(const std::string& name) const
 	int u_id = glGetUniformLocation(m_id, name.c_str());
 	if (u_id == -1)
 	{
+		std::cout << " Uniform " << name << " not found" << std::endl;
 		return -1;
 	}
 	m_uniform_map[name] = u_id;
@@ -147,17 +152,12 @@ int Shader::compile_shader(unsigned int type, const std::string& source)
 	return id;
 }
 
-void Shader::use_texture(Texture& texture, const std::string& sampler_name)
+void Shader::upload_texture(const std::string& sampler_name, Texture& texture)
 {
-	auto texture_id   = texture.get_id();
+	/*auto texture_id   = texture.get_id();
 	auto texture_type = texture.get_type();
 
 	int sampler_id = get_uniform(sampler_name);
-	if (sampler_id == -1)
-	{
-		/// Uniform not found
-		return;
-	}
 
 	/// Check if the texture is bound to the unit
 	auto it = std::find_if(m_texture_units.begin(), m_texture_units.end(), [&](const TextureUnit& unit)
@@ -178,19 +178,19 @@ void Shader::use_texture(Texture& texture, const std::string& sampler_name)
 	glActiveTexture(GL_TEXTURE0 + unit_index);
 	glBindTexture(texture_type, texture_id);
 
-	glUniform1i(sampler_id, unit_index);
+	glUniform1i(sampler_id, unit_index);*/
 }
 
 unsigned int Shader::find_available_texture_unit(int texture_type)
 {
-	for (int i = 0; i < m_texture_units.size(); ++i)
+	/*for (int i = 0; i < m_texture_units.size(); ++i)
 	{
 		auto& current_unit = m_texture_units[i];
 		if (current_unit.has_bound_texture(texture_type, EMPTY_TEXTURE_ID))
 		{
 			return i;
 		}
-	}
+	}*/
 	return -1; /// Texture unit overflow
 }
 

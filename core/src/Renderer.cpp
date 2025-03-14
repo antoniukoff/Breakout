@@ -1,6 +1,9 @@
-#include "Renderer.h"
-
 #include <GL/glew.h>
+
+#include "Renderer.h"
+#include "Camera.h"
+#include "Material.h"
+#include "Mesh.h"
 
 Renderer::Renderer()
 {
@@ -17,21 +20,24 @@ void Renderer::begin_frame(Camera& camera)
 	m_view_matrix		= camera.get_view_matrix();
 	m_projection_matrix = camera.get_projection_matrix();
 
+	current_material = nullptr;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::submit(const Shader& shader, const Mesh& mesh, std::vector<mat4> model_matrix)
+void Renderer::submit(Material* material, Mesh* mesh, const mat4& model_matrix)
 {
-	shader.bind();
-	shader.upload_mat4("view_matrix", m_view_matrix);
-	shader.upload_mat4("projection_matrix", m_projection_matrix);
-	mesh.bind();
-	for (int i = 0; i < model_matrix.size(); i++)
+	if (&current_material != &material)
 	{
-		shader.upload_mat4("model_matrix", model_matrix[i]);
-		glDrawArrays(GL_TRIANGLES, 0, mesh.get_vertex_count());
+		material->set_mat("view_matrix", m_view_matrix);
+		material->set_mat("projection_matrix", m_projection_matrix);
+		current_material = material;
 	}
-	mesh.unbind();
+	material->set_mat("model_matrix", model_matrix);
+
+	material->bind();
+	mesh->bind();
+	glDrawArrays(GL_TRIANGLES, 0, mesh->get_vertex_count());
 }
 
 void Renderer::end_frame()

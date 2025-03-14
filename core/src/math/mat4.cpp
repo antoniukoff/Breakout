@@ -1,4 +1,6 @@
 #include "math/mat4.h"
+#include "math/vec3.h"
+
 #include <iostream> 
 
 mat4 mat4::translate(vec3 pos)
@@ -10,6 +12,34 @@ mat4 mat4::translate(vec3 pos)
     t_matrix(2, 3) = pos.z;
 
     return t_matrix;
+}
+
+mat4 mat4::scale(vec3 scale)
+{
+	mat4 t_matrix;
+	t_matrix.load_identity();
+	t_matrix(0, 0) = scale.x;
+	t_matrix(1, 1) = scale.y;
+	t_matrix(2, 2) = scale.z;
+
+	return t_matrix;
+}
+
+mat4 mat4::rotate_x(float amount, bool to_rad)
+{
+	mat4 rotation;
+	float rad_amount = (to_rad) ? TO_RAD(amount) : amount;
+	float cos_theta = cosf(rad_amount);
+	float sin_theta = sinf(rad_amount);
+
+	rotation(0, 0) = 1.0f;
+	rotation(1, 1) = cos_theta;
+	rotation(1, 2) = -sin_theta;
+	rotation(2, 1) = sin_theta;
+	rotation(2, 2) = cos_theta;
+	rotation(3, 3) = 1.0f;
+
+	return rotation;
 }
 
 mat4 mat4::rotate_y(float amount, bool to_rad)
@@ -29,21 +59,21 @@ mat4 mat4::rotate_y(float amount, bool to_rad)
     return rotation;
 }
 
-mat4 mat4::rotate_x(float amount, bool to_rad)
+mat4 mat4::rotate_z(float amount, bool to_rad)
 {
-    mat4 rotation;
-    float rad_amount = (to_rad) ? TO_RAD(amount) : amount;
-    float cos_theta = cosf(rad_amount);
-    float sin_theta = sinf(rad_amount);
+	mat4 rotation;
+	float rad_amount = (to_rad) ? TO_RAD(amount) : amount;
+	float cos_theta = cosf(rad_amount);
+	float sin_theta = sinf(rad_amount);
 
-    rotation(0, 0) = 1.0f;
-    rotation(1, 1) = cos_theta;
-    rotation(1, 2) = -sin_theta;
-    rotation(2, 1) = sin_theta;
-    rotation(2, 2) = cos_theta;
-    rotation(3, 3) = 1.0f;
+	rotation(0, 0) = cos_theta;
+	rotation(0, 1) = -sin_theta;
+    rotation(1, 0) = sin_theta;
+	rotation(1, 1) = cos_theta;
+	rotation(2, 2) = 1.0f;
+	rotation(3, 3) = 1.0f;
 
-    return rotation;
+	return rotation;
 }
 
 void mat4::mult_vec_by_mat(const mat4& mat, vec3& vec)
