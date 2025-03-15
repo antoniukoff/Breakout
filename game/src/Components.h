@@ -68,18 +68,18 @@ DEFINE_COMPONENT_HANDLE(CircleColliderComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, float, radius)
 )
 
-struct MovementComponent
+struct RigidBodyComponent
 {
 	vec3 velocity;
 };
 
 ANNOTATE(
-	MovementComponent,
+	RigidBodyComponent,
 	1,
-	DEFINE_COMPONENT_MEMBER(MovementComponent, 0, vec3, velocity)
+	DEFINE_COMPONENT_MEMBER(RigidBodyComponent, 0, vec3, velocity)
 )
 
-DEFINE_COMPONENT_HANDLE(MovementComponent,
+DEFINE_COMPONENT_HANDLE(RigidBodyComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, vec3, velocity)
 )
 
@@ -123,4 +123,28 @@ ANNOTATE(
 DEFINE_COMPONENT_HANDLE(RenderComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, Mesh*, mesh)
 	COMPONENT_HANDLE_ACCESSOR(1, Material*, material)
+)
+
+struct CameraShakeComponent
+{
+	bool is_active = false;
+	float duration = 5.0f;
+	float time_elapsed = 0.0f;
+	float intensity = 1.0f;
+};
+
+ANNOTATE(
+	CameraShakeComponent,
+	4,
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 0, bool, is_active)
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 1, float, duration)
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 2, float, time_elapsed)
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 3, float, intensity)
+)
+
+DEFINE_COMPONENT_HANDLE(CameraShakeComponent,
+	COMPONENT_HANDLE_ACCESSOR(0, bool, is_active)
+	COMPONENT_HANDLE_ACCESSOR(1, float, duration)
+	COMPONENT_HANDLE_ACCESSOR(2, float, time_elapsed)
+	COMPONENT_HANDLE_ACCESSOR(3, float, intensity)
 )

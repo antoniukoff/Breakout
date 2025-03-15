@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Input.h"
+#include <iostream>
 
 Camera::Camera()
 {}
@@ -9,6 +10,8 @@ void Camera::init_view(vec3 from, vec3 at, vec3 up)
 	m_camera_pos = from;
 	m_target = at;
 	m_up = up;
+	m_look_dir = vec3::normalize(at - from);
+
 	m_view_matrix = mat4::calculate_view_matrix(from, at, up);
 }
 
@@ -29,8 +32,6 @@ const mat4& Camera::get_view_matrix()
 
 void Camera::update()
 {
-	rotate_camera();
-
 	vec3 forward = vec3::normalize(m_target - m_camera_pos);
 	vec3 right = vec3::normalize(vec3::cross(forward, m_up));
 
@@ -58,25 +59,11 @@ const vec3& Camera::get_position() const
 	return m_camera_pos;
 }
 
-void Camera::rotate_camera()
+void Camera::follow(const vec3& position)
 {
-	if (!m_is_rotating)
-	{
-		return;
-	}
+	m_camera_pos += position;
+	m_target += position;
 
-	vec3 look_dir = { 0.0f, 0.0f, -1.0f };
-
-	vec3 rotation_dir = m_on_drag - m_on_drag_begin;
-
-	float curr_yaw	 = yaw + rotation_dir.x;
-	float curr_pitch = pitch + rotation_dir.y;
-
-	mat4 m_yaw		= mat4::rotate_y(curr_yaw, false);
-	mat4 m_pitch	= mat4::rotate_x(curr_pitch, false);
-	mat4 m_combined = mat4::mult_mat_by_mat(m_yaw, m_pitch);
-	mat4::mult_vec_by_mat(m_combined, look_dir);
-
-	m_target	= m_camera_pos + look_dir;
-	m_is_dirty	= true;
+	m_is_dirty = true;
 }
+

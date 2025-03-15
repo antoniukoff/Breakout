@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Renderer.h"
+#include <random>
 
 Game::Game() 
 	: Application(800, 600, "Breakout")
@@ -31,27 +32,28 @@ Game::Game()
 void Game::initialize_level()
 {
 	create_walls();
-	create_ball({0.0f, 0.0f, -37.5f});
+	create_boxes();
+	create_ball({0.0f, -15.0f, -37.5f});
 	create_paddle();
 }
 
 void Game::create_paddle()
 {
-	vec3 paddle_position = vec3{ 0.0f, -20.0f, -37.5f };
+	vec3 paddle_position = vec3{ 0.0f, -30.0f, -37.5f };
 	vec3 paddle_scale = vec3{ 5.0f, 2.0f, 1.0f };
 
-	auto e = m_registry.create_entity();
-	m_registry.add<TransformComponent>(e, paddle_position, paddle_position, paddle_scale);
-	m_registry.add<InputComponent>(e);
-	m_registry.add<BoxColliderComponent>(e, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
-	m_registry.add<RenderComponent>(e, &paddle, &shiny);
+	paddle_id = m_registry.create_entity();
+	m_registry.add<TransformComponent>(paddle_id, paddle_position, paddle_position, paddle_scale);
+	m_registry.add<InputComponent>(paddle_id);
+	m_registry.add<BoxColliderComponent>(paddle_id, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
+	m_registry.add<RenderComponent>(paddle_id, &paddle, &shiny);
 }
 
 void Game::create_ball(vec3 position)
 {
 	auto e = m_registry.create_entity();
 	m_registry.add<TransformComponent>(e, position, position, vec3{ 1.0f, 1.0f, 1.0f });
-	m_registry.add<MovementComponent>(e, vec3{-0.5f, -0.5f, 0.0f });
+	m_registry.add<RigidBodyComponent>(e, vec3{-0.5f, -0.5f, 0.0f });
 	m_registry.add<CircleColliderComponent>(e, 1.0f);
 	m_registry.add<RenderComponent>(e, &sphere, &shiny);
 }
@@ -95,14 +97,45 @@ void Game::create_walls()
 
 }
 
+void Game::create_boxes()
+{
+	uint32_t number_of_boxes_x = 5;
+	uint32_t number_of_boxes_y = 4;
+
+	vec3 box_scale = { 3.0f, 1.0f, 1.0f };
+
+	float offset_x = 6.0f;
+	float offset_y = 3.0f;
+
+	vec3 init_box_position = vec3{ -25.0f, 15.0f, -37.5f };
+
+	float position_offset_x = box_scale.x * 2.0f + offset_x;
+	float position_offset_y = -box_scale.y * 2.0f - offset_y;
+
+	for (uint32_t y = 0; y < number_of_boxes_y; y++)
+	{
+		for (uint32_t x = 0; x < number_of_boxes_x; x++)
+		{
+			auto e = m_registry.create_entity();
+			vec3 position = { init_box_position.x + x * position_offset_x, init_box_position.y + y * position_offset_y, init_box_position.z };
+
+			m_registry.add<TransformComponent>(e, position, position, box_scale);
+			m_registry.add<RenderComponent>(e, &paddle, &shiny);
+			m_registry.add<BoxColliderComponent>(e, vec2{ 2.0f * box_scale.x, 2.0f * box_scale.y });
+			m_registry.add<CameraShakeComponent>(e);
+
+		}
+	}
+}
+
 void Game::on_update() 
 {
-	//m_camera.update();
+	m_camera.update();
 
-	m_registry.for_each<TransformComponent, MovementComponent>([this](
+	m_registry.for_each<TransformComponent, RigidBodyComponent>([this](
 		entity_id e_id,
 		component_handle<TransformComponent> transform_component,
-		component_handle<MovementComponent> movement_component)
+		component_handle<RigidBodyComponent> movement_component)
 		{
 			auto& velocity = movement_component.velocity();
 			auto& position = transform_component.position();
@@ -132,15 +165,6 @@ void Game::on_update()
 				position += {  0.5, 0.0f, 0.0f };
 
 			}
-			if (Input::is_key_pressed(GLFW_KEY_W))
-			{
-				position += {0.0f, 0.5, 0.0f};
-			}
-			if (Input::is_key_pressed(GLFW_KEY_S))
-			{
-				position += {0.0f, -0.5, 0.0f};
-
-			}
 			if (Input::is_key_pressed(GLFW_KEY_E))
 			{
 				angle -= 1.0f;
@@ -149,9 +173,18 @@ void Game::on_update()
 			{
 				angle += 1.0f;
 			}
+
+			vec3 delta_position = position - prev_position;
+
+			if ((position - prev_position).mag() > 0.0f)
+			{
+				m_camera.follow(delta_position);
+			}
 		});
 	
 	ball_collision();
+
+	shake_camera();
 }
 vec2 clamp(vec2 to_clamp, vec2 min, vec2 max)
 {
@@ -163,14 +196,14 @@ vec2 clamp(vec2 to_clamp, vec2 min, vec2 max)
 void Game::ball_collision()
 {
 	m_registry.for_each<TransformComponent, BoxColliderComponent>([&](
-		entity_id e_id,
+		entity_id box,
 		component_handle<TransformComponent> paddle_transform,
 		component_handle<BoxColliderComponent> box_collider)
 		{
-			m_registry.for_each<TransformComponent, MovementComponent, CircleColliderComponent>([&](
-				entity_id e_id,
+			m_registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent>([&](
+				entity_id circle,
 				component_handle<TransformComponent> circle_transform,
-				component_handle<MovementComponent> circle_movement,
+				component_handle<RigidBodyComponent> circle_movement,
 				component_handle<CircleColliderComponent> circle_collider)
 				{
 					vec3& ball_pos = circle_transform.position();
@@ -232,12 +265,21 @@ void Game::ball_collision()
 						vec3 reflected_v = ball_velocity - v_projected * 2.0f;
 						ball_velocity = reflected_v;
 
-						std::cout << "Ball Collided" << std::endl;
+						m_registry.for_each<CameraShakeComponent>([&](
+							entity_id e_id,
+							component_handle<CameraShakeComponent> camera_shake)
+							{
+								if (box != e_id)
+								{
+									return;
+								}
+
+								camera_shake.is_active() = true;
+							});
 					}
 				});
 		});
 }
-
 
 
 void Game::render(float interval)
@@ -265,6 +307,46 @@ void Game::render(float interval)
 		});
 
 	render_colliders();
+}
+
+void Game::shake_camera()
+{
+	static std::mt19937 rng(time(nullptr));
+	static std::uniform_real_distribution<float> shake_offset(-1.0f, 1.0f);
+
+	/// dispatch if brick is not destroyable to the system check if there is entity assigned already
+	m_registry.for_each<CameraShakeComponent>([&](
+		entity_id e_id,
+		component_handle<CameraShakeComponent> camera_shake)
+		{
+
+			bool& is_active = camera_shake.is_active();
+			float intensity = camera_shake.intensity();
+			float& time_elapsed = camera_shake.time_elapsed();
+			float shake_duration = camera_shake.duration();
+			if (!is_active)
+			{
+				return;
+			}
+
+			time_elapsed += 0.05f;
+
+			if (time_elapsed >= shake_duration)
+			{
+				is_active = false;
+				time_elapsed = 0.0f;
+				return;
+			}
+
+			/// Fade out the shakiness
+			float strength = intensity * (1.0f - time_elapsed / shake_duration);
+
+			float yaw_offset = shake_offset(rng) * strength;
+			float pitch_offset = shake_offset(rng) * strength;
+
+			m_camera.add_yaw(yaw_offset);
+			m_camera.add_pitch(pitch_offset);
+		});
 }
 
 void Game::render_colliders()
