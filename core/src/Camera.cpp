@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include "EventSystem.h"
 #include "Input.h"
 
 Camera::Camera()
@@ -28,89 +27,6 @@ const mat4& Camera::get_view_matrix()
 	return m_view_matrix;
 }
 
-void Camera::register_key_events(EventSystem& system)
-{
-	// W key
-	system.register_key_event(GLFW_KEY_W, GLFW_PRESS,
-		[&](int key, int action, int x, int y)
-		{
-			move_forward = true;
-		});
-	system.register_key_event(GLFW_KEY_W, GLFW_RELEASE,
-		[&](int key, int action, int x, int y)
-		{
-			move_forward = false;
-		});
-
-	// S key
-	system.register_key_event(GLFW_KEY_S, GLFW_PRESS,
-		[&](int key, int action, int x, int y)
-		{
-			move_backward = true;
-		});
-	system.register_key_event(GLFW_KEY_S, GLFW_RELEASE,
-		[&](int key, int action, int x, int y)
-		{
-			move_backward = false;
-		});
-
-	// A key
-	system.register_key_event(GLFW_KEY_A, GLFW_PRESS,
-		[&](int key, int action, int x, int y)
-		{
-			move_left = true;
-		});
-	system.register_key_event(GLFW_KEY_A, GLFW_RELEASE,
-		[&](int key, int action, int x, int y)
-		{
-			move_left = false;
-		});
-
-	// D key
-	system.register_key_event(GLFW_KEY_D, GLFW_PRESS,
-		[&](int key, int action, int x, int y)
-		{
-			move_right = true;
-		});
-	system.register_key_event(GLFW_KEY_D, GLFW_RELEASE,
-		[&](int key, int action, int x, int y)
-		{
-			move_right = false;
-		});
-}
-
-void Camera::register_mouse_events(EventSystem& system)
-{
-	system.register_mouse_event(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS,
-		[&](int key, int action, double x, double y)
-		{
-			m_is_rotating = true;
-			auto [rel_x, rel_y] = system.get_rel_mouse_pos();
-			m_on_drag_begin = { rel_x, rel_y, 0.0f };
-		});
-
-	system.register_mouse_event(GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE,
-		[&](int key, int action, double x, double y)
-		{
-			m_is_rotating = false;
-
-			vec3 on_drag_end = m_on_drag - m_on_drag_begin;
-
-			yaw += on_drag_end.x;
-			pitch += on_drag_end.y;
-
-			m_on_drag_begin = {};
-			m_on_drag = {};
-		});
-
-	system.register_mouse_moved_event(typeid(this).hash_code(), 1,
-		[&](int key, int action, int x, int y)
-		{
-			auto [rel_x, rel_y] = system.get_rel_mouse_pos();
-			m_on_drag = { rel_x, rel_y, 0.0f };
-		});
-}
-
 void Camera::update()
 {
 	rotate_camera();
@@ -119,13 +35,13 @@ void Camera::update()
 	vec3 right = vec3::normalize(vec3::cross(forward, m_up));
 
 	vec3 move_direction = {};
-	if (move_forward)
+	if (Input::is_key_pressed(GLFW_KEY_W))
 		move_direction += forward;
-	if (move_backward)
+	if (Input::is_key_pressed(GLFW_KEY_S))
 		move_direction -= forward;
-	if (move_right)
+	if (Input::is_key_pressed(GLFW_KEY_D))
 		move_direction += right;
-	if (move_left)
+	if (Input::is_key_pressed(GLFW_KEY_A))
 		move_direction -= right;
 
 	if (move_direction.mag() > 0.0f)

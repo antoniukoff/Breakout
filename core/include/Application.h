@@ -1,20 +1,15 @@
 #pragma once
 #include <memory>
+
 #include "Window.h"
-#include "EventSystem.h"
-#include "Renderer.h"
+#include "EventDispatcher.h"
+#include "Event.h"
 
 class Application
 {
-private:
-	static Application* s_instance;
-protected:
-	Window* m_window;
-	EventSystem* m_event_system;
-	Renderer* m_renderer;
 public:
-	Application(int width, int height);
-	~Application();
+	Application(int width, int height, const std::string& app_name);
+	~Application() {};
 
 	void run();
 
@@ -23,13 +18,24 @@ public:
 
 	Window* get_window()
 	{
-		return m_window;
+		return m_window.get();
 	}
 
 	static Application& get()
 	{
 		return *s_instance;
 	}
+private:
+	void on_window_close(const Event& event);
+
+private:
+	bool m_is_running = true;
+	static Application* s_instance;
+
+protected:
+	std::unique_ptr<Window> m_window;
+	EventDispatcher m_dispatcher;
+
 };
 
 

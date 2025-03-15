@@ -3,8 +3,6 @@
 #include "math/vec3.h"
 #include "math/mat4.h"
 
-class EventSystem;
-
 class Camera
 {
 public:
@@ -12,9 +10,6 @@ public:
 
 	void init_view(vec3 from, vec3 at, vec3 up);
 	void init_projection(float aspect_ratio, float fov, float near, float far);
-
-	void register_key_events(EventSystem& system);
-	void register_mouse_events(EventSystem& system);
 
 	void update();
 
@@ -46,9 +41,6 @@ private:
 
 	// Movement
 	float move_speed = 0.1f;
-	bool move_forward = false;
-	bool move_backward = false;
-	bool move_left = false;
-	bool move_right = false;
+	
 };
 

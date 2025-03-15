@@ -97,7 +97,7 @@ void mat4::mult_vec_by_mat(const mat4& mat, vec3& vec)
 
 mat4 mat4::mult_mat_by_mat(const mat4& other_mat, const mat4& mat)
 {
-    mat4 new_mat = {}; // Initialize to 0
+    mat4 new_mat;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -113,6 +113,8 @@ mat4 mat4::mult_mat_by_mat(const mat4& other_mat, const mat4& mat)
     return new_mat;
 }
 
+
+/// Column major indexing
 float& mat4::operator()(int row, int column) 
 {
 	return m[column * 4 + row];
@@ -155,10 +157,10 @@ mat4 mat4::calculate_projection(float aspect_ration, float fov, float near, floa
 {
     mat4 projection;
     float fov_rad = TO_RAD(fov);
-    float half_tan_fov = tanf(fov_rad / 2.0f);
+    float half_fov = tanf(fov_rad / 2.0f);
 
-    projection(0, 0) = 1.0f / (half_tan_fov * aspect_ration);
-    projection(1, 1) = 1.0f / half_tan_fov;
+    projection(0, 0) = 1.0f / (half_fov * aspect_ration);
+    projection(1, 1) = 1.0f / half_fov;
     projection(2, 2) = -((far + near) / (far - near));
     projection(2, 3) = -((2 * far * near) / (far - near));
     projection(3, 2) = -1;

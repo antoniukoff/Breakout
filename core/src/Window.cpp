@@ -1,5 +1,6 @@
 #include "Window.h"
-
+#include "EventDispatcher.h"
+#include "CoreEvents.h"
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -19,6 +20,19 @@ Window::Window(float width, float height, const std::string& name)
 	glfwSwapInterval(1);
 
 	initialize_context(3, 3, true);
+
+	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
+		{
+			EventDispatcher* dispatcher = static_cast<EventDispatcher*>(glfwGetWindowUserPointer(window));
+			WindowCloseEvent event;
+			dispatcher->dispatch(event);
+		});
+
+}
+
+void Window::set_event_dispatcher(EventDispatcher* dispatcher)
+{
+	glfwSetWindowUserPointer(m_window, (void*)(dispatcher));
 }
 
 void Window::initialize_context(int major, int minor, bool use_core)

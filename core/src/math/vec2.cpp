@@ -16,6 +16,11 @@ vec2 vec2::operator*(float scalar) const
 	return { x * scalar, y * scalar };
 }
 
+vec2 vec2::operator-() const
+{
+	return { -x, -y };
+}
+
 void vec2::operator-=(const vec2& other)
 {
 	x -= other.x;
@@ -25,6 +30,18 @@ void vec2::operator-=(const vec2& other)
 vec2 vec2::operator-(const vec2& other) const
 {
 	return { x - other.x, y - other.y };
+}
+
+vec2 vec2::operator/(const vec2& other) const
+{
+	return { x / other.x, y / other.y };
+
+}
+
+vec2 vec2::operator/(float scalar) const
+{
+	return { x / scalar, y / scalar };
+
 }
 
 float vec2::mag() const

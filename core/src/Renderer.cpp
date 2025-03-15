@@ -5,14 +5,37 @@
 #include "Material.h"
 #include "Mesh.h"
 
-Renderer::Renderer()
-{
-	glClearColor(0.23f, 0.21f, 0.34f, 1.0f);
+mat4 Renderer::m_view_matrix;
+mat4 Renderer::m_projection_matrix;
+Material* Renderer::current_material = nullptr;
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+std::unique_ptr<Renderer> Renderer::s_instance;
+
+void Renderer::initialize(vec3 clear_color, bool enable_depth_test, bool enable_face_culling)
+{
+	s_instance = std::make_unique<Renderer>();
+
+	glClearColor(clear_color.x, clear_color.y, clear_color.z, 1.0f);
+	
+	if (enable_depth_test)
+	{
+		glEnable(GL_DEPTH_TEST);
+	}
+	else
+	{
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	if (enable_face_culling)
+	{
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+		glCullFace(GL_BACK);
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 void Renderer::begin_frame(Camera& camera)
@@ -42,4 +65,5 @@ void Renderer::submit(Material* material, Mesh* mesh, const mat4& model_matrix)
 
 void Renderer::end_frame()
 {
+	//// Create draw batches to minimize shader change, then flush
 }
