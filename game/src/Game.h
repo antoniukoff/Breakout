@@ -15,8 +15,8 @@
 
 #include "GameEvents.h"
 
-vec3 camera_pos = { 0.0f, 0.0f, 0.5f };
-vec3 target_pos = { 0.0f, 0.0f, 0.0f };
+vec3 camera_pos = { 0.0f, -25.0f, -5.0f };
+vec3 target_pos = { 0.0f, -2.0f, -40.0f };
 vec3 global_up = { 0.0f, 1.0f, 0.0f };
 
 class Game : public Application

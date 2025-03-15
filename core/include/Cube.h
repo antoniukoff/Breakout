@@ -3,7 +3,7 @@
 #include "math/vec3.h"
 #include <vector>
 
-static const float cube_size = 3.0f;
+static const float cube_size = 1.0f;
 
 /// Normals
 static const vec3 forward_dir = { 0.0f , 0.0f, -1.0f };

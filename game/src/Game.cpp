@@ -30,7 +30,7 @@ Game::Game()
 
 void Game::initialize_level()
 {
-	//create_walls();
+	create_walls();
 	create_ball({0.0f, 0.0f, -37.5f});
 	create_paddle();
 }
@@ -38,32 +38,34 @@ void Game::initialize_level()
 void Game::create_paddle()
 {
 	vec3 paddle_position = vec3{ 0.0f, -20.0f, -37.5f };
-	vec3 paddle_scale = vec3{ 3.0f, 1.0f, 1.0f };
+	vec3 paddle_scale = vec3{ 5.0f, 2.0f, 1.0f };
+
 	auto e = m_registry.create_entity();
 	m_registry.add<TransformComponent>(e, paddle_position, paddle_position, paddle_scale);
-	m_registry.add<BoxColliderComponent>(e, vec2{ 5.0, 1.0f });
 	m_registry.add<InputComponent>(e);
+	m_registry.add<BoxColliderComponent>(e, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
 	m_registry.add<RenderComponent>(e, &paddle, &shiny);
 }
 
 void Game::create_ball(vec3 position)
 {
 	auto e = m_registry.create_entity();
-	m_registry.add<TransformComponent>(e, position, position);
-	m_registry.add<CircleColliderComponent>(e, 1.5f);
+	m_registry.add<TransformComponent>(e, position, position, vec3{ 1.0f, 1.0f, 1.0f });
+	m_registry.add<MovementComponent>(e, vec3{-0.5f, -0.5f, 0.0f });
+	m_registry.add<CircleColliderComponent>(e, 1.0f);
 	m_registry.add<RenderComponent>(e, &sphere, &shiny);
 }
 
 void Game::create_walls()
 {
 	vec3 back_wall_transform = vec3{ 0.0f, 0.0f, -40.0f };
-	vec3 back_wall_scale = vec3{ 7.5f, 10.0f, 0.5f };
+	vec3 back_wall_scale = vec3{ 35.0f, 45.0f, 1.0f };
 
-	vec3 horizontal_wall_position = back_wall_transform + vec3{ -22.0f , 0.0f, 2.0f };
-	vec3 horizontal_wall_scale = vec3{ 0.5f, 10.0f, 1.5f };
+	vec3 horizontal_wall_position = back_wall_transform + vec3{ back_wall_scale.x, 0.0f, 2.0f };
+	vec3 horizontal_wall_scale = vec3{ 1.0f, back_wall_scale.y, 1.0f };
 
-	vec3 vertical_wall_position = back_wall_transform + vec3{ 0.0f, 28.5f, 2.0f };
-	vec3 vertical_wall_scale = vec3{ 7.0f, 0.5f, 1.5f };
+	vec3 vertical_wall_position = back_wall_transform + vec3{ 0.0f, back_wall_scale.y, 2.0f };
+	vec3 vertical_wall_scale = vec3{ back_wall_scale.x, 1.0f, 1.0f };
 
 	auto e1 = m_registry.create_entity();
 	auto e2 = m_registry.create_entity();
@@ -85,7 +87,186 @@ void Game::create_walls()
 	m_registry.add<RenderComponent>(e3, &cube, &shiny);
 	m_registry.add<RenderComponent>(e4, &cube, &shiny);
 	m_registry.add<RenderComponent>(e5, &cube, &shiny);
+
+	m_registry.add<BoxColliderComponent>(e2, vec2{ 2.0f * horizontal_wall_scale.x, 2.0f * horizontal_wall_scale.y });
+	m_registry.add<BoxColliderComponent>(e3, vec2{ 2.0f * horizontal_wall_scale.x, 2.0f * horizontal_wall_scale.y });
+	m_registry.add<BoxColliderComponent>(e4, vec2{ 2.0f * vertical_wall_scale.x, 2.0f * vertical_wall_scale.y });
+	m_registry.add<BoxColliderComponent>(e5, vec2{ 2.0f * vertical_wall_scale.x, 2.0f * vertical_wall_scale.y });
+
 }
+
+void Game::on_update() 
+{
+	//m_camera.update();
+
+	m_registry.for_each<TransformComponent, MovementComponent>([this](
+		entity_id e_id,
+		component_handle<TransformComponent> transform_component,
+		component_handle<MovementComponent> movement_component)
+		{
+			auto& velocity = movement_component.velocity();
+			auto& position = transform_component.position();
+			auto& prev_position = transform_component.prev_position();
+
+			prev_position = position;
+			position += velocity;
+		});
+
+	m_registry.for_each<TransformComponent, InputComponent>([this](
+		entity_id e_id,
+		component_handle<TransformComponent> transform_component,
+		component_handle<InputComponent> input_component)
+		{
+			auto& position = transform_component.position();
+			auto& prev_position = transform_component.prev_position();
+			auto& angle = transform_component.angle();
+
+			prev_position = position;
+
+			if (Input::is_key_pressed(GLFW_KEY_A))
+			{
+				position += {-0.5, 0.0f, 0.0f};
+			}
+			if (Input::is_key_pressed(GLFW_KEY_D))
+			{
+				position += {  0.5, 0.0f, 0.0f };
+
+			}
+			if (Input::is_key_pressed(GLFW_KEY_W))
+			{
+				position += {0.0f, 0.5, 0.0f};
+			}
+			if (Input::is_key_pressed(GLFW_KEY_S))
+			{
+				position += {0.0f, -0.5, 0.0f};
+
+			}
+			if (Input::is_key_pressed(GLFW_KEY_E))
+			{
+				angle -= 1.0f;
+			}
+			if (Input::is_key_pressed(GLFW_KEY_Q))
+			{
+				angle += 1.0f;
+			}
+		});
+	
+	ball_collision();
+}
+vec2 clamp(vec2 to_clamp, vec2 min, vec2 max)
+{
+	float x = std::clamp(to_clamp.x, min.x, max.x);
+	float y = std::clamp(to_clamp.y, min.y, max.y);
+
+	return { x, y };
+}
+void Game::ball_collision()
+{
+	m_registry.for_each<TransformComponent, BoxColliderComponent>([&](
+		entity_id e_id,
+		component_handle<TransformComponent> paddle_transform,
+		component_handle<BoxColliderComponent> box_collider)
+		{
+			m_registry.for_each<TransformComponent, MovementComponent, CircleColliderComponent>([&](
+				entity_id e_id,
+				component_handle<TransformComponent> circle_transform,
+				component_handle<MovementComponent> circle_movement,
+				component_handle<CircleColliderComponent> circle_collider)
+				{
+					vec3& ball_pos = circle_transform.position();
+					vec3& ball_velocity = circle_movement.velocity();
+					float ball_radius = circle_collider.radius();
+
+					vec3& paddle_pos = paddle_transform.position();
+					float paddle_angle = paddle_transform.angle();
+					vec2 paddle_half_dims = box_collider.half_extents();
+
+					vec3 vector_from_ball_to_padde = ball_pos - paddle_pos;
+					mat4::mult_vec_by_mat(mat4::rotate_z(-paddle_angle), vector_from_ball_to_padde);
+					vec2 vec = { vector_from_ball_to_padde.x, vector_from_ball_to_padde.y };
+					vec2 clamped = clamp(vec, -paddle_half_dims, paddle_half_dims);
+					vec2 diff = vec - clamped;
+
+					float length = diff.mag();
+					bool collision = length < ball_radius;
+					if (collision)
+					{
+						//// Define normals of the cube
+						constexpr vec2 box_normals[4] =
+						{
+							vec2{0.0f, 1.0f}, // up
+							vec2{0.0f, -1.0f},// down
+							vec2{1.0f, 0.0f},// left
+							vec2{-1.0f, 0.0f} // right
+						};
+
+						float max = 0.0f;
+						int best_match = -1;
+
+						//// Get the dot product of the four sides
+						for (uint32_t i = 0; i < 4; i++)
+						{
+
+							float dot = vec2::dot(diff, box_normals[i]);
+							if (dot > max)
+							{
+								/// Get the best match
+								max = dot;
+								best_match = i;
+							}
+						}
+
+						vec2 normal = box_normals[best_match];
+						vec3 best_normal = { normal.x, normal.y, 0.0f };
+
+						/// Rotate the normal with the paddle
+						mat4::mult_vec_by_mat(mat4::rotate_z(paddle_angle), best_normal);
+
+						ball_pos += best_normal * (ball_radius - length);
+						
+						/// Project velocwity onto the normal
+						vec3 v_projected = best_normal * vec3::dot(ball_velocity, best_normal);
+					
+
+						/// Calculate the reflection vector
+						vec3 reflected_v = ball_velocity - v_projected * 2.0f;
+						ball_velocity = reflected_v;
+
+						std::cout << "Ball Collided" << std::endl;
+					}
+				});
+		});
+}
+
+
+
+void Game::render(float interval)
+{
+	Renderer::begin_frame(m_camera);
+	m_registry.for_each<TransformComponent, RenderComponent>([&](
+		entity_id e_id,
+		component_handle<TransformComponent> transform_component,
+		component_handle<RenderComponent> render_component)
+		{
+			auto& material = render_component.material();
+			auto& mesh = render_component.mesh();
+
+			auto& position = transform_component.position();
+			auto& prev_position = transform_component.prev_position();
+			auto& scale = transform_component.scale();
+			auto& angle = transform_component.angle();
+
+			/// Minimize jiggering between the frames
+			vec3 interpolated_position = prev_position * (1.0f - interval) + position * interval;
+
+			mat4 model = mat4::translate(interpolated_position) * mat4::rotate_z(angle) * mat4::scale(scale);
+
+			Renderer::submit(material, mesh, model);
+		});
+
+	render_colliders();
+}
+
 void Game::render_colliders()
 {
 	GLuint VAO, VBO;
@@ -201,139 +382,6 @@ void Game::on_player_moved_event(const Event& event)
 {
 	auto& move_event = static_cast<const PlayerMovedEvent&>(event);
 	std::cout << move_event.direction << std::endl;
-}
-
-void Game::on_update() 
-{
-	//m_camera.update();
-
-	m_registry.for_each<TransformComponent, MovementComponent>([this](
-		entity_id e_id,
-		component_handle<TransformComponent> transform_component,
-		component_handle<MovementComponent> movement_component)
-		{
-			auto& velocity = movement_component.velocity();
-			auto& position = transform_component.position();
-			auto& prev_position = transform_component.prev_position();
-
-			prev_position = position;
-			position += velocity;
-		});
-
-	m_registry.for_each<TransformComponent, InputComponent>([this](
-		entity_id e_id,
-		component_handle<TransformComponent> transform_component,
-		component_handle<InputComponent> input_component)
-		{
-			auto& position = transform_component.position();
-			auto& prev_position = transform_component.prev_position();
-			auto& angle = transform_component.angle();
-
-			prev_position = position;
-
-			if (Input::is_key_pressed(GLFW_KEY_A))
-			{
-				position += {-0.05, 0.0f, 0.0f};
-			}
-			if (Input::is_key_pressed(GLFW_KEY_D))
-			{
-				position += {  0.05, 0.0f, 0.0f };
-
-			}
-			if (Input::is_key_pressed(GLFW_KEY_W))
-			{
-				position += {0.0f, 0.05, 0.0f};
-			}
-			if (Input::is_key_pressed(GLFW_KEY_S))
-			{
-				position += {0.0f, -0.05, 0.0f};
-
-			}
-			if (Input::is_key_pressed(GLFW_KEY_E))
-			{
-				angle -= 1.0f;
-			}
-			if (Input::is_key_pressed(GLFW_KEY_Q))
-			{
-				angle += 1.0f;
-			}
-		});
-	
-	ball_collision();
-}
-vec2 clamp(vec2 to_clamp, vec2 min, vec2 max)
-{
-	float x = std::clamp(to_clamp.x, min.x, max.x);
-	float y = std::clamp(to_clamp.y, min.y, max.y);
-
-	return { x, y };
-}
-void Game::ball_collision()
-{
-	m_registry.for_each<TransformComponent, BoxColliderComponent>([&](
-		entity_id e_id,
-		component_handle<TransformComponent> paddle_transform,
-		component_handle<BoxColliderComponent> box_collider)
-		{
-			m_registry.for_each<TransformComponent, CircleColliderComponent>([&](
-				entity_id e_id,
-				component_handle<TransformComponent> circle_transform,
-				component_handle<CircleColliderComponent> circle_collider)
-				{
-					vec3 ball_pos = circle_transform.position();
-					float ball_radius = circle_collider.radius();
-
-					vec3 paddle_pos = paddle_transform.position();
-					float paddle_angle = paddle_transform.angle();
-					vec2 paddle_half_dims = box_collider.half_extents();
-
-					vec3 vector_from_ball_to_padde = ball_pos - paddle_pos;
-					mat4::mult_vec_by_mat(mat4::rotate_z(-paddle_angle), vector_from_ball_to_padde);
-					vec2 vec = { vector_from_ball_to_padde.x, vector_from_ball_to_padde.y };
-					vec2 clamped = clamp(vec, -paddle_half_dims, paddle_half_dims);
-					vec2 diff = vec - clamped;
-
-					bool collision = diff.mag() < ball_radius;
-					if (collision)
-					{
-						std::cout << "Ball Collided" << std::endl;
-					}
-					else
-					{
-						std::cout << "Not Collided" << std::endl;
-
-					}
-				});
-		});
-}
-
-
-
-void Game::render(float interval)
-{
-	Renderer::begin_frame(m_camera);
-	m_registry.for_each<TransformComponent, RenderComponent>([&](
-		entity_id e_id,
-		component_handle<TransformComponent> transform_component,
-		component_handle<RenderComponent> render_component)
-		{
-			auto& material = render_component.material();
-			auto& mesh = render_component.mesh();
-
-			auto& position = transform_component.position();
-			auto& prev_position = transform_component.prev_position();
-			auto& scale = transform_component.scale();
-			auto& angle = transform_component.angle();
-
-			/// Minimize jiggering between the frames
-			vec3 interpolated_position = prev_position * (1.0f - interval) + position * interval;
-
-			mat4 model = mat4::translate(interpolated_position) * mat4::rotate_z(angle) * mat4::scale(scale);
-
-			//Renderer::submit(material, mesh, model);
-		});
-
-	render_colliders();
 }
 
 std::unique_ptr<Application> create_application()
