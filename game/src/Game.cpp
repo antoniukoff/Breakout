@@ -5,6 +5,7 @@ Game::Game()
 	: Application(800, 600, "Breakout")
 {
 	phong = Shader("assets/shaders/phong.glsl");
+	debug = Shader("assets/shaders/default.glsl");
 
 	vec3 light_position = { 0.0f, 0.0f , 0.0f };
 	vec4 light_color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -29,7 +30,7 @@ Game::Game()
 
 void Game::initialize_level()
 {
-	create_walls();
+	//create_walls();
 	create_ball({0.0f, 0.0f, -37.5f});
 	create_paddle();
 }
@@ -40,7 +41,7 @@ void Game::create_paddle()
 	vec3 paddle_scale = vec3{ 3.0f, 1.0f, 1.0f };
 	auto e = m_registry.create_entity();
 	m_registry.add<TransformComponent>(e, paddle_position, paddle_position, paddle_scale);
-	m_registry.add<BoxColliderComponent>(e, vec2{ 10.0f, 5.0f });
+	m_registry.add<BoxColliderComponent>(e, vec2{ 5.0, 1.0f });
 	m_registry.add<InputComponent>(e);
 	m_registry.add<RenderComponent>(e, &paddle, &shiny);
 }
@@ -49,7 +50,7 @@ void Game::create_ball(vec3 position)
 {
 	auto e = m_registry.create_entity();
 	m_registry.add<TransformComponent>(e, position, position);
-	m_registry.add<CircleColliderComponent>(e, 5.0f);
+	m_registry.add<CircleColliderComponent>(e, 1.5f);
 	m_registry.add<RenderComponent>(e, &sphere, &shiny);
 }
 
@@ -85,6 +86,116 @@ void Game::create_walls()
 	m_registry.add<RenderComponent>(e4, &cube, &shiny);
 	m_registry.add<RenderComponent>(e5, &cube, &shiny);
 }
+void Game::render_colliders()
+{
+	GLuint VAO, VBO;
+
+	mat4 view = m_camera.get_view_matrix();
+	mat4 proj = m_camera.get_projection_matrix();
+	// Bind Debug Shader
+	debug.bind();
+
+	// Upload view and projection matrices once per frame
+	GLint viewLoc = glGetUniformLocation(debug.get_id(), "view");
+	GLint projLoc = glGetUniformLocation(debug.get_id(), "projection");
+
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view(0, 0));
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, &proj(0, 0));
+
+	// Render Box Colliders
+	m_registry.for_each<TransformComponent, BoxColliderComponent>(
+		[&](entity_id e_id,
+			component_handle<TransformComponent> transform,
+			component_handle<BoxColliderComponent> box_collider)
+		{
+			auto& position = transform.position();
+			auto& angle = transform.angle();
+			vec2 dims = box_collider.half_extents();
+
+			// Define local-space vertices for the box
+			std::vector<vec2> boxVertices = {
+				{ -dims.x, -dims.y },
+				{  dims.x, -dims.y },
+				{  dims.x,  dims.y },
+				{ -dims.x,  dims.y },
+				{ -dims.x, -dims.y } // Closing the loop
+			};
+
+			// Compute Model matrix
+			mat4 model = mat4::translate(position) * mat4::rotate_z(angle);
+			GLint modelLoc = glGetUniformLocation(debug.get_id(), "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model(0, 0));
+
+			// Generate and bind VAO/VBO
+			glGenVertexArrays(1, &VAO);
+			glGenBuffers(1, &VBO);
+
+			glBindVertexArray(VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, boxVertices.size() * sizeof(vec2), boxVertices.data(), GL_DYNAMIC_DRAW);
+
+			// Enable vertex attributes
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
+			glEnableVertexAttribArray(0);
+
+			// Draw the box
+			glDrawArrays(GL_LINE_STRIP, 0, boxVertices.size());
+
+			// Cleanup
+			glBindVertexArray(0);
+			glDeleteBuffers(1, &VBO);
+			glDeleteVertexArrays(1, &VAO);
+		});
+
+	// Render Circle Colliders
+	m_registry.for_each<TransformComponent, CircleColliderComponent>(
+		[&](entity_id e_id,
+			component_handle<TransformComponent> transform,
+			component_handle<CircleColliderComponent> circle_collider)
+		{
+			auto& position = transform.position();
+			float radius = circle_collider.radius();
+
+			constexpr int circleSegments = 32;
+			std::vector<vec2> circleVertices;
+
+			// Generate vertices for a circle
+			for (int i = 0; i <= circleSegments; i++)
+			{
+				float angle = (2.0f * 3.14159265358979323846 * i) / circleSegments;
+				circleVertices.push_back({ radius * cosf(angle), radius * sinf(angle) });
+			}
+
+			// Compute Model matrix
+			mat4 model = mat4::translate(position);
+			GLint modelLoc = glGetUniformLocation(debug.get_id(), "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model(0, 0));
+
+			// Generate and bind VAO/VBO
+			glGenVertexArrays(1, &VAO);
+			glGenBuffers(1, &VBO);
+
+			glBindVertexArray(VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, circleVertices.size() * sizeof(vec2), circleVertices.data(), GL_DYNAMIC_DRAW);
+
+			// Enable vertex attributes
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2), (void*)0);
+			glEnableVertexAttribArray(0);
+
+			// Draw the circle
+			glDrawArrays(GL_LINE_LOOP, 0, circleVertices.size());
+
+			// Cleanup
+			glBindVertexArray(0);
+			glDeleteBuffers(1, &VBO);
+			glDeleteVertexArrays(1, &VAO);
+		});
+
+	debug.unbind();
+}
+
+
 
 void Game::on_player_moved_event(const Event& event)
 {
@@ -177,7 +288,7 @@ void Game::ball_collision()
 					vec2 paddle_half_dims = box_collider.half_extents();
 
 					vec3 vector_from_ball_to_padde = ball_pos - paddle_pos;
-					mat4::mult_vec_by_mat(mat4::rotate_z(paddle_angle), vector_from_ball_to_padde);
+					mat4::mult_vec_by_mat(mat4::rotate_z(-paddle_angle), vector_from_ball_to_padde);
 					vec2 vec = { vector_from_ball_to_padde.x, vector_from_ball_to_padde.y };
 					vec2 clamped = clamp(vec, -paddle_half_dims, paddle_half_dims);
 					vec2 diff = vec - clamped;
@@ -219,8 +330,10 @@ void Game::render(float interval)
 
 			mat4 model = mat4::translate(interpolated_position) * mat4::rotate_z(angle) * mat4::scale(scale);
 
-			Renderer::submit(material, mesh, model);
+			//Renderer::submit(material, mesh, model);
 		});
+
+	render_colliders();
 }
 
 std::unique_ptr<Application> create_application()
