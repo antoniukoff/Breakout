@@ -11,12 +11,10 @@ VertexArray::~VertexArray()
 	glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArray::complete_setup(std::unique_ptr<VertexBuffer> buffer, const VertexLayout& layout)
+void VertexArray::complete_setup(std::shared_ptr<VertexBuffer> buffer, const VertexLayout& layout)
 {
-	m_vbo = std::move(buffer);
-
 	bind();
-	m_vbo->bind();
+	buffer->bind();
 
 	uint32_t vertex_stride = layout.get_vertex_stride();
 	for (auto& attribute : layout)

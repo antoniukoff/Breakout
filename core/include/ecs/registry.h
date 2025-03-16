@@ -102,6 +102,13 @@ public:
 		update_mask<C>(e_id, true);
 	}
 
+	template<typename C>
+	bool has(entity_id e_id)
+	{
+		component_manager<C>& mgr = retrieve_pool<C>();
+		return mgr.contains(e_id);
+	}
+
 	/**
 	* @brief Function to iterate over entity vectors
 	*		 that have the specified set of components.

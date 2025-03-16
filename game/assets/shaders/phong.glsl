@@ -57,5 +57,5 @@ void main()
 	vec4 spec = 1.0 * spec_coeff * light_color;
 
 	/// Final Color
-	frag_color = (ambient + diffuse + spec) * model_color;
+	frag_color = vec4(vec4((ambient + diffuse + spec) * model_color).xyz, 1.0);
 }

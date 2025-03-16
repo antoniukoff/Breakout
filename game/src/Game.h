@@ -6,9 +6,11 @@
 
 #include <Shader.h>
 #include "ShakeCamera.h"
-#include <Cube.h>
 #include <Input.h>
 #include "Material.h"
+
+#include <ParticleBatch.h>
+#include <ParticleEngine.h>
 
 #include <ecs/registry.h> 
 #include "Components.h"
@@ -38,6 +40,8 @@ private:
 	Shader phong;
 	Shader debug;
 	Material shiny;
+	ParticleEngine engine;
+	ParticleBatch batch;
 
 	uint32_t debug_vao;
 

@@ -3,14 +3,16 @@
 #include "math/vec3.h"
 #include "math/vec2.h"
 
+struct Vertex
+{
+    vec3 position;
+    vec2 uv;
+    vec3 normal;
+};
+
 struct Face
 {
-	struct Vertex
-	{
-		vec3 position;
-		vec2 uv;
-		vec3 normal;
-	} v[3];
+    Vertex v[3];
 };
 
 class VertexBuffer

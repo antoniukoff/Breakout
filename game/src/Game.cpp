@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Renderer.h"
 #include <random>
+#include <math/Random.h>
 
 Game::Game() 
 	: Application(800, 600, "Breakout")
@@ -17,9 +18,20 @@ Game::Game()
 	shiny.set_vec4("model_color", cube_color);
 	shiny.set_vec4("light_color", light_color);
 
-	cube = Mesh(get_cube());
+	cube = Mesh("assets/meshes/cube.obj");
 	sphere = Mesh("assets/meshes/sphere.obj");
 	paddle = Mesh("assets/meshes/paddle.obj");
+
+	batch.initizalize(500, 0.01f, &cube, [](Particle& p)
+		{
+			float gravity = 0.015f;
+
+			p.velocity.z -= gravity;
+			p.position += p.velocity;
+
+			p.color.a = (unsigned char)(p.life * 255.0f);
+		});
+	engine.add_particle_batch(&batch);
 
 	m_camera.init_view(camera_pos, target_pos, global_up);
 	m_camera.init_projection(m_window->get_aspect_ratio(), 90.0f, 0.1f, 100.0f);
@@ -53,7 +65,7 @@ void Game::create_ball(vec3 position)
 {
 	auto e = m_registry.create_entity();
 	m_registry.add<TransformComponent>(e, position, position, vec3{ 1.0f, 1.0f, 1.0f });
-	m_registry.add<RigidBodyComponent>(e, vec3{-0.5f, -0.5f, 0.0f });
+	m_registry.add<RigidBodyComponent>(e, vec3{-0.05, -0.05f, 0.0f });
 	m_registry.add<CircleColliderComponent>(e, 1.0f);
 	m_registry.add<RenderComponent>(e, &sphere, &shiny);
 }
@@ -123,7 +135,6 @@ void Game::create_boxes()
 			m_registry.add<RenderComponent>(e, &paddle, &shiny);
 			m_registry.add<BoxColliderComponent>(e, vec2{ 2.0f * box_scale.x, 2.0f * box_scale.y });
 			m_registry.add<CameraShakeComponent>(e);
-
 		}
 	}
 }
@@ -131,7 +142,7 @@ void Game::create_boxes()
 void Game::on_update() 
 {
 	m_camera.update();
-
+	engine.update();
 	m_registry.for_each<TransformComponent, RigidBodyComponent>([this](
 		entity_id e_id,
 		component_handle<TransformComponent> transform_component,
@@ -162,8 +173,7 @@ void Game::on_update()
 			}
 			if (Input::is_key_pressed(GLFW_KEY_D))
 			{
-				position += {  0.5, 0.0f, 0.0f };
-
+				position += {0.5, 0.0f, 0.0f};
 			}
 			if (Input::is_key_pressed(GLFW_KEY_E))
 			{
@@ -209,6 +219,7 @@ void Game::ball_collision()
 					vec3& ball_pos = circle_transform.position();
 					vec3& ball_velocity = circle_movement.velocity();
 					float ball_radius = circle_collider.radius();
+					uint32_t& num_hits = circle_collider.num_hits();
 
 					vec3& paddle_pos = paddle_transform.position();
 					float paddle_angle = paddle_transform.angle();
@@ -221,15 +232,19 @@ void Game::ball_collision()
 					vec2 diff = vec - clamped;
 
 					float length = diff.mag();
-					bool collision = length < ball_radius;
+					bool collision = length <= ball_radius;
 					if (collision)
 					{
+						if (box == paddle_id)
+						{
+							num_hits++;
+						}
 						//// Define normals of the cube
 						constexpr vec2 box_normals[4] =
 						{
 							vec2{0.0f, 1.0f}, // up
-							vec2{0.0f, -1.0f},// down
-							vec2{1.0f, 0.0f},// left
+							vec2{0.0f, -1.0f}, // down
+							vec2{1.0f, 0.0f}, // left
 							vec2{-1.0f, 0.0f} // right
 						};
 
@@ -255,7 +270,18 @@ void Game::ball_collision()
 						/// Rotate the normal with the paddle
 						mat4::mult_vec_by_mat(mat4::rotate_z(paddle_angle), best_normal);
 
-						ball_pos += best_normal * (ball_radius - length);
+						vec3 particle_pos = ball_pos + vec3::normalize(ball_velocity) * length;
+						for (uint32_t i = 0; i < 15; i++)
+						{
+							float rand_x = Random::get_random_float(-0.2f, 0.2f);
+							float rand_y = Random::get_random_float(-0.2f, 0.2f);
+							float rand_z = Random::get_random_float(0.2f, 0.5f);
+
+							Color rand_color = Random::get_random_color();
+
+							batch.add_particle(particle_pos, { rand_x, rand_y, rand_z }, rand_color, 0.25f);
+						}
+						ball_pos += best_normal * (ball_radius - length + 0.5f);
 						
 						/// Project velocwity onto the normal
 						vec3 v_projected = best_normal * vec3::dot(ball_velocity, best_normal);
@@ -263,6 +289,12 @@ void Game::ball_collision()
 
 						/// Calculate the reflection vector
 						vec3 reflected_v = ball_velocity - v_projected * 2.0f;
+
+						if (num_hits > 0 && num_hits % 3 == 0)
+						{
+							reflected_v *= 2.0f;
+							num_hits = 0;
+						}
 						ball_velocity = reflected_v;
 
 						m_registry.for_each<CameraShakeComponent>([&](
@@ -306,14 +338,13 @@ void Game::render(float interval)
 			Renderer::submit(material, mesh, model);
 		});
 
+	engine.draw(m_camera);
+
 	render_colliders();
 }
 
 void Game::shake_camera()
 {
-	static std::mt19937 rng(time(nullptr));
-	static std::uniform_real_distribution<float> shake_offset(-1.0f, 1.0f);
-
 	/// dispatch if brick is not destroyable to the system check if there is entity assigned already
 	m_registry.for_each<CameraShakeComponent>([&](
 		entity_id e_id,
@@ -338,11 +369,11 @@ void Game::shake_camera()
 				return;
 			}
 
-			/// Fade out the shakiness
+			/// fade out the camera shake
 			float strength = intensity * (1.0f - time_elapsed / shake_duration);
 
-			float yaw_offset = shake_offset(rng) * strength;
-			float pitch_offset = shake_offset(rng) * strength;
+			float yaw_offset = Random::get_random_float(-1.0f, 1.0f) * strength;
+			float pitch_offset = Random::get_random_float(-1.0f, 1.0f) * strength;
 
 			m_camera.add_yaw(yaw_offset);
 			m_camera.add_pitch(pitch_offset);
@@ -457,8 +488,6 @@ void Game::render_colliders()
 
 	debug.unbind();
 }
-
-
 
 void Game::on_player_moved_event(const Event& event)
 {

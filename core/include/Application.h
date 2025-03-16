@@ -35,7 +35,6 @@ private:
 protected:
 	std::unique_ptr<Window> m_window;
 	EventDispatcher m_dispatcher;
-
 };
 
 

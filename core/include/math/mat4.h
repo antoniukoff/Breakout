@@ -1,4 +1,5 @@
 #pragma once
+#define TO_RAD(degrees) degrees * (3.14159265358979323846 / 180)
 
 class vec3;
 

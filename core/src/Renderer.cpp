@@ -36,6 +36,9 @@ void Renderer::initialize(vec3 clear_color, bool enable_depth_test, bool enable_
 	{
 		glDisable(GL_CULL_FACE);
 	}
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Renderer::begin_frame(Camera& camera)
@@ -61,6 +64,11 @@ void Renderer::submit(Material* material, Mesh* mesh, const mat4& model_matrix)
 	material->bind();
 	mesh->bind();
 	glDrawArrays(GL_TRIANGLES, 0, mesh->get_vertex_count());
+}
+
+void Renderer::submit_particles(const ParticleBatch& batch)
+{
+
 }
 
 void Renderer::end_frame()

@@ -10,46 +10,6 @@ Mesh::Mesh(const std::string& file_path)
 	parse_obj(file_path);
 }
 
-Mesh::Mesh(const std::vector<float> data)
-{
-	m_vao = std::make_unique<VertexArray>();
-
-	/// Create VBO
-	std::unique_ptr<VertexBuffer> buffer = std::make_unique<VertexBuffer>();
-	buffer->upload_data(data);
-
-	/// Create Layout
-	VertexLayout layout = {
-		{0, 3, GL_FLOAT, GL_FALSE},
-		{1, 2, GL_FLOAT, GL_FALSE},
-		{2, 3, GL_FLOAT, GL_FALSE},
-	};
-
-	m_vertex_count = data.size() * sizeof(float) / layout.get_vertex_stride();
-
-	/// Set VBO and Layout to VAO
-	m_vao->complete_setup(std::move(buffer), layout);
-}
-
-Mesh::Mesh(Mesh&& other) noexcept
-	: m_vao(std::move(other.m_vao))
-	, m_vertex_count(other.m_vertex_count)
-{
-	other.m_vertex_count = 0;
-}
-
-Mesh& Mesh::operator=(Mesh&& other) noexcept
-{
-	if (this != &other)
-	{
-		m_vao = std::move(other.m_vao);
-		m_vertex_count = other.m_vertex_count;
-
-		other.m_vertex_count = 0;
-	}
-	return *this;
-}
-
 void Mesh::bind() const
 {
 	m_vao->bind();
@@ -67,6 +27,7 @@ uint32_t Mesh::get_vertex_count() const
 
 void Mesh::parse_obj(const std::string& file_path)
 {
+	std::vector<Face> faces;
 	std::vector<vec3> positions;
 	std::vector<vec2> tex_coords;
 	std::vector<vec3> normals;
@@ -74,7 +35,6 @@ void Mesh::parse_obj(const std::string& file_path)
 	std::ifstream ifs(file_path);
 	std::string line;
 
-	std::vector<Face> faces;
 
 	while (std::getline(ifs, line)) 
 	{
@@ -108,6 +68,12 @@ void Mesh::parse_obj(const std::string& file_path)
 				faces_info.push_back(face_token);
 			}
 			Face face = process_face(faces_info, positions, tex_coords, normals);
+			for (int i = 0; i < 3; i++)
+			{
+				m_positions.push_back(face.v[i].position);
+				m_tex_coords.push_back(face.v[i].uv);
+				m_normals.push_back(face.v[i].normal);
+			}
 			faces.push_back(face);
 		}
 	}
@@ -151,9 +117,7 @@ Face Mesh::process_face(
 void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 {
 	m_vao = std::make_unique<VertexArray>();
-
-	/// Create VBO
-	std::unique_ptr<VertexBuffer> buffer = std::make_unique<VertexBuffer>();
+	m_vbo = std::make_shared<VertexBuffer>();
 
 	/// Create Layout
 	VertexLayout layout = {
@@ -164,9 +128,9 @@ void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 
 	m_vertex_count = faces.size() * 3;
 
-	buffer->upload_data(faces);
+	m_vbo->upload_data(faces);
 	/// Set VBO and Layout to VAO
-	m_vao->complete_setup(std::move(buffer), layout);
+	m_vao->complete_setup(m_vbo, layout);
 }
 
 

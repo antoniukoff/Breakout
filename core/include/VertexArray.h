@@ -10,10 +10,9 @@ public:
 
 	void bind() const;
 	void unbind() const;
-	void complete_setup(std::unique_ptr<VertexBuffer> buffer, const VertexLayout& layout);
+	void complete_setup(std::shared_ptr<VertexBuffer> buffer, const VertexLayout& layout);
 
 private:
 	uint32_t m_id = 0;
-	std::unique_ptr<VertexBuffer> m_vbo = nullptr;
 };
 

@@ -56,16 +56,19 @@ DEFINE_COMPONENT_HANDLE(BoxColliderComponent,
 struct CircleColliderComponent
 {
 	float radius;
+	uint32_t num_hits = 0;
 };
 
 ANNOTATE(
 	CircleColliderComponent,
-	1,
+	2,
 	DEFINE_COMPONENT_MEMBER(CircleColliderComponent, 0, float, radius)
+	DEFINE_COMPONENT_MEMBER(CircleColliderComponent, 1, uint32_t, num_hits)
 )
 
 DEFINE_COMPONENT_HANDLE(CircleColliderComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, float, radius)
+	COMPONENT_HANDLE_ACCESSOR(1, uint32_t, num_hits)
 )
 
 struct RigidBodyComponent

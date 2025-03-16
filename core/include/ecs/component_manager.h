@@ -89,6 +89,11 @@ public:
 		return instance_to_add;
 	}
 
+	bool contains(entity_id e_id)
+	{
+		return look_up(e_id) != 0;
+	}
+
 	/**
 	 * @brief Maps the entity to the component instance
 	 * @param e_id Entity ID

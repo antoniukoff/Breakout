@@ -1,6 +1,5 @@
 #pragma once
 
-#define TO_RAD(degrees) degrees * (3.14159265358979323846 / 180)
 
 struct vec4
 {
@@ -21,6 +20,7 @@ struct vec3
     vec3 operator - (const vec3& other);
     vec3 operator * (const vec3& other);
     vec3 operator * (float scalar);
+    void operator *= (float scalar);
     vec3 operator-() const;
 
 

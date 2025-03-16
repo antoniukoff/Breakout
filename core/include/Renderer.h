@@ -3,6 +3,8 @@
 #include "math/mat4.h"
 #include <memory>
 
+class ParticleBatch;
+
 class Camera;
 class Mesh;
 class Material;
@@ -14,6 +16,7 @@ public:
 
 	static void begin_frame(Camera& camera);
 	static void submit(Material* material, Mesh* mesh, const mat4& model_matrix);
+	static void submit_particles(const ParticleBatch& batch);
 	static void end_frame();
 
 private:

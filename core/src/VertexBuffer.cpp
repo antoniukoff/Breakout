@@ -28,7 +28,6 @@ void VertexBuffer::upload_data(const std::vector<Face>& faces)
 	unbind();
 }
 
-
 void VertexBuffer::bind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
