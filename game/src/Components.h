@@ -4,15 +4,25 @@
 #include <math/vec2.h>
 #include <Mesh.h>
 #include "Material.h"
+#include "PowerUps.h"
 
 struct TransformComponent
 {
+	TransformComponent(vec3 position)
+		: position(position)
+		, prev_position(position)
+	{}
+
+	TransformComponent(vec3 position, vec3 scale)
+		: position(position)
+		, prev_position(position)
+		, scale(scale)
+	{}
+
 	vec3 position;
 	vec3 prev_position;
 	vec3 scale = { 1.0f, 1.0f, 1.0f };
 	float angle = 0.0f;
-
-	bool is_dirty = true;
 };
 
 ANNOTATE(
@@ -33,7 +43,7 @@ DEFINE_COMPONENT_HANDLE(TransformComponent,
 
 struct BoxColliderComponent
 {
-	BoxColliderComponent(vec2 extents)
+	BoxColliderComponent(vec2 extents, bool is_destroyable = false)
 		: extents(extents)
 		, half_extents(extents / 2.0f)
 	{}
@@ -55,20 +65,28 @@ DEFINE_COMPONENT_HANDLE(BoxColliderComponent,
 
 struct CircleColliderComponent
 {
+	CircleColliderComponent(float radius, bool is_distructable = false)
+		: radius(radius)
+		, is_distructable(is_distructable)
+	{}
+
 	float radius;
 	uint32_t num_hits = 0;
+	bool is_distructable = false;
 };
 
 ANNOTATE(
 	CircleColliderComponent,
-	2,
+	3,
 	DEFINE_COMPONENT_MEMBER(CircleColliderComponent, 0, float, radius)
 	DEFINE_COMPONENT_MEMBER(CircleColliderComponent, 1, uint32_t, num_hits)
+	DEFINE_COMPONENT_MEMBER(CircleColliderComponent, 2, bool, is_distructable)
 )
 
 DEFINE_COMPONENT_HANDLE(CircleColliderComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, float, radius)
 	COMPONENT_HANDLE_ACCESSOR(1, uint32_t, num_hits)
+	COMPONENT_HANDLE_ACCESSOR(2, bool, is_distructable)
 )
 
 struct RigidBodyComponent
@@ -85,29 +103,45 @@ ANNOTATE(
 DEFINE_COMPONENT_HANDLE(RigidBodyComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, vec3, velocity)
 )
+struct LaserComponent
+{
+	LaserComponent(uint32_t num_balls, float duration)
+		: num_balls(num_balls)
+		, duration(duration)
+		, cooldown((float)num_balls / duration)
+	{}
+	uint32_t num_balls;
+	float duration;
+	float cooldown;
+};
+
+ANNOTATE(
+	LaserComponent,
+	3,
+	DEFINE_COMPONENT_MEMBER(LaserComponent, 0, uint32_t, num_balls)
+	DEFINE_COMPONENT_MEMBER(LaserComponent, 1, float, duration)
+	DEFINE_COMPONENT_MEMBER(LaserComponent, 2, float, cooldown)
+)
+
+DEFINE_COMPONENT_HANDLE(LaserComponent,
+	COMPONENT_HANDLE_ACCESSOR(0, uint32_t, num_balls)
+	COMPONENT_HANDLE_ACCESSOR(1, float, duration)
+	COMPONENT_HANDLE_ACCESSOR(2, float, cooldown)
+)
 
 struct InputComponent
 {
-	bool left = false; 
-	bool right = false; 
-	bool tilt_left = false; 
-	bool tile_right = false;
+	bool is_active = false; 
 };
 
 ANNOTATE(
 	InputComponent,
-	4,
-	DEFINE_COMPONENT_MEMBER(InputComponent, 0, bool, left)
-	DEFINE_COMPONENT_MEMBER(InputComponent, 1, bool, right)
-	DEFINE_COMPONENT_MEMBER(InputComponent, 2, bool, tilt_left)
-	DEFINE_COMPONENT_MEMBER(InputComponent, 3, bool, tile_right)
+	1,
+	DEFINE_COMPONENT_MEMBER(InputComponent, 0, bool, is_active)
 )
 
 DEFINE_COMPONENT_HANDLE(InputComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, bool, left)
-	COMPONENT_HANDLE_ACCESSOR(1, bool, right)
-	COMPONENT_HANDLE_ACCESSOR(2, bool, tilt_left)
-	COMPONENT_HANDLE_ACCESSOR(3, bool, tile_right)
+	COMPONENT_HANDLE_ACCESSOR(0, bool, is_active)
 )
 
 struct RenderComponent
@@ -130,7 +164,6 @@ DEFINE_COMPONENT_HANDLE(RenderComponent,
 
 struct CameraShakeComponent
 {
-	bool is_active = false;
 	float duration = 5.0f;
 	float time_elapsed = 0.0f;
 	float intensity = 1.0f;
@@ -138,16 +171,36 @@ struct CameraShakeComponent
 
 ANNOTATE(
 	CameraShakeComponent,
-	4,
-	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 0, bool, is_active)
-	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 1, float, duration)
-	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 2, float, time_elapsed)
-	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 3, float, intensity)
+	3,
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 0, float, duration)
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 1, float, time_elapsed)
+	DEFINE_COMPONENT_MEMBER(CameraShakeComponent, 2, float, intensity)
 )
 
 DEFINE_COMPONENT_HANDLE(CameraShakeComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, bool, is_active)
-	COMPONENT_HANDLE_ACCESSOR(1, float, duration)
-	COMPONENT_HANDLE_ACCESSOR(2, float, time_elapsed)
-	COMPONENT_HANDLE_ACCESSOR(3, float, intensity)
+	COMPONENT_HANDLE_ACCESSOR(0, float, duration)
+	COMPONENT_HANDLE_ACCESSOR(1, float, time_elapsed)
+	COMPONENT_HANDLE_ACCESSOR(2, float, intensity)
+)
+
+struct LifeComponent
+{
+	LifeComponent(uint32_t lives)
+		: max_health(lives)
+		, current_health(lives)
+	{}
+	int max_health;
+	int current_health;
+};
+
+ANNOTATE(
+	LifeComponent,
+	2,
+	DEFINE_COMPONENT_MEMBER(LifeComponent, 0, int, max_health)
+	DEFINE_COMPONENT_MEMBER(LifeComponent, 1, int, current_health)
+)
+
+DEFINE_COMPONENT_HANDLE(LifeComponent,
+	COMPONENT_HANDLE_ACCESSOR(0, int, max_health)
+	COMPONENT_HANDLE_ACCESSOR(1, int, current_health)
 )

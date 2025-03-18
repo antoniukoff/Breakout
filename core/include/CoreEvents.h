@@ -6,3 +6,10 @@ class WindowCloseEvent : public Event
 public:
 	WindowCloseEvent() = default;
 };
+
+class KeyPressEvent : public Event
+{
+public:
+	int key;
+	int action;
+};

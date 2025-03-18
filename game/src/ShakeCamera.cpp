@@ -2,6 +2,11 @@
 
 void ShakeCamera::update()
 {
+	if (!m_is_dirty)
+	{
+		return;
+	}
+
 	vec3 look_dir = m_look_dir;
 
 	float curr_yaw = yaw + temp_yaw;

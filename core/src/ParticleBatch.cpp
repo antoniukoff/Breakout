@@ -11,6 +11,7 @@ struct RenderData
 };
 
 ParticleBatch::ParticleBatch()
+	: shader("assets/shaders/particle.glsl")
 {}
 
 ParticleBatch::~ParticleBatch()
@@ -22,18 +23,26 @@ ParticleBatch::~ParticleBatch()
 
 void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&)> update_func)
 {
+	if (!m_particles)
+	{
+		m_particles = new Particle[max_particles];
+	}
+	m_size = 0;
 	m_mesh = mesh;
 	m_max_marticles = max_particles;
-	m_particles = new Particle[max_particles];
 	m_decay_rate = decay_rate;
 	m_update_func = update_func;
 
-	int mesh_vertices = mesh->get_vertex_count();
+	if (m_instanciated)
+	{
+		return;
+	}
 
+	int mesh_vertices = mesh->get_vertex_count();
+	
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &instanced_vbo);
-
 
 	glBindVertexArray(vao);
 
@@ -49,6 +58,7 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 
 	//// Configuring attributes to send mat4 per instance
 	//// Max attribute size to send to the gpu is vec4
+	//// So we send matrix as 4 vec4's to the vertex shader 
 	glBindBuffer(GL_ARRAY_BUFFER, instanced_vbo);
 	glBufferData(GL_ARRAY_BUFFER, max_particles * sizeof(RenderData), nullptr, GL_DYNAMIC_DRAW);
 
@@ -74,24 +84,29 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 	glVertexAttribDivisor(5, 1);
 
 	glBindVertexArray(0);
+
+	m_instanciated = true;
 }
 
 void ParticleBatch::update()
 {
 	for (int i = 0; i < m_size; i++)
 	{
-		m_update_func(m_particles[i]);
-		m_particles[i].life -= m_decay_rate;
-		if (m_particles[i].life <= 0.0f)
+		auto& particle = m_particles[i];
+
+		particle.prev_position = particle.position;
+		m_update_func(particle);
+		particle.life -= m_decay_rate;
+		if (particle.life <= 0.0f)
 		{
-			m_particles[i] = m_particles[m_size - 1];
+			particle = m_particles[m_size - 1];
 			m_size--;
-			i--;
+			i--; /// process moved particle
 		}
 	}
 }
 
-void ParticleBatch::draw(Camera& camera, Shader& shader)
+void ParticleBatch::draw(Camera& camera, float interval)
 {
 	shader.bind();
 	mat4 view = camera.get_view_matrix();
@@ -105,8 +120,11 @@ void ParticleBatch::draw(Camera& camera, Shader& shader)
 	for (int i = 0; i < m_size; i++)
 	{
 		auto& p = m_particles[i];
-		vec3 position = p.position;
+		vec3& position = p.position;
+		vec3& prev_position = p.prev_position;
 		float scale = p.scale;
+
+		vec3 interpolated_position = prev_position * (1.0f - interval) + position * interval;
 
 		mat4 model = mat4::translate(position) * mat4::scale(vec3{ scale, scale, scale });
 		Color color = p.color;

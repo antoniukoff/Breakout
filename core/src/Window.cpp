@@ -27,6 +27,14 @@ Window::Window(float width, float height, const std::string& name)
 			WindowCloseEvent event;
 			dispatcher->dispatch(event);
 		});
+	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			EventDispatcher* dispatcher = static_cast<EventDispatcher*>(glfwGetWindowUserPointer(window));
+			KeyPressEvent event;
+			event.key = key;
+			event.action = action;
+			dispatcher->dispatch(event);
+		});
 
 }
 

@@ -39,11 +39,14 @@ void Application::run()
 			lag -= ms_per_update;
 		}
 
+		m_dispatcher.process_events();
+
 		/// Send the leftover time amount to the renderer to interpolate between the update frames
 		float interval = lag / ms_per_update;
 
 		render(interval);
 		m_window->swap();
+
 	}
 }
 

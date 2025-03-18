@@ -3,7 +3,6 @@
 
 #include "Window.h"
 #include "EventDispatcher.h"
-#include "Event.h"
 
 class Application
 {

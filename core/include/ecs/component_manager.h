@@ -81,6 +81,7 @@ public:
 			m_component_pool.size++;
 
 		}
+		/// If throws check if you pass all the arguments and if the arguments in the correct order
 		C component = C(std::forward<Args>(args)...);
 
 		/// Add the component data to the member pools at their new instance
@@ -92,6 +93,13 @@ public:
 	bool contains(entity_id e_id)
 	{
 		return look_up(e_id) != 0;
+	}
+
+	void reset()
+	{
+		m_component_pool.size = 1;
+		m_entities_to_components.clear();
+		m_entities_to_components.resize(g_max_entities);
 	}
 
 	/**

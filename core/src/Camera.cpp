@@ -59,6 +59,23 @@ const vec3& Camera::get_position() const
 	return m_camera_pos;
 }
 
+const vec3& Camera::get_target_pos() const
+{
+	return m_target;
+}
+
+void Camera::set_position(const vec3& position)
+{
+	m_camera_pos = position;
+}
+
+void Camera::set_target(const vec3& position)
+{
+	m_target = position;
+	m_look_dir = vec3::normalize(m_target - m_camera_pos);
+	m_is_dirty = true;
+}
+
 void Camera::follow(const vec3& position)
 {
 	m_camera_pos += position;

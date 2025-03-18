@@ -15,6 +15,9 @@ public:
 
 	const mat4& get_view_matrix();
 	const vec3& get_position() const;
+	const vec3& get_target_pos() const;
+	void set_position(const vec3& position);
+	void set_target(const vec3& position);
 
 	void follow(const vec3& position);
 
@@ -28,7 +31,7 @@ protected:
 	vec3 m_target;
 	vec3 m_up;
 
-	bool m_is_dirty = true;
+	bool m_is_dirty = false;
 
 	vec3 m_look_dir;
 
