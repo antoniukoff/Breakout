@@ -10,7 +10,6 @@ void Camera::init_view(vec3 from, vec3 at, vec3 up)
 	m_camera_pos = from;
 	m_target = at;
 	m_up = up;
-	m_look_dir = vec3::normalize(at - from);
 
 	m_view_matrix = mat4::calculate_view_matrix(from, at, up);
 }
@@ -59,6 +58,11 @@ const vec3& Camera::get_position() const
 	return m_camera_pos;
 }
 
+const vec3& Camera::get_look_dir() const
+{
+	return m_target - m_camera_pos;
+}
+
 const vec3& Camera::get_target_pos() const
 {
 	return m_target;
@@ -72,7 +76,6 @@ void Camera::set_position(const vec3& position)
 void Camera::set_target(const vec3& position)
 {
 	m_target = position;
-	m_look_dir = vec3::normalize(m_target - m_camera_pos);
 	m_is_dirty = true;
 }
 

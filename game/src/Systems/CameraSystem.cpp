@@ -14,13 +14,22 @@ CameraSystem::CameraSystem(Game& game)
 
 void CameraSystem::update()
 {
-	if (!game_handle)
+	auto game_state = game_handle->get_state();
+	switch (game_state)
 	{
-		return;
+	case GameState::GAME_START:
+		smooth_camera_position();
+		break;
+	case GameState::IS_ACTIVE:
+		update_camera_shake();
+		smooth_camera_position();
+		break;
+	case GameState::GAME_END:
+		break;
+	default:
+		break;
 	}
-
-	smooth_camera_position();
-	update_camera_shake();
+	
 }
 
 void CameraSystem::update_camera_shake()
@@ -30,6 +39,7 @@ void CameraSystem::update_camera_shake()
 	{
 		return;
 	}
+
 	auto& registry = game_handle->get_registry();
 	auto& camera = game_handle->get_active_camera();
 
@@ -51,8 +61,8 @@ void CameraSystem::update_camera_shake()
 	/// fade out the camera shake
 	float strength = intensity * (1.0f - time_elapsed / shake_duration);
 
-	float yaw_offset = Random::get_random_float(-1.0f, 1.0f) * strength;
-	float pitch_offset = Random::get_random_float(-1.0f, 1.0f) * strength;
+	float yaw_offset = Random::get_random_float(-0.5f, 0.5f) * strength;
+	float pitch_offset = Random::get_random_float(-0.5f, 0.5f) * strength;
 
 	camera.add_yaw(yaw_offset);
 	camera.add_pitch(pitch_offset);
@@ -60,17 +70,29 @@ void CameraSystem::update_camera_shake()
 
 void CameraSystem::smooth_camera_position()
 {
+	auto& registry = game_handle->get_registry();
 	auto& camera = game_handle->get_active_camera();
+	auto& scene_data = game_handle->get_scene_data();
 
-	vec3 target_position = game_handle->get_scene_data().camera_pos;
-	vec3 target_look_dir = game_handle->get_scene_data().target_pos;
+	auto [transform] = registry.unpack<TransformComponent>(game_handle->get_paddle_id());
+	vec3 position = transform.position();
+
+	vec3 target_position = scene_data.camera_pos;
+	vec3 target_target = scene_data.target_pos;
+	target_position.x = position.x;
+	target_target.x = position.x;
 
 	vec3 camera_pos = camera.get_position();
+	vec3 target_pos = camera.get_target_pos();
+
 	vec3 lerped_camera_pos = vec3::lerp(camera_pos, target_position, 0.01f);
+	vec3 lerped_target_pos = vec3::lerp(target_pos, target_target, 0.01f);
 
 	camera.set_position(lerped_camera_pos);
-	camera.set_target(target_look_dir);
+	camera.set_target(lerped_target_pos);
 }
+
+
 
 void CameraSystem::on_collision(const Event& event)
 {

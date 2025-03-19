@@ -33,7 +33,7 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 	m_decay_rate = decay_rate;
 	m_update_func = update_func;
 
-	if (m_instanciated)
+	if (m_initialized)
 	{
 		return;
 	}
@@ -85,7 +85,7 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 
 	glBindVertexArray(0);
 
-	m_instanciated = true;
+	m_initialized = true;
 }
 
 void ParticleBatch::update()
@@ -101,7 +101,8 @@ void ParticleBatch::update()
 		{
 			particle = m_particles[m_size - 1];
 			m_size--;
-			i--; /// process moved particle
+			/// process moved particle
+			i--; 
 		}
 	}
 }

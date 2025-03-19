@@ -3,13 +3,6 @@
 #include <string>
 #include <math/vec3.h>
 
-class PlayerMovedEvent : public Event
-{
-public:
-	PlayerMovedEvent() = default;
-	std::string direction;
-};
-
 class CollisionEvent : public Event
 {
 public:
@@ -31,10 +24,18 @@ public:
 	RestartEvent() = default;
 };
 
-class NextLevelEvent : public Event
+class DifficultyIncreasedEvent : public Event
 {
 public:
-	NextLevelEvent() = default;
+	DifficultyIncreasedEvent() = default;
 };
+
+class RespawnEvent : public Event
+{
+public:
+	RespawnEvent() = default;
+	vec3 position;
+};
+
 
 

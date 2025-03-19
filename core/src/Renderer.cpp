@@ -9,12 +9,8 @@ mat4 Renderer::m_view_matrix;
 mat4 Renderer::m_projection_matrix;
 Material* Renderer::current_material = nullptr;
 
-std::unique_ptr<Renderer> Renderer::s_instance;
-
 void Renderer::initialize(vec3 clear_color, bool enable_depth_test, bool enable_face_culling)
 {
-	s_instance = std::make_unique<Renderer>();
-
 	glClearColor(clear_color.x, clear_color.y, clear_color.z, 1.0f);
 	
 	if (enable_depth_test)
@@ -66,10 +62,6 @@ void Renderer::submit(Material* material, Mesh* mesh, const mat4& model_matrix)
 	glDrawArrays(GL_TRIANGLES, 0, mesh->get_vertex_count());
 }
 
-void Renderer::submit_particles(const ParticleBatch& batch)
-{
-
-}
 
 void Renderer::end_frame()
 {

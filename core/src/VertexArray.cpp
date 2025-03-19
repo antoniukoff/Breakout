@@ -11,7 +11,7 @@ VertexArray::~VertexArray()
 	glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArray::complete_setup(std::shared_ptr<VertexBuffer> buffer, const VertexLayout& layout)
+void VertexArray::complete_setup(VertexBuffer* buffer, const VertexLayout& layout)
 {
 	bind();
 	buffer->bind();

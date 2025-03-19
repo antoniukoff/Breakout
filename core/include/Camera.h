@@ -13,15 +13,16 @@ public:
 
 	virtual void update();
 
-	const mat4& get_view_matrix();
 	const vec3& get_position() const;
+	const vec3& get_look_dir() const;
 	const vec3& get_target_pos() const;
 	void set_position(const vec3& position);
 	void set_target(const vec3& position);
 
 	void follow(const vec3& position);
 
-	mat4 get_projection_matrix()
+	const mat4& get_view_matrix();
+	const mat4& get_projection_matrix() const 
 	{
 		return m_projection_matrix;
 	}
@@ -33,8 +34,6 @@ protected:
 
 	bool m_is_dirty = false;
 
-	vec3 m_look_dir;
-
 	/// Rotation
 	float yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
 
@@ -44,6 +43,5 @@ protected:
 private:
 	mat4 m_view_matrix;
 	mat4 m_projection_matrix;
-
 };
 

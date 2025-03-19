@@ -19,6 +19,5 @@ private:
 	void on_collision(const Event& event);
 private:
 	uint32_t entity_processing = -1;
-	vec3 target_position;
 };
 

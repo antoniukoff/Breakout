@@ -6,11 +6,11 @@ class System
 public:
 	virtual void update() = 0;
 
-	void init(Game& game)
+	virtual void init(Game& game)
 	{
 		game_handle = &game;
 	};
-	void reset()
+	virtual void reset()
 	{
 		if (game_handle)
 		{

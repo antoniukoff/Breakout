@@ -7,7 +7,7 @@ void ShakeCamera::update()
 		return;
 	}
 
-	vec3 look_dir = m_look_dir;
+	vec3 look_dir = get_look_dir();
 
 	float curr_yaw = yaw + temp_yaw;
 	float curr_pitch = pitch + temp_pitch;

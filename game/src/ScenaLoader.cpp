@@ -2,21 +2,16 @@
 #include "LevelData.h"
 #include "Game.h"
 #include <math/Random.h>
+#include "ResourceManager.h"
 
-static Game::SceneData data;
+static SceneData data;
 
 void ScenaLoader::load_scene(Game& game, uint32_t level)
 {
-	data.paddle_id = 0;
-	data.current_level = level;
-	data.max_velocity_boosts = 0;
-	data.number_of_balls = 0;
-	data.number_of_bricks = 0;
-
-	auto& level_data = g_levels[level];
+	data = SceneData();
 
 	ScenaLoader::create_arena(game);
-	ScenaLoader::parse_level(game, level_data);
+	ScenaLoader::parse_level(game, g_levels);
 
 	game.set_scene_data(data);
 }
@@ -72,7 +67,6 @@ void ScenaLoader::create_object(Game& game, int object_type, const vec3& positio
 	default:
 		break;
 	}
-
 }
 
 void ScenaLoader::create_arena(Game& game)
@@ -80,16 +74,18 @@ void ScenaLoader::create_arena(Game& game)
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 
-	auto [paddle, material] = game.get_paddle();
-	auto [cube, material2] = game.get_default_mesh_and_material();
+	auto back = ResourceManager::get()->get_mesh("cube");
+	auto walls = ResourceManager::get()->get_mesh("paddle");
+	auto material = ResourceManager::get()->get_material("shiny_material");
 
 	//// Arena 
 	vec3 arena_position = vec3{ 0.0f, 0.0f, z_depth };
 	registry.add<TransformComponent>(e, arena_position, arena_scale);
-	registry.add<RenderComponent>(e, &cube, &material);
+	registry.add<RenderComponent>(e, back, material);
 	////
 
-	data.target_pos = vec3{ 0.0f, arena_scale.y - 50.0f, z_depth };
+	data.target_pos.y = arena_scale.y - 50.0f;
+	data.target_pos.z = z_depth;
 
 	//// Horizontal Walls
 	vec3 horizontal_wall_position = arena_position+ vec3{ arena_scale.x, 0.0f, 2.0f };
@@ -100,7 +96,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, horizontal_wall_position, horizontal_wall_scale);
 	registry.add<BoxColliderComponent>(e, horizontal_bounds);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 
 	horizontal_wall_position.x = -horizontal_wall_position.x;
@@ -108,7 +104,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, horizontal_wall_position, horizontal_wall_scale);
 	registry.add<BoxColliderComponent>(e, horizontal_bounds);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 	////
 
@@ -120,7 +116,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, vertical_wall_position, vertical_wall_scale);
 	registry.add<BoxColliderComponent>(e, vertical_bounds);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 
 	vertical_wall_position.y = -vertical_wall_position.y;
@@ -128,33 +124,33 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, vertical_wall_position, vertical_wall_scale);
 	registry.add<BoxColliderComponent>(e, vertical_bounds);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 	////
 }
 
 void ScenaLoader::create_brick(Game& game, vec3 position)
 {
-	auto [paddle, material] = game.get_paddle();
+	auto paddle = ResourceManager::get()->get_mesh("paddle");
+	auto material = ResourceManager::get()->get_material("shiny_material");
 
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position, brick_scale);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, paddle, material);
 	registry.add<BoxColliderComponent>(e, vec2{ brick_scale.x * 2.0f, brick_scale.y * 2.0f });
 	registry.add<LifeComponent>(e, 1);
-
-	data.number_of_bricks++;
 }
 
 void ScenaLoader::create_solid_brick(Game& game, vec3 position)
 {
-	auto [paddle, material] = game.get_paddle();
+	auto paddle = ResourceManager::get()->get_mesh("paddle");
+	auto material = ResourceManager::get()->get_material("shiny_material");
 
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position, brick_scale);
-	registry.add<RenderComponent>(e, &paddle, &material);
+	registry.add<RenderComponent>(e, paddle, material);
 	registry.add<BoxColliderComponent>(e, vec2{ brick_scale.x * 2.0f, brick_scale.y * 2.0f });
 	registry.add<CameraShakeComponent>(e);
 }
@@ -162,23 +158,28 @@ void ScenaLoader::create_solid_brick(Game& game, vec3 position)
 void ScenaLoader::create_paddle(Game& game, vec3 position)
 {
 	auto& registry = game.get_registry();
-	auto [paddle, material] = game.get_paddle();
+
+	auto paddle = ResourceManager::get()->get_mesh("paddle");
+	auto material = ResourceManager::get()->get_material("shiny_material");
 
 	entity_id paddle_id = registry.create_entity();
 	registry.add<TransformComponent>(paddle_id, position, paddle_scale);
 	registry.add<InputComponent>(paddle_id);
 	registry.add<BoxColliderComponent>(paddle_id, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
-	registry.add<RenderComponent>(paddle_id, &paddle, &material);
+	registry.add<RenderComponent>(paddle_id, paddle, material);
 
 	data.paddle_id = paddle_id;
 
 	data.camera_pos = vec3{ position.x, position.y - 15.0f, 5.0f };
+	data.target_pos.x = position.x;
 }
 
 void ScenaLoader::create_ball(Game& game, vec3 position)
 {
 	auto& registry = game.get_registry();
-	auto [sphere, material] = game.get_sphere();
+
+	auto ball = ResourceManager::get()->get_mesh("ball");
+	auto material = ResourceManager::get()->get_material("shiny_material");
 
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position);
@@ -187,8 +188,8 @@ void ScenaLoader::create_ball(Game& game, vec3 position)
 	vec3 velocity = vec3::normalize({ x, y, 0.0f }) * 0.25f;
 	registry.add<RigidBodyComponent>(e, velocity);
 	registry.add<CircleColliderComponent>(e, 1.0f);
-	registry.add<RenderComponent>(e, &sphere, &material);
+	registry.add<RenderComponent>(e, ball, material);
 
-	data.number_of_balls++;
+	data.active_balls++;
 }
 

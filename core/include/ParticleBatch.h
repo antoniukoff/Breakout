@@ -7,7 +7,8 @@
 class Mesh;
 class Camera;
 
-class Particle {
+class Particle 
+{
 public:
 	vec3 position;
 	vec3 prev_position;
@@ -43,13 +44,13 @@ public:
 
 private:
 	//// Particle Data
-	int m_size = 0;
-	uint32_t m_max_marticles = 0;
-	float m_decay_rate = 0.1f;
-	Mesh* m_mesh = nullptr;
+	bool	  m_initialized = false;
+	uint32_t  m_size = 0;
+	uint32_t  m_max_marticles = 0;
+	float	  m_decay_rate = 0.1f;
+	Mesh*     m_mesh = nullptr;
 	Particle* m_particles = nullptr;
 	std::function<void(Particle&)> m_update_func;
-	bool m_instanciated = false;
 
 	/// Draw Data
 	uint32_t vao = 0;

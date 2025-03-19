@@ -96,6 +96,13 @@ void Shader::create_shader(const std::string& file_path)
 std::tuple<std::string, std::string> Shader::parse_shader(const std::string& file_path)
 {
 	std::ifstream file(file_path);
+
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open resource file: " << file_path << std::endl;
+		return {};
+	}
+
 	std::string line;
 	std::stringstream ss[2];
 
@@ -124,6 +131,8 @@ std::tuple<std::string, std::string> Shader::parse_shader(const std::string& fil
 		}
 		ss[(int)type] << line << std::endl;
 	}
+
+	file.close();
 
 	return { ss[0].str(), ss[1].str() };
 }

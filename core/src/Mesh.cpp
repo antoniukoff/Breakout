@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <cassert>
+#include <iostream>
 
 Mesh::Mesh(const std::string& file_path)
 {
@@ -27,16 +28,22 @@ uint32_t Mesh::get_vertex_count() const
 
 void Mesh::parse_obj(const std::string& file_path)
 {
+	std::ifstream file(file_path);
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open resource file: " << file_path << std::endl;
+		return;
+	}
+
 	std::vector<Face> faces;
 	std::vector<vec3> positions;
 	std::vector<vec2> tex_coords;
 	std::vector<vec3> normals;
 
-	std::ifstream ifs(file_path);
 	std::string line;
 
 
-	while (std::getline(ifs, line)) 
+	while (std::getline(file, line))
 	{
 		std::istringstream stream(line);
 		std::string type;
@@ -77,7 +84,7 @@ void Mesh::parse_obj(const std::string& file_path)
 			faces.push_back(face);
 		}
 	}
-	ifs.close();
+	file.close();
 
 	create_mesh(faces, GL_STATIC_DRAW);
 }
@@ -117,7 +124,7 @@ Face Mesh::process_face(
 void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 {
 	m_vao = std::make_unique<VertexArray>();
-	m_vbo = std::make_shared<VertexBuffer>();
+	m_vbo = std::make_unique<VertexBuffer>();
 
 	/// Create Layout
 	VertexLayout layout = {
@@ -130,7 +137,7 @@ void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 
 	m_vbo->upload_data(faces);
 	/// Set VBO and Layout to VAO
-	m_vao->complete_setup(m_vbo, layout);
+	m_vao->complete_setup(m_vbo.get(), layout);
 }
 
 
