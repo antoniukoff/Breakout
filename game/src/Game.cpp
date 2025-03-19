@@ -25,6 +25,7 @@ Game::Game()
 
 	m_dispatcher.subscribe<RestartEvent>(std::bind(&Game::on_restart, this, std::placeholders::_1));
 	m_dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&Game::on_brick_destroyed, this, std::placeholders::_1));
+	m_dispatcher.subscribe<RespawnEvent>(std::bind(&Game::on_brick_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<KeyPressEvent>(std::bind(&Game::on_key_press, this, std::placeholders::_1));
 }
 
@@ -47,33 +48,88 @@ void Game::render(float interval)
 
 void Game::on_restart(const Event& event)
 {
-	m_registry.reset();
-	initialize_level(0);
+	m_scene_data.lives--;
+	if (m_scene_data.lives <= 0)
+	{
+		m_registry.reset();
+		initialize_level(0);
+	}
+	else
+	{
+		auto [paddle_transform] = m_registry.unpack<TransformComponent>(m_scene_data.paddle_id);
+		auto [rigid_body] = m_registry.unpack<RigidBodyComponent>(m_scene_data.active_ball_id);
+
+		vec3 position = paddle_transform.position();
+		float velocity_mag = rigid_body.velocity().mag();
+
+		m_registry.add<TransformComponent>(m_scene_data.active_ball_id, vec3{ position + vec3{0.0f, 10.0f, 0.0} });
+
+		float x = Random::get_random_float(-0.45f, 0.45f);
+		float y = Random::get_random_float(0.05f, 0.7f);
+
+		vec3 velocity = vec3::normalize({ x, y, 0.0f }) * velocity_mag;
+		m_registry.add<RigidBodyComponent>(m_scene_data.active_ball_id, velocity);
+
+		m_scene_data.state = GameState::GAME_START;
+	}
+
+	reset();
 }
 
 void Game::on_brick_destroyed(const Event& event)
 {
 	m_scene_data.bricks_destroyed++;
+	m_scene_data.num_bricks--;
 	if (m_scene_data.bricks_destroyed >= m_scene_data.difficulty_threashhold[m_scene_data.current_difficulty])
 	{
-		m_dispatcher.dispatch(DifficultyIncreasedEvent{});
-		m_scene_data.current_difficulty++;
+		if (m_scene_data.current_difficulty < m_scene_data.difficulty_threashhold.size() - 1)
+		{
+			m_dispatcher.dispatch(DifficultyIncreasedEvent{});
+			m_scene_data.current_difficulty++;
+			std::cout << "Difficulty Increased" << std::endl;
+
+		}
+		else
+		{
+			m_dispatcher.dispatch(LastDifficulty{});
+			if (m_scene_data.num_bricks <= 0)
+			{
+				m_dispatcher.dispatch(GameWonEvent{});
+				reset();
+				m_scene_data.state = GameState::GAME_END;
+			}
+		}
 	}
+}
+
+void Game::on_brick_respawn(const Event& event)
+{
+	m_scene_data.num_bricks++;
 }
 
 void Game::on_key_press(const Event& event)
 {
 	const KeyPressEvent& e = static_cast<const KeyPressEvent&>(event);
-	if (e.key == GLFW_KEY_SPACE)
+	if (e.key == GLFW_KEY_SPACE && e.action == GLFW_PRESS)
 	{
-		m_scene_data.state = GameState::IS_ACTIVE;
-		start();
+		if (m_scene_data.state == GameState::GAME_START)
+		{
+			m_scene_data.state = GameState::IS_ACTIVE;
+			start();
+		}
+		else if (m_scene_data.state == GameState::GAME_END)
+		{
+			reset();
+			m_registry.reset();
+			ScenaLoader::load_scene(*this, 1);
+			m_scene_data.state = GameState::GAME_START;
+		}
 	}
 	if (e.key == GLFW_KEY_R)
 	{
-		m_scene_data.state = GameState::GAME_START;
 		m_registry.reset();
 		initialize_level(0);
+		m_scene_data.state = GameState::GAME_START;
 	}
 }
 

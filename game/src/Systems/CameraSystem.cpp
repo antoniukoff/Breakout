@@ -17,19 +17,13 @@ void CameraSystem::update()
 	auto game_state = game_handle->get_state();
 	switch (game_state)
 	{
-	case GameState::GAME_START:
-		smooth_camera_position();
-		break;
 	case GameState::IS_ACTIVE:
 		update_camera_shake();
-		smooth_camera_position();
-		break;
-	case GameState::GAME_END:
 		break;
 	default:
 		break;
 	}
-	
+	smooth_camera_position();
 }
 
 void CameraSystem::update_camera_shake()
@@ -79,6 +73,7 @@ void CameraSystem::smooth_camera_position()
 
 	vec3 target_position = scene_data.camera_pos;
 	vec3 target_target = scene_data.target_pos;
+	/// Follow players x position
 	target_position.x = position.x;
 	target_target.x = position.x;
 

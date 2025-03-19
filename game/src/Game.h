@@ -32,14 +32,16 @@ enum class GameState
 struct SceneData
 {
 	uint32_t current_difficulty = 0;
-	uint32_t difficulty_threashhold[6] =
+	std::vector<int> difficulty_threashhold =
 	{
-		2, 5, 10, 20, 40 
+		2, 5, 7, 8, 10
 	};
+	uint32_t num_bricks = 0;
 
+	int lives = 5;
 	uint32_t paddle_id = 0;
 	uint32_t bricks_destroyed = 0;
-	int active_balls = 0;
+	uint32_t active_ball_id = 0;
 	GameState state = GameState::GAME_START;
 
 	/// Used to interpolate to players position at the start 
@@ -76,6 +78,7 @@ private:
 private:
 	void on_restart(const Event& event);
 	void on_brick_destroyed(const Event& event);
+	void on_brick_respawn(const Event& event);
 	void on_key_press(const Event& event);
 
 public:

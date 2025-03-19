@@ -13,3 +13,8 @@ public:
 	int key;
 	int action;
 };
+
+class OnGameWon : public Event
+{
+public:
+};

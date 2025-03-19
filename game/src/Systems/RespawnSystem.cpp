@@ -10,6 +10,7 @@ RespawnSystem::RespawnSystem(Game& game)
 	auto& dispatcher = game.get_dispatcher();
 	dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&RespawnSystem::on_brick_destroyed, this, std::placeholders::_1));
 	dispatcher.subscribe<DifficultyIncreasedEvent>(std::bind(&RespawnSystem::on_difficulty_increased, this, std::placeholders::_1));
+	dispatcher.subscribe<LastDifficulty>(std::bind(&RespawnSystem::on_last_difficulty, this, std::placeholders::_1));
 }
 
 void RespawnSystem::init(Game& game)
@@ -66,4 +67,8 @@ void RespawnSystem::on_difficulty_increased(const Event& event)
 	m_respawn_timer / 2.0f;
 }
 
+void RespawnSystem::on_last_difficulty(const Event& event)
+{
+	m_respawn_timer = 2000.0f;
+}
 

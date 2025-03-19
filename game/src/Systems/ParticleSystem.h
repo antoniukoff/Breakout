@@ -24,6 +24,7 @@ private:
 	void on_collision(const Event& event);
 	void on_brick_destroyed(const Event& event);
 	void on_respawn_event(const Event& event);
+	void on_game_won(const Event& event);
 
 private:
 	emitters m_emitters;

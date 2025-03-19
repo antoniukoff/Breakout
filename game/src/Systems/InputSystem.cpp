@@ -30,6 +30,7 @@ void InputSystem::update()
 		update_player_movement();
 		break;
 	case GameState::GAME_END:
+		update_camera_movement();
 		break;
 	default:
 		break;
@@ -70,7 +71,6 @@ void InputSystem::update_player_movement()
 	angle = std::clamp(angle, -45.0f, 45.0f);
 	position.x = std::clamp(position.x, -arena_scale.x + scale.x, arena_scale.x - scale.x);
 
-	vec3 delta_position = position - prev_position;
 }
 
 void InputSystem::update_camera_movement()
@@ -79,7 +79,12 @@ void InputSystem::update_camera_movement()
 	auto& scene_data = game_handle->get_scene_data();
 
 	vec3 current_target = camera.get_target_pos();
+
+	auto& registry = game_handle->get_registry();
+	auto [transform] = registry.unpack<TransformComponent>(game_handle->get_paddle_id());
+	vec3 paddle_pos = transform.position();
 	vec3 target_target = scene_data.target_pos;
+	target_target.x = paddle_pos.x;
 
 	if (Input::is_key_pressed(GLFW_KEY_A))
 	{

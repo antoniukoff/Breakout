@@ -37,5 +37,20 @@ public:
 	vec3 position;
 };
 
+class LastDifficulty : public Event
+{
+public:
+	LastDifficulty() = default;
+};
+
+class GameWonEvent : public Event
+{
+public:
+	GameWonEvent() = default;
+};
+
+
+
+
 
 

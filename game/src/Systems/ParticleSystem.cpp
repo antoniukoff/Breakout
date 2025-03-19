@@ -18,6 +18,7 @@ ParticleSystem::ParticleSystem(Game& game)
 	dispatcher.subscribe<CollisionEvent>(std::bind(&ParticleSystem::on_collision, this, std::placeholders::_1));
 	dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&ParticleSystem::on_brick_destroyed, this, std::placeholders::_1));
 	dispatcher.subscribe<RespawnEvent>(std::bind(&ParticleSystem::on_respawn_event, this, std::placeholders::_1));
+	dispatcher.subscribe<GameWonEvent>(std::bind(&ParticleSystem::on_game_won, this, std::placeholders::_1));
 }
 
 void ParticleSystem::update()
@@ -35,13 +36,14 @@ void ParticleSystem::update()
 		break;
 	case GameState::IS_ACTIVE:
 		draw_trail();
-		process_emitters();
 		break;
 	case GameState::GAME_END:
 		break;
 	default:
 		break;
 	}
+	process_emitters();
+
 	line_handle->update();
 	trail_handle->update();
 	patricle_handle->update();
@@ -114,7 +116,7 @@ void ParticleSystem::process_emitters()
 		float rand_z = Random::get_random_float(0.2f, 0.5f);
 		float rand_scale = Random::get_random_float(0.25f, 0.5f);
 
-		patricle_handle->add_particle(particle.position, { rand_x, rand_y, rand_z }, particle.color, rand_scale);
+		patricle_handle->add_particle(particle.position, particle.velocity + vec3{ rand_x, rand_y, rand_z }, particle.color, rand_scale);
 	}
 
 }
@@ -181,4 +183,22 @@ void ParticleSystem::on_respawn_event(const Event& event)
 
 	float duration = 100.0f;
 	m_emitters.push_back({ duration, p });
+}
+
+void ParticleSystem::on_game_won(const Event& event)
+{
+	auto& registry = game_handle->get_registry();
+	registry.for_each<TransformComponent>([&](entity_id e, component_handle<TransformComponent> transform)
+		{
+			vec3 position = transform.position();
+			Color rand_color = Random::get_random_color();
+
+			Particle p;
+			p.color = rand_color;
+			p.position = position;
+			p.velocity = vec3{ 0.0f, 0.0f, 1.0f };
+
+			float duration = 1000.0f;
+			m_emitters.push_back({ duration, p });
+		});
 }

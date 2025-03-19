@@ -11,7 +11,7 @@ void ScenaLoader::load_scene(Game& game, uint32_t level)
 	data = SceneData();
 
 	ScenaLoader::create_arena(game);
-	ScenaLoader::parse_level(game, g_levels);
+	ScenaLoader::parse_level(game, g_levels[level]);
 
 	game.set_scene_data(data);
 }
@@ -140,12 +140,14 @@ void ScenaLoader::create_brick(Game& game, vec3 position)
 	registry.add<RenderComponent>(e, paddle, material);
 	registry.add<BoxColliderComponent>(e, vec2{ brick_scale.x * 2.0f, brick_scale.y * 2.0f });
 	registry.add<LifeComponent>(e, 1);
+
+	data.num_bricks++;
 }
 
 void ScenaLoader::create_solid_brick(Game& game, vec3 position)
 {
 	auto paddle = ResourceManager::get()->get_mesh("paddle");
-	auto material = ResourceManager::get()->get_material("shiny_material");
+	auto material = ResourceManager::get()->get_material("matte_material");
 
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
@@ -190,6 +192,6 @@ void ScenaLoader::create_ball(Game& game, vec3 position)
 	registry.add<CircleColliderComponent>(e, 1.0f);
 	registry.add<RenderComponent>(e, ball, material);
 
-	data.active_balls++;
+	data.active_ball_id = e;
 }
 

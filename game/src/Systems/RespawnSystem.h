@@ -19,6 +19,7 @@ public:
 private:
 	void on_brick_destroyed(const Event& event);
 	void on_difficulty_increased(const Event& event);
+	void on_last_difficulty(const Event& event);
 
 private:
 	float m_respawn_timer = 1250.0f;
