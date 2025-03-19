@@ -14,7 +14,7 @@ public:
 	RespawnSystem(Game& game);
 	void init(Game& game) override;
 	void update() override;
-	void reset() override;
+	void reset();
 	
 private:
 	void on_brick_destroyed(const Event& event);

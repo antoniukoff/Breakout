@@ -10,13 +10,7 @@ public:
 	{
 		game_handle = &game;
 	};
-	virtual void reset()
-	{
-		if (game_handle)
-		{
-			game_handle = nullptr;
-		}
-	};
+	
 
 protected:
 	Game* game_handle = nullptr;

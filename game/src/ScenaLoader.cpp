@@ -13,6 +13,8 @@ void ScenaLoader::load_scene(Game& game, uint32_t level)
 	ScenaLoader::create_arena(game);
 	ScenaLoader::parse_level(game, g_levels[level]);
 
+	data.current_level = level;
+
 	game.set_scene_data(data);
 }
 

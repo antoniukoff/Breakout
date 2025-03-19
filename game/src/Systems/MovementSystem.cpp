@@ -11,7 +11,8 @@ MovementSystem::MovementSystem(Game& game)
 
 void MovementSystem::update()
 {
-	if (!game_handle)
+	auto state = game_handle->get_state();
+	if (state != GameState::IS_ACTIVE)
 	{
 		return;
 	}

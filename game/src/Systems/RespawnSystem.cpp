@@ -20,11 +20,6 @@ void RespawnSystem::init(Game& game)
 
 void RespawnSystem::update()
 {
-	if (!game_handle)
-	{
-		return;
-	}
-
 	m_elapsed++;
 	if (m_elapsed >= m_respawn_timer)
 	{
@@ -45,10 +40,6 @@ void RespawnSystem::update()
 
 void RespawnSystem::reset()
 {
-	if (game_handle)
-	{
-		game_handle = nullptr;
-	}
 	m_respawn_timer = 2500.0f;
 	m_elapsed = 0.0f;
 

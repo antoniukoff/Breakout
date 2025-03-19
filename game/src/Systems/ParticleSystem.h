@@ -18,7 +18,7 @@ public:
 	void draw_shooting_line();
 	void draw_trail();
 	void process_emitters();
-	void reset() override;
+	void reset();
 	void draw(float interval);
 private:
 	void on_collision(const Event& event);

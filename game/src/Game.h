@@ -31,16 +31,19 @@ enum class GameState
 
 struct SceneData
 {
+	uint32_t current_level = 0;
 	uint32_t current_difficulty = 0;
-	std::vector<int> difficulty_threashhold =
+	std::vector<std::vector<int> > difficulty_threashhold =
 	{
-		2, 5, 7, 8, 10
+		{ 1, 1 },
+		{ 5, 8, 12, 16, 20 },
+		{ 5, 8, 12, 16, 20, 25, 30 }
 	};
-	uint32_t num_bricks = 0;
+	uint32_t num_bricks;
+	uint32_t bricks_destroyed = 0;
 
 	int lives = 5;
 	uint32_t paddle_id = 0;
-	uint32_t bricks_destroyed = 0;
 	uint32_t active_ball_id = 0;
 	GameState state = GameState::GAME_START;
 

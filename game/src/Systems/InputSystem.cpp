@@ -13,11 +13,6 @@ InputSystem::InputSystem(Game& game)
 
 void InputSystem::update()
 {
-	if (!game_handle)
-	{
-		return;
-	}
-
 	auto state = game_handle->get_state();
 
 	switch (state)

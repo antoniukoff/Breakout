@@ -56,6 +56,7 @@ void Game::on_restart(const Event& event)
 	}
 	else
 	{
+		/// Reset balls position
 		auto [paddle_transform] = m_registry.unpack<TransformComponent>(m_scene_data.paddle_id);
 		auto [rigid_body] = m_registry.unpack<RigidBodyComponent>(m_scene_data.active_ball_id);
 
@@ -73,16 +74,15 @@ void Game::on_restart(const Event& event)
 		m_scene_data.state = GameState::GAME_START;
 	}
 
-	reset();
 }
 
 void Game::on_brick_destroyed(const Event& event)
 {
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
-	if (m_scene_data.bricks_destroyed >= m_scene_data.difficulty_threashhold[m_scene_data.current_difficulty])
+	if (m_scene_data.bricks_destroyed >= m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty])
 	{
-		if (m_scene_data.current_difficulty < m_scene_data.difficulty_threashhold.size() - 1)
+		if (m_scene_data.current_difficulty < m_scene_data.difficulty_threashhold[m_scene_data.current_level].size() - 1)
 		{
 			m_dispatcher.dispatch(DifficultyIncreasedEvent{});
 			m_scene_data.current_difficulty++;
@@ -121,7 +121,15 @@ void Game::on_key_press(const Event& event)
 		{
 			reset();
 			m_registry.reset();
-			ScenaLoader::load_scene(*this, 1);
+			m_scene_data.current_level++;
+			if (m_scene_data.current_level < 3)
+			{
+				ScenaLoader::load_scene(*this, m_scene_data.current_level);
+			}
+			else
+			{
+				ScenaLoader::load_scene(*this, 0);
+			}
 			m_scene_data.state = GameState::GAME_START;
 		}
 	}
@@ -159,8 +167,6 @@ void Game::initialize_subsystems()
 
 void Game::reset()
 {	
-	movement.reset();
-	physics.reset();
 	respawn_system.reset();
 	particle_system.reset();
 }
