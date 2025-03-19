@@ -31,7 +31,8 @@ workspace "Breakout"
 
         links { 
             "glfw3", 
-            "glew32s" 
+            "glew32s",
+            "opengl32"
         }
 
         files { 
@@ -51,6 +52,8 @@ workspace "Breakout"
             ["Vendor/Headers/*"] = {"core/vendor/**.h"},
             ["Vendor/Sources/*"] = {"core/vendor/**.cpp"}
          }
+
+         defines "GLEW_STATIC"
 
         filter "system:windows"
             cppdialect "C++20"

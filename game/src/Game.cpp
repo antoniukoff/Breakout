@@ -151,7 +151,7 @@ void Game::initialize_subsystems()
 {
 	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("cube"));
 	line.initizalize(500, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p){});
-	trail.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
+	trail.initizalize(1000, 0.001f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
 		{
 			p.scale *= p.life;
 			p.color.a *= p.life;
