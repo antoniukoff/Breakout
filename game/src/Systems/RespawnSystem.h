@@ -21,7 +21,7 @@ private:
 	void on_last_difficulty(const Event& event);
 
 private:
-	float m_respawn_timer = 1250.0f;
+	float m_respawn_timer = 3500.0f;
 	float m_elapsed = 0.0f;
 	std::queue<vec3> m_available_positions;
 };

@@ -35,7 +35,7 @@ void RespawnSystem::update()
 
 void RespawnSystem::reset()
 {
-	m_respawn_timer = 2500.0f;
+	m_respawn_timer = 3500.0f;
 	m_elapsed = 0.0f;
 
 	std::queue<vec3> new_queue;
@@ -50,7 +50,7 @@ void RespawnSystem::on_brick_destroyed(const Event& event)
 
 void RespawnSystem::on_difficulty_increased(const Event& event)
 {
-	m_respawn_timer / 2.0f;
+	m_respawn_timer *= 0.75f;
 }
 
 void RespawnSystem::on_last_difficulty(const Event& event)
