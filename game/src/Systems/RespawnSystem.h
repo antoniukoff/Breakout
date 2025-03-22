@@ -12,7 +12,6 @@ class RespawnSystem : public System
 {
 public:
 	RespawnSystem(Game& game);
-	void init(Game& game) override;
 	void update() override;
 	void reset();
 	

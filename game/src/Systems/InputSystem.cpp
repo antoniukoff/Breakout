@@ -65,7 +65,6 @@ void InputSystem::update_player_movement()
 
 	angle = std::clamp(angle, -45.0f, 45.0f);
 	position.x = std::clamp(position.x, -arena_scale.x + scale.x, arena_scale.x - scale.x);
-
 }
 
 void InputSystem::update_camera_movement()
@@ -78,8 +77,9 @@ void InputSystem::update_camera_movement()
 	auto& registry = game_handle->get_registry();
 	auto [transform] = registry.unpack<TransformComponent>(game_handle->get_paddle_id());
 	vec3 paddle_pos = transform.position();
-	vec3 target_target = scene_data.target_pos;
-	target_target.x = paddle_pos.x;
+
+	vec3 target_target	 = scene_data.target_pos;
+		 target_target.x = paddle_pos.x;
 
 	if (Input::is_key_pressed(GLFW_KEY_A))
 	{
@@ -90,8 +90,7 @@ void InputSystem::update_camera_movement()
 		target_target.x += 20.0f;
 	}
 
-	vec3 lerped_target = vec3::lerp(current_target, target_target, 0.01f);
-	
+	vec3 lerped_target = vec3::lerp(current_target, target_target, 0.01f);	
 	camera.set_target(lerped_target);
 }
 

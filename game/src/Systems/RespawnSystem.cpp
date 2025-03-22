@@ -1,6 +1,5 @@
 #include "RespawnSystem.h"
 #include "../GameEvents.h"
-#include "../ScenaLoader.h"
 #include "../Game.h"
 
 RespawnSystem::RespawnSystem(Game& game)
@@ -13,11 +12,6 @@ RespawnSystem::RespawnSystem(Game& game)
 	dispatcher.subscribe<LastDifficulty>(std::bind(&RespawnSystem::on_last_difficulty, this, std::placeholders::_1));
 }
 
-void RespawnSystem::init(Game& game)
-{
-	game_handle = &game;
-}
-
 void RespawnSystem::update()
 {
 	m_elapsed++;
@@ -26,13 +20,14 @@ void RespawnSystem::update()
 		if (m_available_positions.size() > 0)
 		{
 			vec3 position = m_available_positions.front();
-			ScenaLoader::create_brick(*game_handle, position);
-			m_available_positions.pop();
 
 			auto& dispatcher = game_handle->get_dispatcher();
+
 			RespawnEvent event;
 			event.position = position;
 			dispatcher.dispatch(event);
+
+			m_available_positions.pop();
 		}
 		m_elapsed = 0.0f;
 	}
@@ -60,6 +55,6 @@ void RespawnSystem::on_difficulty_increased(const Event& event)
 
 void RespawnSystem::on_last_difficulty(const Event& event)
 {
-	m_respawn_timer = 2000.0f;
+	m_respawn_timer = 200000.0f;
 }
 

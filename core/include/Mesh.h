@@ -16,13 +16,9 @@ public:
 
 	uint32_t get_vertex_count() const;
 
-	std::vector<vec3>& get_mesh_positions()
+	VertexBuffer& get_vbo()
 	{
-		return m_positions;
-	}
-	VertexBuffer* get_vbo()
-	{
-		return m_vbo.get();
+		return m_vbo;
 	}
 
 private:
@@ -31,12 +27,8 @@ private:
 	void create_mesh(const std::vector<Face>& faces, uint32_t usage_mode);
 
 private:
-	std::vector<vec3> m_positions;
-	std::vector<vec2> m_tex_coords;
-	std::vector<vec3> m_normals;
-
-	std::unique_ptr<VertexArray> m_vao = nullptr;
-	std::unique_ptr<VertexBuffer> m_vbo = nullptr;
+	VertexArray m_vao;
+	VertexBuffer m_vbo;
 
 	uint32_t m_vertex_count = 0;
 };

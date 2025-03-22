@@ -23,11 +23,6 @@ ParticleSystem::ParticleSystem(Game& game)
 
 void ParticleSystem::update()
 {
-	if (!game_handle)
-	{
-		return;
-	}
-	
 	GameState game_state = game_handle->get_state();
 	switch (game_state)
 	{
@@ -128,10 +123,6 @@ void ParticleSystem::reset()
 
 void ParticleSystem::draw(float interval)
 {
-	if (!game_handle)
-	{
-		return;
-	}
 	auto& camera = game_handle->get_active_camera();
 	line_handle->draw(camera, interval);
 	trail_handle->draw(camera, interval);
@@ -196,7 +187,7 @@ void ParticleSystem::on_game_won(const Event& event)
 			Particle p;
 			p.color = rand_color;
 			p.position = position;
-			p.velocity = vec3{ 0.0f, 0.0f, 1.0f };
+			p.velocity = vec3{ 0.0f, 0.0f, 0.0f };
 
 			float duration = 1000.0f;
 			m_emitters.push_back({ duration, p });

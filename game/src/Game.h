@@ -2,12 +2,10 @@
 
 #include <Application.h>
 
-#include <Shader.h>
-#include <Material.h>
-#include <ParticleBatch.h>
 #include <ecs/registry.h> 
 
 #include "ShakeCamera.h"
+#include <ParticleBatch.h>
 
 #include "Components.h"
 #include "GameEvents.h"
@@ -75,11 +73,11 @@ private:
 	void initialize_level(uint32_t level);
 	void initialize_subsystems();
 	void reset();
-	void start();
 	void set_scene_data(const SceneData& data);
 
 private:
 	void on_restart(const Event& event);
+	void reset_ball();
 	void on_brick_destroyed(const Event& event);
 	void on_brick_respawn(const Event& event);
 	void on_key_press(const Event& event);
@@ -92,8 +90,8 @@ public:
 	inline ParticleBatch&   get_particle_batch()	{ return particles; }
 	inline ParticleBatch&   get_trail_batch()		{ return trail; }
 	inline ParticleBatch&   get_line_batch()		{ return line; }
-	inline entity_id        get_paddle_id()		    { return m_scene_data.paddle_id; }
 	inline const SceneData& get_scene_data() const  { return m_scene_data; }
+	inline const entity_id  get_paddle_id()	const   { return m_scene_data.paddle_id; }
 	inline const GameState& get_state() const		{ return m_scene_data.state; }
 
 private:

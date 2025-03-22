@@ -23,38 +23,33 @@ ParticleBatch::~ParticleBatch()
 
 void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&)> update_func)
 {
-	if (!m_particles)
+	if (m_particles)
 	{
-		m_particles = new Particle[max_particles];
+		delete[] m_particles;
 	}
+
+	m_particles = new Particle[max_particles];
 	m_size = 0;
 	m_mesh = mesh;
 	m_max_marticles = max_particles;
 	m_decay_rate = decay_rate;
 	m_update_func = update_func;
-
-	if (m_initialized)
+	
+	if (!m_initialized)
 	{
-		return;
+		glDeleteBuffers(1, &instanced_vbo);
+		glDeleteVertexArrays(1, &vao);
 	}
-
-	int mesh_vertices = mesh->get_vertex_count();
 	
 	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &instanced_vbo);
 
 	glBindVertexArray(vao);
 
-	//// Mesh data
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, mesh_vertices * sizeof(vec3), mesh->get_mesh_positions().data(), GL_STATIC_DRAW);
+	mesh->get_vbo().bind();
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, instanced_vbo);
-	glBufferData(GL_ARRAY_BUFFER, max_particles * sizeof(RenderData), nullptr, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
 	//// Configuring attributes to send mat4 per instance
 	//// Max attribute size to send to the gpu is vec4

@@ -28,7 +28,6 @@ void CameraSystem::update()
 
 void CameraSystem::update_camera_shake()
 {
-
 	if (entity_processing == -1)
 	{
 		return;
@@ -75,7 +74,7 @@ void CameraSystem::smooth_camera_position()
 	vec3 target_target = scene_data.target_pos;
 	/// Follow players x position
 	target_position.x = position.x;
-	target_target.x = position.x;
+	target_target.x   = position.x;
 
 	vec3 camera_pos = camera.get_position();
 	vec3 target_pos = camera.get_target_pos();
@@ -86,8 +85,6 @@ void CameraSystem::smooth_camera_position()
 	camera.set_position(lerped_camera_pos);
 	camera.set_target(lerped_target_pos);
 }
-
-
 
 void CameraSystem::on_collision(const Event& event)
 {

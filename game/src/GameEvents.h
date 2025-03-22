@@ -6,7 +6,6 @@
 class CollisionEvent : public Event
 {
 public:
-	CollisionEvent() = default;
 	uint32_t entity_id;
 	vec3 position;
 };
@@ -14,40 +13,29 @@ public:
 class BrickDestroyedEvent : public Event
 {
 public:
-	BrickDestroyedEvent() = default;
 	vec3 position;
 };
 
+class GameStarted : public Event
+{};
+
 class RestartEvent : public Event
-{
-public:
-	RestartEvent() = default;
-};
+{};
 
 class DifficultyIncreasedEvent : public Event
-{
-public:
-	DifficultyIncreasedEvent() = default;
-};
+{};
 
 class RespawnEvent : public Event
 {
 public:
-	RespawnEvent() = default;
 	vec3 position;
 };
 
 class LastDifficulty : public Event
-{
-public:
-	LastDifficulty() = default;
-};
+{};
 
 class GameWonEvent : public Event
-{
-public:
-	GameWonEvent() = default;
-};
+{};
 
 
 

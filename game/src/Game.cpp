@@ -1,9 +1,8 @@
 #include "Game.h"
-#include "Renderer.h"
 #include "ScenaLoader.h"
 #include <CoreEvents.h>
-#include <math/Random.h>
 #include "ResourceManager.h"
+#include <math/Random.h>
 #include <../vendor/glfw/include/GLFW/glfw3.h>
 
 Game::Game() 
@@ -16,7 +15,6 @@ Game::Game()
 	, particle_system(*this)
 	, health_system(*this)
 	, render_system(*this)
-
 {
 	ResourceManager::initialize("assets/resources.txt");
 
@@ -46,34 +44,43 @@ void Game::render(float interval)
 	particle_system.draw(interval);
 }
 
+void Game::initialize_subsystems()
+{
+	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("ball"));
+	line.initizalize(500, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p) {});
+	trail.initizalize(1000, 0.001f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
+		{
+			p.scale *= p.life;
+			p.color.a *= p.life;
+		});
+
+	/// Default camera properties
+	vec3 camera_pos = { -50.0f, -50.0f, 60.0f };
+	vec3 target_pos = { 0.0f, 0.0f, 0.0f };
+	vec3 global_up = { 0.0f, 1.0f, 0.0f };
+	m_camera.init_view(camera_pos, target_pos, global_up);
+	m_camera.init_projection(m_window->get_aspect_ratio(), 90.0f, 0.1f, 1000.0f);
+}
+
+void Game::initialize_level(uint32_t level)
+{
+	reset();
+	m_registry.reset();
+	ScenaLoader::load_scene(*this, level);
+}
+
 void Game::on_restart(const Event& event)
 {
 	m_scene_data.lives--;
 	if (m_scene_data.lives <= 0)
 	{
-		m_registry.reset();
 		initialize_level(0);
 	}
 	else
 	{
-		/// Reset balls position
-		auto [paddle_transform] = m_registry.unpack<TransformComponent>(m_scene_data.paddle_id);
-		auto [rigid_body] = m_registry.unpack<RigidBodyComponent>(m_scene_data.active_ball_id);
-
-		vec3 position = paddle_transform.position();
-		float velocity_mag = rigid_body.velocity().mag();
-
-		m_registry.add<TransformComponent>(m_scene_data.active_ball_id, vec3{ position + vec3{0.0f, 10.0f, 0.0} });
-
-		float x = Random::get_random_float(-0.45f, 0.45f);
-		float y = Random::get_random_float(0.05f, 0.7f);
-
-		vec3 velocity = vec3::normalize({ x, y, 0.0f }) * velocity_mag;
-		m_registry.add<RigidBodyComponent>(m_scene_data.active_ball_id, velocity);
-
+		reset_ball();
 		m_scene_data.state = GameState::GAME_START;
 	}
-
 }
 
 void Game::on_brick_destroyed(const Event& event)
@@ -95,7 +102,6 @@ void Game::on_brick_destroyed(const Event& event)
 			if (m_scene_data.num_bricks <= 0)
 			{
 				m_dispatcher.dispatch(GameWonEvent{});
-				reset();
 				m_scene_data.state = GameState::GAME_END;
 			}
 		}
@@ -104,6 +110,9 @@ void Game::on_brick_destroyed(const Event& event)
 
 void Game::on_brick_respawn(const Event& event)
 {
+	const RespawnEvent& e = static_cast<const RespawnEvent&>(event);
+	ScenaLoader::create_brick(*this, e.position);
+
 	m_scene_data.num_bricks++;
 }
 
@@ -115,54 +124,24 @@ void Game::on_key_press(const Event& event)
 		if (m_scene_data.state == GameState::GAME_START)
 		{
 			m_scene_data.state = GameState::IS_ACTIVE;
-			start();
 		}
 		else if (m_scene_data.state == GameState::GAME_END)
 		{
-			reset();
-			m_registry.reset();
 			m_scene_data.current_level++;
 			if (m_scene_data.current_level < 3)
 			{
-				ScenaLoader::load_scene(*this, m_scene_data.current_level);
+				initialize_level(m_scene_data.current_level);
 			}
 			else
 			{
-				ScenaLoader::load_scene(*this, 0);
+				initialize_level(0);
 			}
-			m_scene_data.state = GameState::GAME_START;
 		}
 	}
 	if (e.key == GLFW_KEY_R)
 	{
-		m_registry.reset();
 		initialize_level(0);
-		m_scene_data.state = GameState::GAME_START;
 	}
-}
-
-void Game::initialize_level(uint32_t level)
-{
-	reset();
-	ScenaLoader::load_scene(*this, level);
-}
-
-void Game::initialize_subsystems()
-{
-	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("cube"));
-	line.initizalize(500, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p){});
-	trail.initizalize(1000, 0.001f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
-		{
-			p.scale *= p.life;
-			p.color.a *= p.life;
-		});
-
-	/// Default camera properties
-	vec3 camera_pos = { -50.0f, -50.0f, 60.0f };
-	vec3 target_pos = { 0.0f, 0.0f, 0.0f };
-	vec3 global_up = { 0.0f, 1.0f, 0.0f };
-	m_camera.init_view(camera_pos, target_pos, global_up);
-	m_camera.init_projection(m_window->get_aspect_ratio(), 90.0f, 0.1f, 1000.0f);
 }
 
 void Game::reset()
@@ -171,12 +150,22 @@ void Game::reset()
 	particle_system.reset();
 }
 
-void Game::start()
+void Game::reset_ball()
 {
-	movement.init(*this);
-	physics.init(*this);
-	respawn_system.init(*this);
-	particle_system.init(*this);
+	/// Reset balls position
+	auto [ball_rigid_body] = m_registry.unpack<RigidBodyComponent>(m_scene_data.active_ball_id);
+	auto [paddle_transform] = m_registry.unpack<TransformComponent>(m_scene_data.paddle_id);
+
+	vec3  ball_position = paddle_transform.position() + vec3{ 0.0f, 10.0f, 0.0 };
+	float velocity_mag	= ball_rigid_body.velocity().mag();
+
+	float x = Random::get_random_float(-0.45f, 0.45f);
+	float y = Random::get_random_float(0.05f, 0.7f);
+
+	vec3 velocity = vec3::normalize(vec3{ x, y, 0.0f }) * velocity_mag;
+
+	m_registry.add<TransformComponent>(m_scene_data.active_ball_id, ball_position);
+	m_registry.add<RigidBodyComponent>(m_scene_data.active_ball_id, velocity);
 }
 
 void Game::set_scene_data(const SceneData& data)

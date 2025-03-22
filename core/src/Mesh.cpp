@@ -13,12 +13,12 @@ Mesh::Mesh(const std::string& file_path)
 
 void Mesh::bind() const
 {
-	m_vao->bind();
+	m_vao.bind();
 }
 
 void Mesh::unbind() const
 {
-	m_vao->unbind();
+	m_vao.unbind();
 }
 
 uint32_t Mesh::get_vertex_count() const
@@ -75,12 +75,7 @@ void Mesh::parse_obj(const std::string& file_path)
 				faces_info.push_back(face_token);
 			}
 			Face face = process_face(faces_info, positions, tex_coords, normals);
-			for (int i = 0; i < 3; i++)
-			{
-				m_positions.push_back(face.v[i].position);
-				m_tex_coords.push_back(face.v[i].uv);
-				m_normals.push_back(face.v[i].normal);
-			}
+			
 			faces.push_back(face);
 		}
 	}
@@ -123,9 +118,6 @@ Face Mesh::process_face(
 
 void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 {
-	m_vao = std::make_unique<VertexArray>();
-	m_vbo = std::make_unique<VertexBuffer>();
-
 	/// Create Layout
 	VertexLayout layout = {
 		{0, 3, GL_FLOAT, GL_FALSE},
@@ -135,9 +127,9 @@ void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
 
 	m_vertex_count = faces.size() * 3;
 
-	m_vbo->upload_data(faces);
+	m_vbo.upload_data(faces);
 	/// Set VBO and Layout to VAO
-	m_vao->complete_setup(m_vbo.get(), layout);
+	m_vao.complete_setup(m_vbo, layout);
 }
 
 

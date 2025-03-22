@@ -12,11 +12,6 @@ PhysicsSystem::PhysicsSystem(Game& game)
 
 void PhysicsSystem::update()
 {
-	if (!game_handle)
-	{
-		return;
-	}
-
 	auto& registry = game_handle->get_registry();
 	auto& dispatcher = game_handle->get_dispatcher();
 
