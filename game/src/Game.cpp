@@ -46,7 +46,7 @@ void Game::render(float interval)
 
 void Game::initialize_subsystems()
 {
-	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("ball"));
+	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("cube"));
 	line.initizalize(500, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p) {});
 	trail.initizalize(1000, 0.001f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
 		{
@@ -67,6 +67,7 @@ void Game::initialize_level(uint32_t level)
 	reset();
 	m_registry.reset();
 	ScenaLoader::load_scene(*this, level);
+	std::cout << "\nStarting Level: " << level + 1 << "\nInitial target: " << get_current_threashold() <<" bricks!\n";
 }
 
 void Game::on_restart(const Event& event)
@@ -87,22 +88,36 @@ void Game::on_brick_destroyed(const Event& event)
 {
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
-	if (m_scene_data.bricks_destroyed >= m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty])
+
+	size_t current_threshold        = get_current_threashold();
+	size_t current_level_thresholds = m_scene_data.difficulty_threashhold[m_scene_data.current_level].size();
+
+	if (m_scene_data.bricks_destroyed >= current_threshold)
 	{
-		if (m_scene_data.current_difficulty < m_scene_data.difficulty_threashhold[m_scene_data.current_level].size() - 1)
+		if (m_scene_data.current_difficulty < current_level_thresholds - 1)
 		{
 			m_dispatcher.dispatch(DifficultyIncreasedEvent{});
 			m_scene_data.current_difficulty++;
-			std::cout << "Difficulty Increased" << std::endl;
+				
+			size_t next_threshold    = get_current_threashold();
+			size_t bricks_to_destroy = next_threshold - current_threshold;
 
+			std::cout << "Increased difficulty, destroy: " << bricks_to_destroy << " bricks!\n";
 		}
 		else
 		{
-			m_dispatcher.dispatch(LastDifficulty{});
 			if (m_scene_data.num_bricks <= 0)
 			{
 				m_dispatcher.dispatch(GameWonEvent{});
 				m_scene_data.state = GameState::GAME_END;
+
+				std::cout << "Level " << m_scene_data.current_level + 1 << " complete. Press Space Bar to continue. Press R to restart." << std::endl;
+			}
+			else
+			{
+				m_dispatcher.dispatch(LastDifficulty{});
+
+				std::cout << "Targets complete, destroy remaining bricks: " << m_scene_data.num_bricks << std::endl;
 			}
 		}
 	}

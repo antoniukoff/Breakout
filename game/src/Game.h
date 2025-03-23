@@ -84,15 +84,16 @@ private:
 
 public:
 
-	inline SceneRegistry&   get_registry()			{ return m_registry; }
-	inline ShakeCamera&     get_active_camera()	    { return m_camera; }
-	inline EventDispatcher& get_dispatcher()		{ return m_dispatcher; }
-	inline ParticleBatch&   get_particle_batch()	{ return particles; }
-	inline ParticleBatch&   get_trail_batch()		{ return trail; }
-	inline ParticleBatch&   get_line_batch()		{ return line; }
-	inline const SceneData& get_scene_data() const  { return m_scene_data; }
-	inline const entity_id  get_paddle_id()	const   { return m_scene_data.paddle_id; }
-	inline const GameState& get_state() const		{ return m_scene_data.state; }
+	inline SceneRegistry&   get_registry()				   { return m_registry; }
+	inline ShakeCamera&     get_active_camera()			   { return m_camera; }
+	inline EventDispatcher& get_dispatcher()			   { return m_dispatcher; }
+	inline ParticleBatch&   get_particle_batch()		   { return particles; }
+	inline ParticleBatch&   get_trail_batch()			   { return trail; }
+	inline ParticleBatch&   get_line_batch()			   { return line; }
+	inline const SceneData& get_scene_data() const	       { return m_scene_data; }
+	inline const entity_id  get_paddle_id()	const		   { return m_scene_data.paddle_id; }
+	inline const int        get_current_threashold() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
+	inline const GameState& get_state() const			   { return m_scene_data.state; }
 
 private:
 	SceneRegistry m_registry;

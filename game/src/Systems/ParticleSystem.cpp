@@ -187,7 +187,7 @@ void ParticleSystem::on_game_won(const Event& event)
 			Particle p;
 			p.color = rand_color;
 			p.position = position;
-			p.velocity = vec3{ 0.0f, 0.0f, 0.0f };
+			p.velocity = vec3{ 0.0f, 0.0f, 1.0f };
 
 			float duration = 1000.0f;
 			m_emitters.push_back({ duration, p });
