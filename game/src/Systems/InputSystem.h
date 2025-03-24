@@ -8,12 +8,12 @@ class InputSystem : public System
 public:
 	InputSystem(Game& game);
 
-	void update() override;
+	void update(float dt) override;
 private:
-	void update_player_movement();
-	void update_camera_movement();
+	void update_player_movement(float dt);
+	void update_camera_movement(float dt);
 
-	void update_player_trajectory();
+	void update_initial_movement_dir(float dt);
 private:
 };
 

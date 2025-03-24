@@ -11,92 +11,84 @@ InputSystem::InputSystem(Game& game)
 	init(game);
 }
 
-void InputSystem::update()
+void InputSystem::update(float dt)
 {
 	auto state = game_handle->get_state();
 
 	switch (state)
 	{
 	case GameState::GAME_START:
-		update_player_trajectory();
-		update_camera_movement();
+		update_initial_movement_dir(dt);
+		update_camera_movement(dt);
 		break;
 	case GameState::IS_ACTIVE:
-		update_player_movement();
+		update_player_movement(dt);
 		break;
 	case GameState::GAME_END:
-		update_camera_movement();
+		update_camera_movement(dt);
 		break;
 	default:
 		break;
 	}
 }
 
-void InputSystem::update_player_movement()
+void InputSystem::update_player_movement(float dt)
 {
+	const float movement_speed = 100.0f; 
+	const float rotation_speed = 90.0f;  
+
 	uint32_t paddle = game_handle->get_paddle_id();
-	auto& registry = game_handle->get_registry();
+	auto& registry  = game_handle->get_registry();
 
-	auto [transform] = registry.unpack<TransformComponent>(paddle);
+	auto [rigid_body] = registry.unpack<RigidBodyComponent>(paddle);
 
-	auto& position = transform.position();
-	auto& prev_position = transform.prev_position();
-	auto& scale = transform.scale();
-	auto& angle = transform.angle();
+	auto& velocity = rigid_body.velocity();
+	auto& angular  = rigid_body.angular_velocity();
 
-	prev_position = position;
+	velocity = vec3();
+	angular = 0.0f;
 
 	if (Input::is_key_pressed(GLFW_KEY_A))
 	{
-		position += {-0.5, 0.0f, 0.0f};
+		velocity.x -= movement_speed;
 	}
 	if (Input::is_key_pressed(GLFW_KEY_D))
 	{
-		position += {0.5, 0.0f, 0.0f};
+		velocity.x += movement_speed;
 	}
 	if (Input::is_key_pressed(GLFW_KEY_E))
 	{
-		angle -= 1.0f;
+		angular -= rotation_speed;
 	}
 	if (Input::is_key_pressed(GLFW_KEY_Q))
 	{
-		angle += 1.0f;
+		angular += rotation_speed;
 	}
-
-	angle = std::clamp(angle, -45.0f, 45.0f);
-	position.x = std::clamp(position.x, -arena_scale.x + scale.x, arena_scale.x - scale.x);
 }
 
-void InputSystem::update_camera_movement()
+void InputSystem::update_camera_movement(float dt)
 {
 	auto& camera = game_handle->get_active_camera();
-	auto& scene_data = game_handle->get_scene_data();
 
 	vec3 current_target = camera.get_target_pos();
 
-	auto& registry = game_handle->get_registry();
-	auto [transform] = registry.unpack<TransformComponent>(game_handle->get_paddle_id());
-	vec3 paddle_pos = transform.position();
-
-	vec3 target_target	 = scene_data.target_pos;
-		 target_target.x = paddle_pos.x;
-
+	vec3 new_target = current_target;
 	if (Input::is_key_pressed(GLFW_KEY_A))
 	{
-		target_target.x += -20.0f;
+		new_target.x -= 20;
 	}
 	if (Input::is_key_pressed(GLFW_KEY_D))
 	{
-		target_target.x += 20.0f;
+		new_target.x += 20;
 	}
-
-	vec3 lerped_target = vec3::lerp(current_target, target_target, 0.01f);	
+	vec3 lerped_target = vec3::lerp(current_target, new_target, dt);
 	camera.set_target(lerped_target);
 }
 
-void InputSystem::update_player_trajectory()
+void InputSystem::update_initial_movement_dir(float dt)
 {
 	float angle = 0.0f;
+
 	if (Input::is_key_pressed(GLFW_KEY_Q))
 	{
 		angle = 1.0f;
@@ -111,6 +103,7 @@ void InputSystem::update_player_trajectory()
 		{
 			vec3& velocity = rigid_body.velocity();
 			mat4 rotation = mat4::rotate_z(angle);
+
 			mat4::mult_vec_by_mat(rotation, velocity);
 		});
 }

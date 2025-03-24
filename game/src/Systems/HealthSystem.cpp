@@ -35,7 +35,3 @@ void HealthSystem::on_collision_event(const Event& event)
 		}
 	}
 }
-
-void HealthSystem::update()
-{
-}

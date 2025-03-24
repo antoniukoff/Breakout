@@ -2,6 +2,8 @@
 
 #include "../Game.h"
 #include "../GameEvents.h"
+#include "../LevelData.h"
+#include <algorithm>
 
 #include <math/Random.h>
 
@@ -10,7 +12,30 @@ PhysicsSystem::PhysicsSystem(Game& game)
 	init(game);
 }
 
-void PhysicsSystem::update()
+void PhysicsSystem::update(float dt)
+{
+	check_player_level_bounds();
+	update_ball_box_collision();
+}
+
+void PhysicsSystem::check_player_level_bounds()
+{
+	auto& registry = game_handle->get_registry();
+	auto& dispatcher = game_handle->get_dispatcher();
+
+	registry.for_each<TransformComponent, RigidBodyComponent, BoxColliderComponent>([&](
+		entity_id circle,
+		component_handle<TransformComponent>   paddle_transform,
+		component_handle<RigidBodyComponent>   paddle_movement,
+		component_handle<BoxColliderComponent> paddle_collider)
+		{
+			float& position_x		= paddle_transform.position().x;
+			float  paddle_extent_x = paddle_collider.half_extents().x;
+			position_x = std::clamp(position_x, -arena_scale.x + paddle_extent_x, arena_scale.x - paddle_extent_x);
+		});
+}
+
+void PhysicsSystem::update_ball_box_collision()
 {
 	auto& registry = game_handle->get_registry();
 	auto& dispatcher = game_handle->get_dispatcher();
@@ -26,7 +51,6 @@ void PhysicsSystem::update()
 			vec3& ball_prev_pos = circle_transform.prev_position();
 			vec3& ball_velocity = circle_movement.velocity();
 			float ball_radius = circle_collider.radius();
-			bool can_destroy_ball = circle_collider.is_distructable();
 
 			registry.for_each<TransformComponent, BoxColliderComponent>([&](
 				entity_id box,
@@ -38,7 +62,7 @@ void PhysicsSystem::update()
 					float box_angle = paddle_transform.angle();
 					vec2 box_extents = box_collider.half_extents();
 
-					CollisionData collision = check_brick_collision(ball_pos, ball_radius, box_pos, box_extents, box_angle);
+					CollisionData collision = check_OBB_Circle_collision(ball_pos, ball_radius, box_pos, box_extents, box_angle);
 					bool collided = collision.collided;
 					vec2 distance = collision.collision_vector;
 
@@ -49,8 +73,6 @@ void PhysicsSystem::update()
 						/// Rotate the normal with the paddle
 						mat4::mult_vec_by_mat(mat4::rotate_z(box_angle), best_normal);
 
-						ball_prev_pos = ball_pos;
-
 						vec3 world_collision_point = ball_pos - best_normal * (ball_radius + distance.mag());
 
 						CollisionEvent e;
@@ -58,7 +80,7 @@ void PhysicsSystem::update()
 						e.position = world_collision_point;
 						dispatcher.dispatch(e);
 
-
+						ball_prev_pos = ball_pos;
 						ball_pos += best_normal * (ball_radius - distance.mag() + 0.5f);
 
 						/// Project velocwity onto the normal --- no need for normals dot product since its a unit length
@@ -66,13 +88,14 @@ void PhysicsSystem::update()
 					}
 					else
 					{
+						/// Check if the ball is below paddle
 						if (box == game_handle->get_paddle_id())
 						{
 							vec3 point_of_no_return = calculate_paddle_lowest_point(box_pos, collision.closest_point, box_extents.to_vec3(), box_angle);
 
 							if (ball_pos.y - ball_radius < point_of_no_return.y)
 							{
-								dispatcher.dispatch(RestartEvent{});
+								dispatcher.dispatch(BallRespawnEvent{});
 							}
 						}
 					}
@@ -80,7 +103,7 @@ void PhysicsSystem::update()
 		});
 }
 
-CollisionData PhysicsSystem::check_brick_collision(const vec3& ball_pos, float radius, const vec3& box_pos, const vec2& collider_half_dims, float box_angle)
+CollisionData PhysicsSystem::check_OBB_Circle_collision(const vec3& ball_pos, float radius, const vec3& box_pos, const vec2& collider_half_dims, float box_angle)
 {
 	vec3 local_ball_position = ball_pos - box_pos;
 
@@ -91,6 +114,8 @@ CollisionData PhysicsSystem::check_brick_collision(const vec3& ball_pos, float r
 
 	/// Clamp to get the closest point on the collider
 	vec2 closest_point = vec2::clamp(local_ball_2D, -collider_half_dims, collider_half_dims);
+
+	/// Vector from point on the bounds to the balls position in paddles local space
 	vec2 collision_vector = local_ball_2D - closest_point;
 
 	float length = collision_vector.mag();
@@ -101,17 +126,23 @@ CollisionData PhysicsSystem::check_brick_collision(const vec3& ball_pos, float r
 
 vec3 PhysicsSystem::calculate_paddle_lowest_point(const vec3& paddle_pos, const vec3& collider_collision_point, const vec3& box_extents, float paddle_angle)
 {
+	/// Only check the left and right side of the paddle
 	vec3 best_normal = collider_collision_point.x > 0.0f ? vec3{ 1.0, 0.0f,0.0f } : vec3{ -1.0f, 0.0f, 0.0f };
 
+	/// Get the bottom left or right point on the boxes collider in local space
 	vec3 local_point_of_no_return = best_normal * box_extents;
 	local_point_of_no_return.y -= box_extents.y;
 
+	/// Rotate the point with the boxes angle
 	mat4::mult_vec_by_mat(mat4::rotate_z(paddle_angle), local_point_of_no_return);
+
+	/// Flip the side if the checking side is tilted up
 	if (local_point_of_no_return.y > 0.0f)
 	{
 		local_point_of_no_return = -local_point_of_no_return;
 	}
 
+	/// Return the point in the world space
 	return paddle_pos + local_point_of_no_return;
 }
 

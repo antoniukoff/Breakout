@@ -20,8 +20,7 @@ Application::Application(int width, int height, const std::string& app_name)
 
 void Application::run()
 {
-	/// Fixed timestep loop
-	const double ms_per_update = 1.0 / 144.0f;
+	const float ms_per_update = 1.0f / 144.0f;
 	double previous = glfwGetTime();
 	double lag = 0.0;
 	while (m_is_running)
@@ -35,18 +34,16 @@ void Application::run()
 
 		while (lag >= ms_per_update)
 		{
-			on_update();
+			on_update(ms_per_update);
 			lag -= ms_per_update;
 		}
-
+			
 		m_dispatcher.process_events();
 
-		/// Send the leftover time amount to the renderer to interpolate between the update frames
 		float interval = lag / ms_per_update;
 
 		render(interval);
 		m_window->swap();
-
 	}
 }
 

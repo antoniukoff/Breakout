@@ -21,7 +21,7 @@ ParticleBatch::~ParticleBatch()
 	glDeleteVertexArrays(1, &vao);
 }
 
-void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&)> update_func)
+void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&, float dt)> update_func)
 {
 	if (m_particles)
 	{
@@ -83,15 +83,15 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 	m_initialized = true;
 }
 
-void ParticleBatch::update()
+void ParticleBatch::update(float dt)
 {
 	for (int i = 0; i < m_size; i++)
 	{
 		auto& particle = m_particles[i];
 
 		particle.prev_position = particle.position;
-		m_update_func(particle);
-		particle.life -= m_decay_rate;
+		m_update_func(particle, dt);
+		particle.life -= m_decay_rate * dt;
 		if (particle.life <= 0.0f)
 		{
 			particle = m_particles[m_size - 1];
@@ -105,7 +105,7 @@ void ParticleBatch::update()
 void ParticleBatch::draw(Camera& camera, float interval)
 {
 	shader.bind();
-	mat4 view = camera.get_view_matrix();
+	mat4 view		= camera.get_view_matrix(interval);
 	mat4 projection = camera.get_projection_matrix();
 
 	shader.upload_mat4("view", view);
@@ -122,7 +122,7 @@ void ParticleBatch::draw(Camera& camera, float interval)
 
 		vec3 interpolated_position = prev_position * (1.0f - interval) + position * interval;
 
-		mat4 model = mat4::translate(position) * mat4::scale(vec3{ scale, scale, scale });
+		mat4 model = mat4::translate(interpolated_position) * mat4::scale(vec3{ scale, scale, scale });
 		Color color = p.color;
 
 		instanced_data.push_back({ model, color });
@@ -148,8 +148,14 @@ void ParticleBatch::add_particle(const vec3& position, const vec3& velocity, con
 	auto& p = m_particles[m_size];
 	p.life = 1.0f;
 	p.position = position;
+	p.prev_position = position;
 	p.velocity = velocity;
 	p.color = color;
 	p.scale = width;
 	m_size++;
+}
+
+void ParticleBatch::reset()
+{
+	m_size = 0;
 }

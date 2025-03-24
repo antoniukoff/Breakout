@@ -19,13 +19,13 @@ void Camera::init_projection(float aspect_ratio, float fov, float near, float fa
 	m_projection_matrix = mat4::calculate_projection(aspect_ratio, fov, near, far);
 }
 
-const mat4& Camera::get_view_matrix()
+const mat4& Camera::get_view_matrix(float interval)
 {
-	if (m_is_dirty)
-	{
-		m_view_matrix = mat4::calculate_view_matrix(m_camera_pos, m_target, m_up);
-		m_is_dirty = false;
-	}
+	vec3 camera_position = vec3::lerp(m_prev_position, m_camera_pos, interval);
+	vec3 target_position = vec3::lerp(m_prev_target, m_target, interval);
+
+	m_view_matrix = mat4::calculate_view_matrix(camera_position, target_position, m_up);
+
 	return m_view_matrix;
 }
 
@@ -70,20 +70,15 @@ const vec3& Camera::get_target_pos() const
 
 void Camera::set_position(const vec3& position)
 {
+	m_prev_position = m_camera_pos;
 	m_camera_pos = position;
+	m_is_dirty = true;
 }
 
 void Camera::set_target(const vec3& position)
 {
+	m_prev_target = m_target;
 	m_target = position;
-	m_is_dirty = true;
-}
-
-void Camera::follow(const vec3& position)
-{
-	m_camera_pos += position;
-	m_target += position;
-
 	m_is_dirty = true;
 }
 

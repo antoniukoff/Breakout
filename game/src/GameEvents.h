@@ -19,13 +19,13 @@ public:
 class GameStarted : public Event
 {};
 
-class RestartEvent : public Event
+class BallRespawnEvent : public Event
 {};
 
 class DifficultyIncreasedEvent : public Event
 {};
 
-class RespawnEvent : public Event
+class BrickRespawnEvent : public Event
 {
 public:
 	vec3 position;

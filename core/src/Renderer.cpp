@@ -37,9 +37,9 @@ void Renderer::initialize(vec3 clear_color, bool enable_depth_test, bool enable_
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Renderer::begin_frame(Camera& camera)
+void Renderer::begin_frame(Camera& camera, float interval)
 {
-	m_view_matrix		= camera.get_view_matrix();
+	m_view_matrix		= camera.get_view_matrix(interval);
 	m_projection_matrix = camera.get_projection_matrix();
 
 	current_material = nullptr;

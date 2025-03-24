@@ -92,16 +92,19 @@ DEFINE_COMPONENT_HANDLE(CircleColliderComponent,
 struct RigidBodyComponent
 {
 	vec3 velocity;
+	float angular_velocity;
 };
 
 ANNOTATE(
 	RigidBodyComponent,
-	1,
+	2,
 	DEFINE_COMPONENT_MEMBER(RigidBodyComponent, 0, vec3, velocity)
+	DEFINE_COMPONENT_MEMBER(RigidBodyComponent, 1, float, angular_velocity)
 )
 
 DEFINE_COMPONENT_HANDLE(RigidBodyComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, vec3, velocity)
+	COMPONENT_HANDLE_ACCESSOR(1, float, angular_velocity)
 )
 struct LaserComponent
 {
@@ -164,7 +167,7 @@ DEFINE_COMPONENT_HANDLE(RenderComponent,
 
 struct CameraShakeComponent
 {
-	float duration = 5.0f;
+	float duration = 0.8f;
 	float time_elapsed = 0.0f;
 	float intensity = 1.0f;
 };

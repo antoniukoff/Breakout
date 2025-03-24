@@ -21,20 +21,20 @@ Game::Game()
 	initialize_subsystems();
 	initialize_level(0);
 
-	m_dispatcher.subscribe<RestartEvent>(std::bind(&Game::on_restart, this, std::placeholders::_1));
+	m_dispatcher.subscribe<BallRespawnEvent>(std::bind(&Game::on_ball_respawn, this, std::placeholders::_1));
+	m_dispatcher.subscribe<BrickRespawnEvent>(std::bind(&Game::on_brick_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&Game::on_brick_destroyed, this, std::placeholders::_1));
-	m_dispatcher.subscribe<RespawnEvent>(std::bind(&Game::on_brick_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<KeyPressEvent>(std::bind(&Game::on_key_press, this, std::placeholders::_1));
 }
 
-void Game::on_update()
+void Game::on_update(float dt)
 {
-	input.update();
-	movement.update();
-	physics.update();
-	respawn_system.update();
-	camera_system.update();
-	particle_system.update();
+	input.update(dt);
+	movement.update(dt);
+	physics.update(dt);
+	respawn_system.update(dt);
+	camera_system.update(dt);
+	particle_system.update(dt);
 	m_camera.update();
 }
 
@@ -46,9 +46,9 @@ void Game::render(float interval)
 
 void Game::initialize_subsystems()
 {
-	particles.initizalize(500, 0.01f, ResourceManager::get()->get_mesh("cube"));
-	line.initizalize(500, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p) {});
-	trail.initizalize(1000, 0.001f, ResourceManager::get()->get_mesh("ball"), [](Particle& p)
+	particles.initizalize(1500, 1.0f, ResourceManager::get()->get_mesh("cube"));
+	line.initizalize(300, 50.0f, ResourceManager::get()->get_mesh("ball"), [](Particle& p, float) {});
+	trail.initizalize(1000, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p, float)
 		{
 			p.scale *= p.life;
 			p.color.a *= p.life;
@@ -67,10 +67,10 @@ void Game::initialize_level(uint32_t level)
 	reset();
 	m_registry.reset();
 	ScenaLoader::load_scene(*this, level);
-	std::cout << "\nStarting Level: " << level + 1 << "\nInitial target: " << get_current_threashold() <<" bricks!\n";
+	std::cout << "\nStarting Level: " << level + 1 << "\nInitial target: " << get_current_difficulty_target() <<" bricks!\n";
 }
 
-void Game::on_restart(const Event& event)
+void Game::on_ball_respawn(const Event& event)
 {
 	m_scene_data.lives--;
 	if (m_scene_data.lives <= 0)
@@ -89,7 +89,7 @@ void Game::on_brick_destroyed(const Event& event)
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
 
-	size_t current_threshold        = get_current_threashold();
+	size_t current_threshold        = get_current_difficulty_target();
 	size_t current_level_thresholds = m_scene_data.difficulty_threashhold[m_scene_data.current_level].size();
 
 	if (m_scene_data.bricks_destroyed >= current_threshold)
@@ -99,7 +99,7 @@ void Game::on_brick_destroyed(const Event& event)
 			m_dispatcher.dispatch(DifficultyIncreasedEvent{});
 			m_scene_data.current_difficulty++;
 				
-			size_t next_threshold    = get_current_threashold();
+			size_t next_threshold    = get_current_difficulty_target();
 			size_t bricks_to_destroy = next_threshold - current_threshold;
 
 			std::cout << "Increased difficulty, destroy: " << bricks_to_destroy << " bricks!\n";
@@ -125,7 +125,7 @@ void Game::on_brick_destroyed(const Event& event)
 
 void Game::on_brick_respawn(const Event& event)
 {
-	const RespawnEvent& e = static_cast<const RespawnEvent&>(event);
+	const BrickRespawnEvent& e = static_cast<const BrickRespawnEvent&>(event);
 	ScenaLoader::create_brick(*this, e.position);
 
 	m_scene_data.num_bricks++;

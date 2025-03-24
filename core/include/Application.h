@@ -12,7 +12,7 @@ public:
 
 	void run();
 
-	virtual void on_update() = 0;
+	virtual void on_update(float dt) = 0;
 	virtual void render(float interval) = 0;
 
 	Window* get_window()

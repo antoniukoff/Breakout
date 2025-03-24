@@ -18,12 +18,13 @@ public:
 	float scale = 0.0f;	
 };
 
-inline void default_particle_update(Particle& particle)
+inline void default_particle_update(Particle& particle, float dt)
 {
-	float gravity = 0.015f;
+	const float gravity = 115; 
 
-	particle.velocity.z -= gravity;
-	particle.position += particle.velocity;
+	particle.velocity.z -= gravity * dt;
+	particle.prev_position = particle.position;
+	particle.position += particle.velocity * dt;
 
 	particle.color.a = (unsigned char)(particle.life * 255.0f);
 }
@@ -34,13 +35,17 @@ public:
 	ParticleBatch();
 	~ParticleBatch();
 
-	void initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&)> update_func = default_particle_update);
-	void update();
+	void initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&, float)> update_func = default_particle_update);
+	void update(float dt);
 	void draw(Camera& camera, float interval);
 	void add_particle(const vec3& position,
 		const vec3& velocity,
 		const Color& color,
 		float scale);
+
+	void reset();
+
+	inline uint32_t get_capacity() const { return m_max_marticles; }
 
 private:
 	//// Particle Data
@@ -50,7 +55,7 @@ private:
 	float	  m_decay_rate = 0.1f;
 	Mesh*     m_mesh = nullptr;
 	Particle* m_particles = nullptr;
-	std::function<void(Particle&)> m_update_func;
+	std::function<void(Particle&, float)> m_update_func;
 
 	/// Draw Data
 	uint32_t vao = 0;

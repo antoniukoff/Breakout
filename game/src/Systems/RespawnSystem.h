@@ -4,7 +4,6 @@
 #include <math/vec3.h>
 #include <queue>
 
-
 class Game;
 class Event;
 
@@ -12,7 +11,7 @@ class RespawnSystem : public System
 {
 public:
 	RespawnSystem(Game& game);
-	void update() override;
+	void update(float dt) override;
 	void reset();
 	
 private:
@@ -21,7 +20,9 @@ private:
 	void on_last_difficulty(const Event& event);
 
 private:
-	float m_respawn_timer = 3500.0f;
+	const float m_max_respawn_time = 20.0f;
+
+	float m_respawn_timer = m_max_respawn_time;
 	float m_elapsed = 0.0f;
 	std::queue<vec3> m_available_positions;
 };

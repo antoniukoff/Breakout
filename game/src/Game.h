@@ -33,9 +33,9 @@ struct SceneData
 	uint32_t current_difficulty = 0;
 	std::vector<std::vector<int> > difficulty_threashhold =
 	{
-		{ 1, 1 },
-		{ 5, 8, 12, 16, 20 },
-		{ 5, 8, 12, 16, 20, 25, 30 }
+		{ 1, 2, 3 },
+		{ 3, 5, 8, 12, 15 },
+		{  3, 5, 8, 12, 15, 19, 23 }
 	};
 	uint32_t num_bricks;
 	uint32_t bricks_destroyed = 0;
@@ -66,7 +66,7 @@ class Game : public Application
 
 public:
 	Game();
-	void on_update() override;
+	void on_update(float dt) override;
 	void render(float interval) override;
 
 private:
@@ -76,7 +76,7 @@ private:
 	void set_scene_data(const SceneData& data);
 
 private:
-	void on_restart(const Event& event);
+	void on_ball_respawn(const Event& event);
 	void reset_ball();
 	void on_brick_destroyed(const Event& event);
 	void on_brick_respawn(const Event& event);
@@ -84,16 +84,19 @@ private:
 
 public:
 
-	inline SceneRegistry&   get_registry()				   { return m_registry; }
-	inline ShakeCamera&     get_active_camera()			   { return m_camera; }
-	inline EventDispatcher& get_dispatcher()			   { return m_dispatcher; }
-	inline ParticleBatch&   get_particle_batch()		   { return particles; }
-	inline ParticleBatch&   get_trail_batch()			   { return trail; }
-	inline ParticleBatch&   get_line_batch()			   { return line; }
-	inline const SceneData& get_scene_data() const	       { return m_scene_data; }
-	inline const entity_id  get_paddle_id()	const		   { return m_scene_data.paddle_id; }
-	inline const int        get_current_threashold() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
-	inline const GameState& get_state() const			   { return m_scene_data.state; }
+	inline SceneRegistry&   get_registry()						  { return m_registry; }
+	inline ShakeCamera&     get_active_camera()					  { return m_camera; }
+	inline EventDispatcher& get_dispatcher()					  { return m_dispatcher; }
+	inline ParticleBatch&   get_particle_batch()				  { return particles; }
+	inline ParticleBatch&   get_trail_batch()					  { return trail; }
+	inline ParticleBatch&   get_line_batch()					  { return line; }
+	inline SceneData&		get_scene_data()					  { return m_scene_data; }
+	inline const entity_id  get_paddle_id()	const				  { return m_scene_data.paddle_id; }
+	inline const entity_id  get_current_difficulty()	const	  { return m_scene_data.current_difficulty; }
+	inline const entity_id  get_current_level()			    const { return m_scene_data.current_level; }
+	inline const uint32_t   get_level_difficulties() const		  { return m_scene_data.difficulty_threashhold[m_scene_data.current_level].size(); }
+	inline const int        get_current_difficulty_target() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
+	inline const GameState& get_state() const					  { return m_scene_data.state; }
 
 private:
 	SceneRegistry m_registry;

@@ -13,7 +13,7 @@ class Renderer
 public:
 	static void initialize(vec3 clear_color, bool enable_depth_test = true, bool enable_face_culling = true);
 
-	static void begin_frame(Camera& camera);
+	static void begin_frame(Camera& camera, float interval);
 	static void submit(Material* material, Mesh* mesh, const mat4& model_matrix);
 	static void end_frame();
 

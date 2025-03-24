@@ -12,30 +12,32 @@ RespawnSystem::RespawnSystem(Game& game)
 	dispatcher.subscribe<LastDifficulty>(std::bind(&RespawnSystem::on_last_difficulty, this, std::placeholders::_1));
 }
 
-void RespawnSystem::update()
+void RespawnSystem::update(float dt)
 {
-	m_elapsed++;
+	if (m_available_positions.size() == 0)
+	{
+		return;
+	}
+	m_elapsed += dt;
 	if (m_elapsed >= m_respawn_timer)
 	{
-		if (m_available_positions.size() > 0)
-		{
-			vec3 position = m_available_positions.front();
+		vec3 position = m_available_positions.front();
 
-			auto& dispatcher = game_handle->get_dispatcher();
+		auto& dispatcher = game_handle->get_dispatcher();
 
-			RespawnEvent event;
-			event.position = position;
-			dispatcher.dispatch(event);
+		BrickRespawnEvent event;
+		event.position = position;
+		dispatcher.dispatch(event);
 
-			m_available_positions.pop();
-		}
+		m_available_positions.pop();
+
 		m_elapsed = 0.0f;
 	}
 }
 
 void RespawnSystem::reset()
 {
-	m_respawn_timer = 3500.0f;
+	m_respawn_timer = m_max_respawn_time;
 	m_elapsed = 0.0f;
 
 	std::queue<vec3> new_queue;
@@ -50,11 +52,10 @@ void RespawnSystem::on_brick_destroyed(const Event& event)
 
 void RespawnSystem::on_difficulty_increased(const Event& event)
 {
-	m_respawn_timer *= 0.75f;
+	m_respawn_timer -= 2.0f;
 }
 
 void RespawnSystem::on_last_difficulty(const Event& event)
 {
-	m_respawn_timer = 200000.0f;
 }
 

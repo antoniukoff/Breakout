@@ -12,7 +12,7 @@ void RenderSystem::draw(float interval)
 	auto& registry = game_handle->get_registry();
 	auto& camera = game_handle->get_active_camera();
 
-	Renderer::begin_frame(camera);
+	Renderer::begin_frame(camera, interval);
 	registry.for_each<TransformComponent, RenderComponent>([&](
 		entity_id e_id,
 		component_handle<TransformComponent> transform_component,
