@@ -92,9 +92,6 @@ public:
 	inline ParticleBatch&   get_line_batch()					  { return line; }
 	inline SceneData&		get_scene_data()					  { return m_scene_data; }
 	inline const entity_id  get_paddle_id()	const				  { return m_scene_data.paddle_id; }
-	inline const entity_id  get_current_difficulty()	const	  { return m_scene_data.current_difficulty; }
-	inline const entity_id  get_current_level()			    const { return m_scene_data.current_level; }
-	inline const uint32_t   get_level_difficulties() const		  { return m_scene_data.difficulty_threashhold[m_scene_data.current_level].size(); }
 	inline const int        get_current_difficulty_target() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
 	inline const GameState& get_state() const					  { return m_scene_data.state; }
 

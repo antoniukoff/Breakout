@@ -30,7 +30,7 @@ void ParticleSystem::update(float dt)
 		draw_shooting_line(dt);
 		break;
 	case GameState::IS_ACTIVE:
-	//	draw_trail();
+		draw_trail();
 		break;
 	case GameState::GAME_END:
 		break;
@@ -75,7 +75,10 @@ void ParticleSystem::draw_shooting_line(float dt)
 void ParticleSystem::draw_trail()
 {
 	auto& registry = game_handle->get_registry();
-	registry.for_each<TransformComponent, RigidBodyComponent>([&](entity_id e, component_handle<TransformComponent> transform, component_handle<RigidBodyComponent> rigid_body)
+	registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent>([&](entity_id e,
+		component_handle<TransformComponent> transform,
+		component_handle<RigidBodyComponent> rigid_body,
+		component_handle<CircleColliderComponent> _)
 		{
 			vec3 ball_pos = transform.position();
 			vec3 ball_vel = rigid_body.velocity();
@@ -111,11 +114,13 @@ void ParticleSystem::process_emitters(float dt)
 
 		float rand_x = Random::get_random_float(-20.0f, 20.0f);
 		float rand_y = Random::get_random_float(-20.0f, 20.0f);
+		float rand_z = Random::get_random_float(60.0f, 75.0f);
+
 		float rand_scale = Random::get_random_float(0.25f, 0.5f);
 
-		vec3 final_velocity = particle.velocity + vec3{ rand_x, rand_y, 50.0f };
+		vec3 particle_velocity = vec3{ rand_x, rand_y, rand_z } + particle.velocity;
 
-		patricle_handle->add_particle(particle.position, final_velocity, particle.color, rand_scale);
+		patricle_handle->add_particle(particle.position, particle_velocity, particle.color, rand_scale);
 	}
 
 }
@@ -191,7 +196,7 @@ void ParticleSystem::on_game_won(const Event& event)
 			Particle p;
 			p.color = rand_color;
 			p.position = position;
-			p.velocity = vec3{ 0.0f, 0.0f, 1.0f };
+			p.velocity = vec3{ 0.0f, 0.0f, 20.0f };
 
 			float duration = 10.0f;
 			m_emitters.push_back({ duration, p });

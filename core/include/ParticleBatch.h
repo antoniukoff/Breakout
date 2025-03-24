@@ -43,7 +43,6 @@ public:
 		const Color& color,
 		float scale);
 
-	void reset();
 
 	inline uint32_t get_capacity() const { return m_max_marticles; }
 

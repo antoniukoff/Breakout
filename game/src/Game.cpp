@@ -153,7 +153,7 @@ void Game::on_key_press(const Event& event)
 			}
 		}
 	}
-	if (e.key == GLFW_KEY_R)
+	if (e.key == GLFW_KEY_R && e.action == GLFW_PRESS)
 	{
 		initialize_level(0);
 	}

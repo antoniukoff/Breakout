@@ -154,8 +154,3 @@ void ParticleBatch::add_particle(const vec3& position, const vec3& velocity, con
 	p.scale = width;
 	m_size++;
 }
-
-void ParticleBatch::reset()
-{
-	m_size = 0;
-}
