@@ -19,7 +19,7 @@ Game::Game()
 	ResourceManager::initialize("assets/resources.txt");
 
 	initialize_subsystems();
-	initialize_level(1);
+	initialize_level(0);
 
 	m_dispatcher.subscribe<BallRespawnEvent>(std::bind(&Game::on_ball_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<BrickRespawnEvent>(std::bind(&Game::on_brick_respawn, this, std::placeholders::_1));
@@ -90,18 +90,18 @@ void Game::on_brick_destroyed(const Event& event)
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
 
-	size_t current_threshold        = get_current_difficulty_target();
-	size_t current_level_thresholds = m_scene_data.difficulty_threashhold[m_scene_data.current_level].size();
+	size_t current_difficulty = get_current_difficulty_target();
+	size_t level_diffuculties = get_level_diffuculties();
 
-	if (m_scene_data.bricks_destroyed >= current_threshold)
+	if (m_scene_data.bricks_destroyed >= current_difficulty)
 	{
-		if (m_scene_data.current_difficulty < current_level_thresholds - 1)
+		if (get_current_difficulty() < level_diffuculties - 1)
 		{
 			m_dispatcher.dispatch(DifficultyIncreasedEvent{});
 			m_scene_data.current_difficulty++;
 				
-			size_t next_threshold    = get_current_difficulty_target();
-			size_t bricks_to_destroy = next_threshold - current_threshold;
+			size_t next_difficulty    = get_current_difficulty_target();
+			size_t bricks_to_destroy = next_difficulty - current_difficulty;
 
 			std::cout << "Increased difficulty, destroy: " << bricks_to_destroy << " bricks!\n";
 		}
@@ -154,8 +154,7 @@ void Game::on_key_press(const Event& event)
 	}
 	if (e.key == GLFW_KEY_R && e.action == GLFW_PRESS)
 	{
-		m_dispatcher.dispatch(DifficultyIncreasedEvent{});
-		m_scene_data.current_difficulty++;
+		initialize_level(m_scene_data.current_level);
 	}
 }
 

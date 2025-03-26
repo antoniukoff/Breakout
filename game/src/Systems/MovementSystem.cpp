@@ -19,6 +19,38 @@ void MovementSystem::update(float dt)
 
 	auto& registry = game_handle->get_registry();
 
+	registry.for_each<RigidBodyComponent, BounceComponent>([&](
+		entity_id e_id,
+		component_handle<RigidBodyComponent> movement_component,
+		component_handle<BounceComponent> bounce_component)
+		{
+			vec3& velocity = movement_component.velocity();
+
+			float base_speed = bounce_component.base_speed();
+			float total_time = bounce_component.impulse_time();
+			float& elapsed_time = bounce_component.elapsed_time();
+			float& impulse_strength = bounce_component.impulse_strength();
+
+			if (impulse_strength == 0.0f)
+			{
+				return;
+			}
+			elapsed_time += dt;
+			if (elapsed_time >= total_time)
+			{
+				velocity = vec3::normalize(velocity) * base_speed;
+				elapsed_time = 0.0f;
+				impulse_strength = 0.0f;
+				return;
+			}
+			
+			float impulse = (1.0f - (elapsed_time / total_time)) * impulse_strength;
+
+			float actual_impulse = base_speed + impulse;
+
+			velocity = vec3::normalize(velocity) * actual_impulse;
+		});
+
 	registry.for_each<TransformComponent, RigidBodyComponent>([&](
 		entity_id e_id,
 		component_handle<TransformComponent> transform_component,
@@ -35,6 +67,7 @@ void MovementSystem::update(float dt)
 
 			position += velocity * dt;
 			angle += angular * dt;
+			angle = std::clamp(angle, -45.0f, 45.0f);
 		});
 }
 

@@ -169,7 +169,6 @@ void ScenaLoader::create_paddle(Game& game, vec3 position)
 	entity_id paddle_id = registry.create_entity();
 	registry.add<TransformComponent>(paddle_id, position, paddle_scale);
 	registry.add<RigidBodyComponent>(paddle_id);
-	registry.add<InputComponent>(paddle_id);
 	registry.add<BoxColliderComponent>(paddle_id, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
 	registry.add<RenderComponent>(paddle_id, paddle, material);
 
@@ -192,6 +191,7 @@ void ScenaLoader::create_ball(Game& game, vec3 position)
 	float y = Random::get_random_float(0.05f, 0.7f);
 	vec3 velocity = vec3::normalize({ x, y, 0.0f }) * 40.0f;
 	registry.add<RigidBodyComponent>(e, velocity);
+	registry.add<BounceComponent>(e);
 	registry.add<CircleColliderComponent>(e, 1.0f);
 	registry.add<RenderComponent>(e, ball, material);
 

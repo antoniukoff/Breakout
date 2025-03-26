@@ -46,10 +46,11 @@ void PhysicsSystem::update_ball_box_collision()
 	auto& registry = game_handle->get_registry();
 	auto& dispatcher = game_handle->get_dispatcher();
 
-	registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent>([&](
+	registry.for_each<TransformComponent, RigidBodyComponent, BounceComponent, CircleColliderComponent>([&](
 		entity_id circle,
 		component_handle<TransformComponent> circle_transform,
 		component_handle<RigidBodyComponent> circle_movement,
+		component_handle<BounceComponent> ball_bounce,
 		component_handle<CircleColliderComponent> circle_collider)
 		{
 			/// Ball Data
@@ -91,6 +92,16 @@ void PhysicsSystem::update_ball_box_collision()
 
 						/// Project velocwity onto the normal --- no need for normals dot product since its a unit length
 						ball_velocity = vec3::reflect(ball_velocity, best_normal);
+						if (box == game_handle->get_paddle_id())
+						{
+							if (ball_bounce.impulse_strength() > 0.0f)
+							{
+								return;
+							}
+							ball_bounce.impulse_strength() = 50.0f;
+							ball_bounce.impulse_time() = 0.5f;
+							ball_bounce.base_speed() = ball_velocity.mag();
+						}
 					}
 					else
 					{

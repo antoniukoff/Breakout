@@ -18,8 +18,9 @@ void HealthSystem::on_collision_event(const Event& event)
 	auto& registry = game_handle->get_registry();
 	if (registry.has<LifeComponent>(ce.entity_id))
 	{
-		auto [health_component] = registry.unpack<LifeComponent>(ce.entity_id);
+		auto [health_component, render_component] = registry.unpack<LifeComponent, RenderComponent>(ce.entity_id);
 		auto& curr_health = health_component.current_health();
+		auto max_health = health_component.max_health();
 		curr_health--;
 
 		if (curr_health <= 0)

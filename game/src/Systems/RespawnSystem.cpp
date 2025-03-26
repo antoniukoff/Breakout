@@ -13,7 +13,8 @@ RespawnSystem::RespawnSystem(Game& game)
 
 void RespawnSystem::update(float dt)
 {
-	if (m_available_positions.size() == 0)
+	auto game_state = game_handle->get_state();
+	if (m_available_positions.size() == 0 || game_state == GameState::GAME_END)
 	{
 		return;
 	}
@@ -21,7 +22,6 @@ void RespawnSystem::update(float dt)
 	if (m_elapsed >= m_respawn_timer)
 	{
 		vec3 position = m_available_positions.front();
-
 		auto& dispatcher = game_handle->get_dispatcher();
 
 		BrickRespawnEvent event;
@@ -63,7 +63,7 @@ void RespawnSystem::on_difficulty_increased(const Event& event)
 
 	float min_respawn_time_for_the_level = m_max_respawn_time - (level_respawn_ratio * (m_max_respawn_time - min_respawn_amount));
 
-	float respawn_offset = min_respawn_time_for_the_level / (total_difficulties - 1);
+	float respawn_offset = (m_max_respawn_time - min_respawn_time_for_the_level) / (total_difficulties - 1);
 
 	m_respawn_timer -= respawn_offset;
 }

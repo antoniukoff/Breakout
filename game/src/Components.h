@@ -106,45 +106,29 @@ DEFINE_COMPONENT_HANDLE(RigidBodyComponent,
 	COMPONENT_HANDLE_ACCESSOR(0, vec3, velocity)
 	COMPONENT_HANDLE_ACCESSOR(1, float, angular_velocity)
 )
-struct LaserComponent
+
+struct BounceComponent
 {
-	LaserComponent(uint32_t num_balls, float duration)
-		: num_balls(num_balls)
-		, duration(duration)
-		, cooldown((float)num_balls / duration)
-	{}
-	uint32_t num_balls;
-	float duration;
-	float cooldown;
+	float base_speed;
+	float impulse_strength;
+	float impulse_time;
+	float elapsed_time;
 };
 
 ANNOTATE(
-	LaserComponent,
-	3,
-	DEFINE_COMPONENT_MEMBER(LaserComponent, 0, uint32_t, num_balls)
-	DEFINE_COMPONENT_MEMBER(LaserComponent, 1, float, duration)
-	DEFINE_COMPONENT_MEMBER(LaserComponent, 2, float, cooldown)
+	BounceComponent,
+	4,
+	DEFINE_COMPONENT_MEMBER(BounceComponent, 0, float, base_speed)
+	DEFINE_COMPONENT_MEMBER(BounceComponent, 1, float, impulse_strength)
+	DEFINE_COMPONENT_MEMBER(BounceComponent, 2, float, impulse_time)
+	DEFINE_COMPONENT_MEMBER(BounceComponent, 3, float, elapsed_time)
 )
 
-DEFINE_COMPONENT_HANDLE(LaserComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, uint32_t, num_balls)
-	COMPONENT_HANDLE_ACCESSOR(1, float, duration)
-	COMPONENT_HANDLE_ACCESSOR(2, float, cooldown)
-)
-
-struct InputComponent
-{
-	bool is_active = false; 
-};
-
-ANNOTATE(
-	InputComponent,
-	1,
-	DEFINE_COMPONENT_MEMBER(InputComponent, 0, bool, is_active)
-)
-
-DEFINE_COMPONENT_HANDLE(InputComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, bool, is_active)
+DEFINE_COMPONENT_HANDLE(BounceComponent,
+	COMPONENT_HANDLE_ACCESSOR(0, float, base_speed)
+	COMPONENT_HANDLE_ACCESSOR(1, float, impulse_strength)
+	COMPONENT_HANDLE_ACCESSOR(2, float, impulse_time)
+	COMPONENT_HANDLE_ACCESSOR(3, float, elapsed_time)
 )
 
 struct RenderComponent

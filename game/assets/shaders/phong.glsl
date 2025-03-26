@@ -38,6 +38,7 @@ out vec4 frag_color;
 uniform vec4 model_color;
 uniform vec4 light_color;
 
+
 void main()
 {
 	/// Ambient

@@ -35,7 +35,7 @@ void InputSystem::update(float dt)
 void InputSystem::update_player_movement(float dt)
 {
 	const float movement_speed = 100.0f; 
-	const float rotation_speed = 90.0f;  
+	const float rotation_speed = 120.0f;  
 
 	uint32_t paddle = game_handle->get_paddle_id();
 	auto& registry  = game_handle->get_registry();

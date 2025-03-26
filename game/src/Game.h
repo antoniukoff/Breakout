@@ -54,11 +54,10 @@ using SceneRegistry = registry<TransformComponent,
 	BoxColliderComponent,
 	CircleColliderComponent,
 	RigidBodyComponent,
-	InputComponent,
+	BounceComponent,
 	RenderComponent,
 	CameraShakeComponent,
-	LifeComponent,
-	LaserComponent>;
+	LifeComponent>;
 
 class Game : public Application
 {
@@ -92,6 +91,7 @@ public:
 	inline ParticleBatch&   get_line_batch()					  { return line; }
 	inline SceneData&		get_scene_data()					  { return m_scene_data; }
 	inline const entity_id  get_paddle_id()	const				  { return m_scene_data.paddle_id; }
+	inline const entity_id  get_ball_id()	const				  { return m_scene_data.active_ball_id; }
 	inline const int        get_current_difficulty_target() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
 	inline const int        get_current_level() const			  { return m_scene_data.current_level; }
 	inline const int        get_current_difficulty() const		  { return m_scene_data.current_difficulty; }

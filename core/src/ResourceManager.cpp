@@ -77,6 +77,13 @@ void ResourceManager::initialize(const std::string file_path)
 					material->set_vec4(uniform_name, vec);
 					continue;
 				}
+				else if (type == "float")
+				{
+					float scalar;
+					stream >> scalar;
+					material->set_scalar(uniform_name, scalar);
+					continue;
+				}
 			}
 		}
 	}
