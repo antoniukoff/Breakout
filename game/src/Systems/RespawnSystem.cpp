@@ -51,7 +51,7 @@ void RespawnSystem::on_brick_destroyed(const Event& event)
 
 void RespawnSystem::on_difficulty_increased(const Event& event)
 {
-	float min_respawn_amount = 5.0f;
+	float min_respawn_amount = 7.5f;
 
 	float current_level = game_handle->get_current_level();
 	float total_difficulties = game_handle->get_level_diffuculties();

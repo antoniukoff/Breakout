@@ -57,7 +57,7 @@ void Game::initialize_subsystems()
 	/// Default camera properties
 	vec3 camera_pos = { -50.0f, -50.0f, 60.0f };
 	vec3 target_pos = { 0.0f, 0.0f, 0.0f };
-	vec3 global_up = { 0.0f, 1.0f, 0.0f };
+	vec3 global_up = { 0.0f, 0.0f, 1.0f };
 
 	m_camera.init_view(camera_pos, target_pos, global_up);
 	m_camera.init_projection(m_window->get_aspect_ratio(), 90.0f, 0.1f, 1000.0f);
@@ -154,12 +154,13 @@ void Game::on_key_press(const Event& event)
 	}
 	if (e.key == GLFW_KEY_R && e.action == GLFW_PRESS)
 	{
-		initialize_level(m_scene_data.current_level);
+		initialize_level(0);
 	}
 }
 
 void Game::reset()
 {	
+	camera_system.reset();
 	respawn_system.reset();
 	particle_system.reset();
 }

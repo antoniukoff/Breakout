@@ -24,9 +24,6 @@ void InputSystem::update(float dt)
 	case GameState::IS_ACTIVE:
 		update_player_movement(dt);
 		break;
-	case GameState::GAME_END:
-		update_camera_movement(dt);
-		break;
 	default:
 		break;
 	}
