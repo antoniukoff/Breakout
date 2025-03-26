@@ -14,6 +14,12 @@ PhysicsSystem::PhysicsSystem(Game& game)
 
 void PhysicsSystem::update(float dt)
 {
+	auto state = game_handle->get_state();
+	if (state != GameState::IS_ACTIVE)
+	{
+		return;
+	}
+
 	check_player_level_bounds();
 	update_ball_box_collision();
 }

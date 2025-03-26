@@ -47,7 +47,10 @@ void ParticleSystem::update(float dt)
 void ParticleSystem::draw_shooting_line(float dt)
 {
 	auto& registry = game_handle->get_registry();
-	registry.for_each<TransformComponent, RigidBodyComponent>([&](entity_id e, component_handle<TransformComponent> transform, component_handle<RigidBodyComponent> rigid_body)
+	registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent >([&](entity_id e,
+		component_handle<TransformComponent> transform, 
+		component_handle<RigidBodyComponent> rigid_body,
+		component_handle<CircleColliderComponent> _)
 		{
 			vec3 ball_pos = transform.position();
 			vec3 ball_vel = rigid_body.velocity();

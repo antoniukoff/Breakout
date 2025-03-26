@@ -9,7 +9,6 @@ RespawnSystem::RespawnSystem(Game& game)
 	auto& dispatcher = game.get_dispatcher();
 	dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&RespawnSystem::on_brick_destroyed, this, std::placeholders::_1));
 	dispatcher.subscribe<DifficultyIncreasedEvent>(std::bind(&RespawnSystem::on_difficulty_increased, this, std::placeholders::_1));
-	dispatcher.subscribe<LastDifficulty>(std::bind(&RespawnSystem::on_last_difficulty, this, std::placeholders::_1));
 }
 
 void RespawnSystem::update(float dt)
@@ -52,10 +51,21 @@ void RespawnSystem::on_brick_destroyed(const Event& event)
 
 void RespawnSystem::on_difficulty_increased(const Event& event)
 {
-	m_respawn_timer -= 2.0f;
+	float min_respawn_amount = 5.0f;
+
+	float current_level = game_handle->get_current_level();
+	float total_difficulties = game_handle->get_level_diffuculties();
+	float total_levels = 2.0f;
+
+	float level_ratio = current_level / total_levels;
+
+	float level_respawn_ratio = (level_ratio + 1.0f) * 0.5f;
+
+	float min_respawn_time_for_the_level = m_max_respawn_time - (level_respawn_ratio * (m_max_respawn_time - min_respawn_amount));
+
+	float respawn_offset = min_respawn_time_for_the_level / (total_difficulties - 1);
+
+	m_respawn_timer -= respawn_offset;
 }
 
-void RespawnSystem::on_last_difficulty(const Event& event)
-{
-}
 

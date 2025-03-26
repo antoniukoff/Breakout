@@ -31,9 +31,6 @@ public:
 	vec3 position;
 };
 
-class LastDifficulty : public Event
-{};
-
 class GameWonEvent : public Event
 {};
 

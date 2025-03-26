@@ -93,6 +93,9 @@ public:
 	inline SceneData&		get_scene_data()					  { return m_scene_data; }
 	inline const entity_id  get_paddle_id()	const				  { return m_scene_data.paddle_id; }
 	inline const int        get_current_difficulty_target() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
+	inline const int        get_current_level() const			  { return m_scene_data.current_level; }
+	inline const int        get_current_difficulty() const		  { return m_scene_data.current_difficulty; }
+	inline const int        get_level_diffuculties() const		  { return m_scene_data.difficulty_threashhold[m_scene_data.current_level].size(); }
 	inline const GameState& get_state() const					  { return m_scene_data.state; }
 
 private:
