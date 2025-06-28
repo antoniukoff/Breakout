@@ -1,12 +1,15 @@
 #pragma once
 
-#include "Common.h"
+#include "common.h"
 #include "utility.h"
+
+template<typename T>
+class component_handle;
 
 /**
  * @class component_pool
  *
- * @brief Represents the compotent pool data
+ * @brief Represents the component pool data
  *
  * @tparam C Component type
  * @tparam elements Number of elements in the component
@@ -18,19 +21,9 @@ struct component_pool
 	void* buffer[elements];
 	~component_pool()
 	{
-		delete buffer[0];
+		free(buffer[0]);
 	}
 };
-
-/**
- * @class component_handle
- *
- * @brief This class is responsible for accessing the component fields
- *
- * @tparam C Component type
- */
-template<typename C>
-class component_handle;
 
 /**
  * @class component_manager
@@ -60,6 +53,14 @@ public:
 		size_t bytes = g_container_size * packed_component_size;
 		m_component_pool.buffer[0] = malloc(bytes);
 		reflecs::constexpr_loop::execute<member_count - 1, generate_buffers_wrapper>(this, m_component_pool.buffer, g_container_size);
+	}
+
+	~component_manager()
+	{
+		for (size_t i = 1; i < m_component_pool.size; ++i) 
+		{
+			destroy_instance(i);
+		}
 	}
 
 	/*
@@ -182,6 +183,27 @@ public:
 private:
 
 #pragma region CompileHelpers
+
+	void destroy_instance(component_instance instance)
+	{
+		auto destroy = [this, instance]<size_t... Is>(std::index_sequence<Is...>) 
+		{
+			(destroy_member<Is>(instance), ...);
+		};
+		destroy(std::make_index_sequence<member_count>{});
+	}
+
+	template<size_t index>
+	void destroy_member(component_instance instance)
+	{
+		using data_type = typename reflecs::component_reflection::get_type<C, index>::type;
+		if constexpr (!std::is_trivially_destructible_v<data_type>) 
+		{
+			data_type* arr = static_cast<data_type*>(m_component_pool.buffer[index]);
+			arr[instance].~data_type();
+		}
+	}
+
 	/**
 	 * @brief Generates field buffers for each member of the component
 	 * @tparam index Index of the component member
@@ -263,9 +285,9 @@ private:
 	{
 		using data_type = typename reflecs::component_reflection::get_type<C, index>::type;
 
-		data_type* array_handle = static_cast<data_type*>(m_component_pool.buffer[index]);
-
-		array_handle[instance_to_add] = component.*reflecs::component_reflection::get_pointer_to_member<C, index>();
+		void* address = (char*)m_component_pool.buffer[index] + sizeof(data_type) * instance_to_add;
+		
+		new(address)data_type(component.*reflecs::component_reflection::get_pointer_to_member<C, index>());
 	}
 
 	/**

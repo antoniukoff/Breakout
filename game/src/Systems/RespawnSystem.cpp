@@ -1,5 +1,4 @@
 #include "RespawnSystem.h"
-#include "../GameEvents.h"
 #include "../Game.h"
 
 RespawnSystem::RespawnSystem(Game& game)
@@ -43,10 +42,9 @@ void RespawnSystem::reset()
 	std::swap(m_available_positions, new_queue);
 }
 
-void RespawnSystem::on_brick_destroyed(const Event& event)
+void RespawnSystem::on_brick_destroyed(const BrickDestroyedEvent& event)
 {
-	const BrickDestroyedEvent& e = static_cast<const BrickDestroyedEvent&>(event);
-	m_available_positions.push(e.position);
+	m_available_positions.push(event.position);
 }
 
 void RespawnSystem::on_difficulty_increased(const Event& event)

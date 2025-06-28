@@ -1,0 +1,10 @@
+Mesh cube assets/meshes/cube.obj
+Mesh paddle assets/meshes/paddle.obj
+Mesh ball assets/meshes/sphere.obj
+
+Shader particle assets/shaders/particle.glsl
+Shader default assets/shaders/default.glsl
+Shader phong assets/shaders/phong.glsl
+
+Material matte_material phong float material.ambient_strength 0.1 float material.diffuse_strength 0.8 float material.specular_strength 1 float material.shininess 96.0 vec4 material.color 1 1 1 1
+Material plain default 

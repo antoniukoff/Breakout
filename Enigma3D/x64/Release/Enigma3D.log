@@ -1,0 +1,26 @@
+﻿  EnigmaApp.cpp
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\math\mat4.h(4,7): warning C4099: 'vec3': type name first seen using 'struct' now seen using 'class'
+  (compiling source file 'EnigmaApp.cpp')
+      C:\Users\volod\Documents\dev\Personal\breakout\core\include\math\vec3.h(10,8):
+      see declaration of 'vec3'
+  
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\math\Random.h(12,41): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  (compiling source file 'EnigmaApp.cpp')
+  
+C:\Users\volod\Documents\dev\Personal\breakout\Enigma3D\EnigmaApp.cpp(13,34): warning C4244: 'initializing': conversion from 'float' to 'const uint32_t', possible loss of data
+C:\Users\volod\Documents\dev\Personal\breakout\Enigma3D\EnigmaApp.cpp(14,35): warning C4244: 'initializing': conversion from 'float' to 'const uint32_t', possible loss of data
+C:\Users\volod\Documents\dev\Personal\breakout\Enigma3D\EnigmaApp.cpp(145,20): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\volod\Documents\dev\Personal\breakout\Enigma3D\EnigmaApp.cpp(204,26): warning C4267: '=': conversion from 'size_t' to 'uint32_t', possible loss of data
+  Previous IPDB not found, fall back to full compilation.
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\ecs\internal\component_manager.h(91): warning C4172: returning address of local variable or temporary : instance_to_add
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\ecs\internal\component_manager.h(91): warning C4172: returning address of local variable or temporary : instance_to_add
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\ecs\internal\component_manager.h(91): warning C4172: returning address of local variable or temporary : instance_to_add
+C:\Users\volod\Documents\dev\Personal\breakout\core\include\ecs\internal\component_manager.h(91): warning C4172: returning address of local variable or temporary : instance_to_add
+  All 2097 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+core.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'core.lib(glew.obj)' or at ''; linking object as if no debug info
+  Enigma3D.vcxproj -> C:\Users\volod\Documents\dev\Personal\breakout\x64\Release\Enigma3D.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

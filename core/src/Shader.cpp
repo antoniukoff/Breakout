@@ -7,13 +7,13 @@
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(const std::string& file_path)
+Shader::Shader(const std::string& file_path, const std::string& name)
+	: m_name(name)
 {
 	create_shader(file_path);
 
 	int max_texture_units;
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
-	
 }
 
 void Shader::bind() const
@@ -26,30 +26,45 @@ void Shader::unbind() const
 	glUseProgram(0);
 }
 
-void Shader::upload_mat4(const std::string& uniform_name, const mat4& value) 
+void Shader::upload_mat4(const std::string& uniform_name, const mat4& value)
 {
-	glUniformMatrix4fv(get_uniform(uniform_name), 1, GL_FALSE, &value(0, 0));
+	if (int u_id = get_uniform(uniform_name); u_id != -1)
+	{
+		glUniformMatrix4fv(u_id, 1, GL_FALSE, &value(0, 0));
+	}
 }
 
 void Shader::upload_vec4(const std::string& uniform_name, const vec4& value) 
 {
-	glUniform4fv(get_uniform(uniform_name), 1, &value.x);
+	if (int u_id = get_uniform(uniform_name); u_id != -1)
+	{
+		glUniform4fv(u_id, 1, &value.x);
+	}
 }
 
-void Shader::upload_vec4(const std::string& uniform_name, const vec3& value) 
+void Shader::upload_vec4(const std::string& uniform_name, const vec3& value)
 {
-	vec4 v = value.to_vec4();
-	glUniform4fv(get_uniform(uniform_name), 1, &v.x);
+	if (int u_id = get_uniform(uniform_name); u_id != -1)
+	{
+		vec4 v = value.to_vec4();
+		glUniform4fv(u_id, 1, &v.x);
+	}
 }
 
-void Shader::upload_vec3(const std::string& uniform_name, const vec3& value) 
+void Shader::upload_vec3(const std::string& uniform_name, const vec3& value)
 {
-	glUniform3fv(get_uniform(uniform_name), 1, &value.x);
+	if (int u_id = get_uniform(uniform_name); u_id != -1)
+	{
+		glUniform3fv(u_id, 1, &value.x);
+	}
 }
 
 void Shader::upload_float(const std::string& uniform_name, float value)
 {
-	glUniform1f(get_uniform(uniform_name), value);
+	if (int u_id = get_uniform(uniform_name); u_id != -1)
+	{
+		glUniform1f(u_id, value);
+	}
 }
 
 unsigned int Shader::get_id() const
@@ -67,9 +82,9 @@ int Shader::get_uniform(const std::string& name)
 	int u_id = glGetUniformLocation(m_id, name.c_str());
 	if (u_id == -1)
 	{
-		std::cout << " Uniform " << name << " not found" << std::endl;
-		return -1;
+		std::cout << "[ERROR]: Uniform *" << name << "* was not found!(" << get_name() << ".glsl)" << std::endl;
 	}
+
 	m_uniform_map[name] = u_id;
 	return u_id;
 }

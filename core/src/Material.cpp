@@ -1,8 +1,9 @@
 #include "Material.h"
 #include "Shader.h"
 
-Material::Material(Shader* shader)
-	:shader_handle(shader)
+Material::Material(Shader* shader, const std::string& name)
+	: shader_handle(shader)
+	, name(name)
 {}
 
 void Material::set_mat(const std::string name, const mat4& mat)

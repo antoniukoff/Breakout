@@ -11,7 +11,7 @@ class Shader
 {
 public:
 	Shader() = default;
-	Shader(const std::string& file_path);
+	Shader(const std::string& file_path, const std::string& name);
 
 	void bind() const;
 	void unbind() const;
@@ -24,6 +24,7 @@ public:
 	void upload_float(const std::string& uniform_name, float value);
 
 	unsigned int get_id() const;
+	const std::string& get_name() const { return m_name; }
 private:
 
 	unsigned int find_available_texture_unit(int texture_type);
@@ -35,6 +36,7 @@ private:
 
 
 private:
+	std::string m_name;
 	std::unordered_map<std::string, int> m_uniform_map;
 	unsigned int m_id = 0;
 };

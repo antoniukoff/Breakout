@@ -70,14 +70,14 @@ void ResourceManager::initialize(const std::string file_path)
 					material->set_vec3(uniform_name, vec);
 					continue;
 				}
-				else if (type == "vec4")
+				if (type == "vec4")
 				{
 					vec4 vec;
 					stream >> vec.x >> vec.y >> vec.z >> vec.w;
 					material->set_vec4(uniform_name, vec);
 					continue;
 				}
-				else if (type == "float")
+				if (type == "float")
 				{
 					float scalar;
 					stream >> scalar;
@@ -96,8 +96,23 @@ Material* ResourceManager::load_material(const std::string& name, const std::str
 	{
 		std::cout << "Could not find shader - " << shader_name << " - while creating material: " << name << std::endl;
 	}
-	materials[name] = std::make_unique<Material>(shader);
+	materials[name] = std::make_unique<Material>(shader, name);
 	return materials[name].get();
+}
+
+void ResourceManager::list_assets()
+{
+	std::cout << "Active Materials: \n";
+	for (const auto& [name, _] : s_instance->materials)
+	{
+		std::cout << "- " << name << ", \n";
+	}
+
+	std::cout << "Active Meshes: \n";
+	for (const auto& [name, _] : s_instance->meshes)
+	{
+		std::cout << "- " << name << ", \n";
+	}
 }
 
 Mesh* ResourceManager::get_mesh(const std::string& name)
@@ -127,9 +142,14 @@ Material* ResourceManager::get_material(const std::string& name)
 	return materials.at(name).get();
 }
 
-ResourceManager* ResourceManager::get()
+Material ResourceManager::get_material_instance(const std::string& name)
 {
-	return s_instance.get();
+	return *get_material(name);
+}
+
+ResourceManager& ResourceManager::get()
+{
+	return *s_instance;
 }
 
 Mesh* ResourceManager::load_mesh(const std::string& name, const std::string& file_path)
@@ -140,7 +160,7 @@ Mesh* ResourceManager::load_mesh(const std::string& name, const std::string& fil
 
 Shader* ResourceManager::load_shader(const std::string& name, const std::string& file_path)
 {
-	shaders[name] = std::make_unique<Shader>(file_path);
+	shaders[name] = std::make_unique<Shader>(file_path, name);
 	return shaders[name].get();
 }
 

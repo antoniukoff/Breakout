@@ -1,4 +1,7 @@
 #include "Application.h"
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
 
 //////////////////////////////
 /// To be defined by the user

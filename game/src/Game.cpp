@@ -1,9 +1,9 @@
 #include "Game.h"
 #include "ScenaLoader.h"
 #include <CoreEvents.h>
-#include "ResourceManager.h"
 #include <math/Random.h>
 #include <../vendor/glfw/include/GLFW/glfw3.h>
+#include "ResourceManager.h"
 
 Game::Game() 
 	: Application(1280, 720, "Breakout")
@@ -16,9 +16,8 @@ Game::Game()
 	, health_system(*this)
 	, render_system(*this)
 {
-	ResourceManager::initialize("assets/resources.txt");
 
-	initialize_subsystems();
+	initialize_systems();
 	initialize_level(0);
 
 	m_dispatcher.subscribe<BallRespawnEvent>(std::bind(&Game::on_ball_respawn, this, std::placeholders::_1));
@@ -38,13 +37,13 @@ void Game::on_update(float dt)
 	m_camera.update();
 }
 
-void Game::render(float interval)
+void Game::on_render(float interval)
 {
 	render_system.draw(interval);
 	particle_system.draw(interval);
 }
 
-void Game::initialize_subsystems()
+void Game::initialize_systems()
 {
 	particles.initizalize(1500, 1.0f, ResourceManager::get()->get_mesh("cube"));
 	line.initizalize(300, 50.0f, ResourceManager::get()->get_mesh("ball"), [](Particle& p, float) {});

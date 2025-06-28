@@ -14,7 +14,10 @@ public:
 	int action;
 };
 
-class OnGameWon : public Event
+class MousePressEvent : public Event
 {
 public:
+	int button;
+	int action;
+	float screen_x, screen_y;
 };

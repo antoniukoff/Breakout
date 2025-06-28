@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 #include "Material.h"
 #include "Mesh.h"
@@ -11,13 +12,16 @@ class ResourceManager
 {
 public:
 	static void initialize(const std::string file_path);
-	static ResourceManager* get();
+	static ResourceManager& get();
 
 public:
 	Mesh* get_mesh(const std::string& name);
 	Shader* get_shader(const std::string& name);
 	Material* get_material(const std::string& name);
-	
+
+	Material get_material_instance (const std::string& name);
+
+	void list_assets();
 private:
 	Mesh* load_mesh(const std::string& name, const std::string& file_path);
 	Shader* load_shader(const std::string& name, const std::string& file_path);

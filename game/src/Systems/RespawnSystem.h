@@ -1,5 +1,6 @@
 #pragma once
 #include "System.h"
+#include "../GameEvents.h"
 
 #include <math/vec3.h>
 #include <queue>
@@ -15,7 +16,7 @@ public:
 	void reset();
 	
 private:
-	void on_brick_destroyed(const Event& event);
+	void on_brick_destroyed(const BrickDestroyedEvent& event);
 	void on_difficulty_increased(const Event& event);
 
 private:

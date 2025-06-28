@@ -11,7 +11,7 @@ struct RenderData
 };
 
 ParticleBatch::ParticleBatch()
-	: shader("assets/shaders/particle.glsl")
+	: shader("assets/shaders/particle.glsl", "particle")
 {}
 
 ParticleBatch::~ParticleBatch()
@@ -105,11 +105,6 @@ void ParticleBatch::update(float dt)
 void ParticleBatch::draw(Camera& camera, float interval)
 {
 	shader.bind();
-	mat4 view		= camera.get_view_matrix(interval);
-	mat4 projection = camera.get_projection_matrix();
-
-	shader.upload_mat4("view", view);
-	shader.upload_mat4("projection", projection);
 
 	std::vector<RenderData> instanced_data;
 

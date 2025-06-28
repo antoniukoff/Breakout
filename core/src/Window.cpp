@@ -19,7 +19,7 @@ Window::Window(float width, float height, const std::string& name)
 	glViewport(0, 0, width, height);
 	glfwSwapInterval(1);
 
-	initialize_context(3, 3, true);
+	initialize_context(4, 6, true);
 
 	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
 		{
@@ -27,6 +27,7 @@ Window::Window(float width, float height, const std::string& name)
 			WindowCloseEvent event;
 			dispatcher->dispatch(event);
 		});
+
 	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			EventDispatcher* dispatcher = static_cast<EventDispatcher*>(glfwGetWindowUserPointer(window));
@@ -36,6 +37,11 @@ Window::Window(float width, float height, const std::string& name)
 			dispatcher->dispatch(event);
 		});
 
+}
+
+Window::~Window()
+{
+	glfwTerminate();
 }
 
 void Window::set_event_dispatcher(EventDispatcher* dispatcher)
@@ -56,6 +62,8 @@ void Window::initialize_context(int major, int minor, bool use_core)
 	{
 		std::cerr << "Failed to initialize glew!" << std::endl;
 	}
+
+	std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
 }
 
 void Window::poll_events()

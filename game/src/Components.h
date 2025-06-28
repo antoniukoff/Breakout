@@ -1,5 +1,5 @@
 #pragma once
-#include <ecs/utility.h>
+
 #include <math/vec3.h>
 #include <math/vec2.h>
 #include <Mesh.h>

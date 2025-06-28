@@ -3,7 +3,6 @@
 #include "math/mat4.h"
 #include <memory>
 
-
 class Camera;
 class Mesh;
 class Material;
@@ -13,13 +12,14 @@ class Renderer
 public:
 	static void initialize(vec3 clear_color, bool enable_depth_test = true, bool enable_face_culling = true);
 
-	static void begin_frame(Camera& camera, float interval);
+	/// Renderer states
+	static void set_clear_color(vec3 clear_color);
+
+	static void prepare_new_frame();
 	static void submit(Material* material, Mesh* mesh, const mat4& model_matrix);
 	static void end_frame();
 
 private:
-	static mat4 m_view_matrix;
-	static mat4 m_projection_matrix;
 	static Material* current_material;
 };
 

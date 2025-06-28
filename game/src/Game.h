@@ -2,7 +2,7 @@
 
 #include <Application.h>
 
-#include <ecs/registry.h> 
+#include <ecs/reflecs.h> 
 
 #include "ShakeCamera.h"
 #include <ParticleBatch.h>
@@ -66,11 +66,11 @@ class Game : public Application
 public:
 	Game();
 	void on_update(float dt) override;
-	void render(float interval) override;
+	void on_render(float interval) override;
 
 private:
 	void initialize_level(uint32_t level);
-	void initialize_subsystems();
+	void initialize_systems();
 	void reset();
 	void set_scene_data(const SceneData& data);
 

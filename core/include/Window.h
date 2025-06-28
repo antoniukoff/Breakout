@@ -13,6 +13,7 @@ public:
 	Window operator =(Window&& other) = delete;
 
 	Window(float width, float height, const std::string& name);
+	~Window();
 
 	void set_event_dispatcher(EventDispatcher* dispatcher);
 	void initialize_context(int major, int minor, bool use_core);

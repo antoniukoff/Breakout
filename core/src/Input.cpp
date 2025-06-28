@@ -1,21 +1,31 @@
-#include "Input.h"
+#include "InputHandler.h"
 #include "Application.h"
 
-bool Input::is_key_pressed(int key)
+#include <GLFW/glfw3.h>
+
+InputHandler::InputHandler()
+{
+}
+
+bool InputHandler::is_key_pressed(KeyCode key)
 {
 	auto window = Application::get().get_window()->get_handle();
-	int state = glfwGetKey(window, key);
+
+	int glfw_key = core_to_glfw_keycode(key);
+	int state = glfwGetKey(window, glfw_key);
 	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool Input::is_mouse_pressed(int button)
+bool InputHandler::is_mouse_pressed(MouseButton button)
 {
 	auto window = Application::get().get_window()->get_handle();
-	int state = glfwGetMouseButton(window, button);
-	return state == GLFW_PRESS || state == GLFW_RELEASE;
+
+	int glfw_button = core_to_glfw_mousebutton(button);
+	int state = glfwGetMouseButton(window, glfw_button);
+	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-std::pair<float, float> Input::get_mouse_pos()
+std::pair<float, float> InputHandler::get_mouse_pos()
 {
 	auto window = Application::get().get_window()->get_handle();
 
@@ -25,7 +35,7 @@ std::pair<float, float> Input::get_mouse_pos()
 	return{ x, y };
 }
 
-std::pair<float, float> Input::get_rel_mouse_pos()
+std::pair<float, float> InputHandler::get_rel_mouse_pos()
 {
 	auto window = Application::get().get_window()->get_handle();
 
@@ -41,3 +51,27 @@ std::pair<float, float> Input::get_rel_mouse_pos()
 
 	return{ rel_x, rel_y };
 }
+
+int InputHandler::core_to_glfw_keycode(KeyCode key)
+{
+	switch (key)
+	{
+	case KeyCode::W: return GLFW_KEY_W;
+	case KeyCode::A: return GLFW_KEY_A;
+	case KeyCode::S: return GLFW_KEY_S;
+	case KeyCode::D: return GLFW_KEY_D;
+	case KeyCode::SPACE: return GLFW_KEY_SPACE;
+	default: return 0;
+	}
+}
+
+int InputHandler::core_to_glfw_mousebutton(MouseButton button)
+{
+	switch (button)
+	{
+	case MouseButton::LEFT: return GLFW_MOUSE_BUTTON_1;
+	case MouseButton::RIGHT: return GLFW_MOUSE_BUTTON_2;
+	default: return 0;
+	}
+}
+

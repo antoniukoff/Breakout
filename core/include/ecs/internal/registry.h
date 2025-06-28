@@ -1,6 +1,8 @@
 #pragma once
+
 #include "component_manager.h"
 #include <queue>
+#include <iostream>
 
 /**
  * @class registry
@@ -40,7 +42,7 @@ public:
 	{
 		if (m_available_ids.empty())
 		{
-			return -1;
+			return g_max_entities;
 		}
 
 		size_t new_id = m_available_ids.front();

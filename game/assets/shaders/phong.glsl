@@ -55,7 +55,7 @@ void main()
 	vec3 reflect_vec = reflect(-light_direction, normal_dir);
 	float spec_coeff = pow(max(dot(reflect_vec, viewer_dir), 0.0), 96.0);
 
-	vec4 spec = 1.0 * spec_coeff * light_color;
+	vec4 spec = spec_coeff * light_color;
 
 	/// Final Color
 	frag_color = vec4(vec4((ambient + diffuse + spec) * model_color).xyz, 1.0);

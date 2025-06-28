@@ -1,12 +1,11 @@
 #pragma once
-#include "Event.h"
+
 #include <functional>
 #include <vector>
 #include <memory>
-#include <algorithm>
-#include <utility>
-#include <iostream>
 	
+#include "Event.h"
+
 class EventDispatcher
 {
 	using EventCallback = std::function<void(const Event&)>;
@@ -16,7 +15,7 @@ public:
 	~EventDispatcher();
 
 	template<typename EventType>
-	void subscribe(const EventCallback& callback);
+	void subscribe(const std::function<void(const EventType&)>& callback);
 
 	/// Defer event updates
 	inline void process_events()
@@ -37,7 +36,6 @@ public:
 	void dispatch(const EventType& event);
 
 private:
-private:
 	std::unordered_map<size_t, std::vector<EventCallback>> m_listeners;
 
 	std::vector<std::pair<size_t, std::unique_ptr<Event>>> m_pending_events;
@@ -48,9 +46,14 @@ private:
 };
 
 template<typename EventType>
-void EventDispatcher::subscribe(const EventCallback& callback)
+void EventDispatcher::subscribe(const std::function<void(const EventType&)>&callback)
 {
-	m_listeners[typeid(EventType).hash_code()].push_back(callback);
+	auto wrapper = [callback](const Event& event)
+		{
+			callback(reinterpret_cast<const EventType&>(event));
+		};
+
+	m_listeners[typeid(EventType).hash_code()].push_back(wrapper);
 }
 
 template<typename EventType>
