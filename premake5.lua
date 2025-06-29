@@ -107,3 +107,48 @@ workspace "Breakout"
             optimize "On"
 
 
+    project "editor"
+        kind "ConsoleApp"
+        language "C++"
+        location "editor"
+
+        outputdir = "%{cfg.system}-%{cfg.buildcfg}-%{cfg.architecture}"
+
+        targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+        objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+        includedirs {
+            "core/include",
+            "core/vendor/imgui/imgui",
+            "core/vendor/imgui/imgui/backends",
+            "core/vendor/glew/include/GL",
+            "core/vendor/glfw/include/GLFW"
+        }    
+
+        links "core"
+
+        files { 
+            "editor/src/**.cpp",
+            "editor/src/**.h",
+        }
+
+        defines "GLEW_STATIC"
+
+        vpaths {
+            ["Headers/*"] = {"%{prj.name}/src/**.h"},
+            ["Sources/*"] = {"%{prj.name}/src/**.cpp"},
+        }
+
+        filter "system:windows"
+            cppdialect "C++20"
+            systemversion "latest"
+
+        filter "configurations:Debug"
+            defines { "DEBUG" }
+            symbols "On"
+
+        filter "configurations:Release"
+            defines { "NDEBUG" }
+            optimize "On"
+
+

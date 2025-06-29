@@ -1,5 +1,5 @@
-#include "Shader.h"
-#include "GLUtils.h"
+#include "shader.h"
+#include "gl_utils.h"
 
 #include <gl/glew.h>
 

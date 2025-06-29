@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "mesh.h"
 #include <memory>
 #include <gl/glew.h>
 #include <sstream>

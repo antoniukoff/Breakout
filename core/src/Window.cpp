@@ -1,6 +1,6 @@
-#include "Window.h"
-#include "EventDispatcher.h"
-#include "CoreEvents.h"
+#include "window.h"
+#include "event_dispatcher.h"
+#include "core_events.h"
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 

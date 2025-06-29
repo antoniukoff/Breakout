@@ -1,12 +1,12 @@
-#include "Game.h"
-#include "ScenaLoader.h"
-#include <CoreEvents.h>
-#include <math/Random.h>
+#include "game.h"
+#include "scene_loader.h"
+#include <core_events.h>
+#include <math/random.h>
 #include <../vendor/glfw/include/GLFW/glfw3.h>
-#include "ResourceManager.h"
+#include "resource_manager.h"
 
 Game::Game() 
-	: Application(1280, 720, "Breakout")
+	: ApplicationBase(1280, 720, "Breakout")
 	, input(*this)
 	, movement(*this)
 	, physics(*this)
@@ -70,7 +70,7 @@ void Game::initialize_level(uint32_t level)
 	std::cout << "\nStarting Level: " << level + 1 << "\nInitial target: " << get_current_difficulty_target() <<" bricks!\n";
 }
 
-void Game::on_ball_respawn(const Event& event)
+void Game::on_ball_respawn(const EventBase& event)
 {
 	m_scene_data.lives--;
 	if (m_scene_data.lives <= 0)
@@ -84,7 +84,7 @@ void Game::on_ball_respawn(const Event& event)
 	}
 }
 
-void Game::on_brick_destroyed(const Event& event)
+void Game::on_brick_destroyed(const EventBase& event)
 {
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
@@ -121,7 +121,7 @@ void Game::on_brick_destroyed(const Event& event)
 	}
 }
 
-void Game::on_brick_respawn(const Event& event)
+void Game::on_brick_respawn(const EventBase& event)
 {
 	const BrickRespawnEvent& e = static_cast<const BrickRespawnEvent&>(event);
 	ScenaLoader::create_brick(*this, e.position);
@@ -129,7 +129,7 @@ void Game::on_brick_respawn(const Event& event)
 	m_scene_data.num_bricks++;
 }
 
-void Game::on_key_press(const Event& event)
+void Game::on_key_press(const EventBase& event)
 {
 	const KeyPressEvent& e = static_cast<const KeyPressEvent&>(event);
 	if (e.key == GLFW_KEY_SPACE && e.action == GLFW_PRESS)
@@ -187,7 +187,7 @@ void Game::set_scene_data(const SceneData& data)
 	m_scene_data = data;
 }
 
-std::unique_ptr<Application> create_application()
+std::unique_ptr<ApplicationBase> create_application()
 {
 	return std::make_unique<Game>();
 }

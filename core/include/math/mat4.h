@@ -1,7 +1,7 @@
 #pragma once
 #define TO_RAD(degrees) degrees * (3.14159265358979323846f / 180.0f)
 
-class vec3;
+struct vec3;
 
 struct mat4
 {

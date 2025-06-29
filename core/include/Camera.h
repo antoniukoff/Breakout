@@ -19,8 +19,8 @@ public:
 	virtual void update(float dt);
 
 	const vec3& get_position() const;
-	const vec3& get_look_dir() const;
 	const vec3& get_target_pos() const;
+	const vec3 get_look_dir() const;
 
 	void set_position(const vec3& position);
 	void set_target(const vec3& position);

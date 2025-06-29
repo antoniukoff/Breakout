@@ -2,7 +2,7 @@
 #include <random>
 #include "vec3.h"
 #include "vec2.h"
-#include "../Color.h"
+#include "../color.h"
 
 class Random
 {

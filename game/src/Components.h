@@ -2,9 +2,9 @@
 
 #include <math/vec3.h>
 #include <math/vec2.h>
-#include <Mesh.h>
+#include <mesh.h>
 #include "Material.h"
-#include "PowerUps.h"
+#include "power_ups.h"
 
 struct TransformComponent
 {

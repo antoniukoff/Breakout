@@ -1,9 +1,9 @@
 #include <GL/glew.h>
 
-#include "Renderer.h"
-#include "Camera.h"
+#include "renderer.h"
+#include "camera.h"
 #include "Material.h"
-#include "Mesh.h"
+#include "mesh.h"
 
 Material* Renderer::current_material = nullptr;
 

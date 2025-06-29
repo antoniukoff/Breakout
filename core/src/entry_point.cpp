@@ -1,0 +1,17 @@
+#include "application_base.h"
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+
+//////////////////////////////
+/// To be defined by the user
+//////////////////////////////
+extern std::unique_ptr<ApplicationBase> create_application();
+
+int main(int argc, char** argv)
+{
+	auto program = create_application();
+	program->run();
+
+	return 0;
+}

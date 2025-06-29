@@ -1,7 +1,7 @@
 #pragma once
 #include "math/mat4.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
+#include "vertex_array.h"
+#include "vertex_buffer.h"
 #include <string>
 #include "math/vec2.h"
 

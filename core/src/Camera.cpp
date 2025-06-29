@@ -1,7 +1,7 @@
-#include "Camera.h"
+#include "camera.h"
 
-#include "InputHandler.h"
-#include "Application.h"
+#include "input_handler.h"
+#include "application_base.h"
 
 #include <algorithm>
 #include <iostream>
@@ -11,7 +11,7 @@ Camera::Camera(CameraParams params)
 {
 	init_view(params.from, params.at, params.up);
 
-	float ar = Application::get().get_window()->get_aspect_ratio();
+	float ar = ApplicationBase::get().get_window()->get_aspect_ratio();
 	init_projection(ar, params.fov, params.near, params.far);
 }
 
@@ -120,14 +120,15 @@ const vec3& Camera::get_position() const
 	return m_params.from;
 }
 
-const vec3& Camera::get_look_dir() const
-{
-	return m_params.at - m_params.from;
-}
 
 const vec3& Camera::get_target_pos() const
 {
 	return m_params.at;
+}
+
+const vec3 Camera::get_look_dir() const
+{
+	return m_params.at - m_params.from;
 }
 
 void Camera::set_position(const vec3& position)

@@ -1,5 +1,5 @@
 #include "Material.h"
-#include "Shader.h"
+#include "shader.h"
 
 Material::Material(Shader* shader, const std::string& name)
 	: shader_handle(shader)

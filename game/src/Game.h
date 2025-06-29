@@ -1,23 +1,23 @@
 #pragma once
 
-#include <Application.h>
+#include <application_base.h>
 
 #include <ecs/reflecs.h> 
 
-#include "ShakeCamera.h"
-#include <ParticleBatch.h>
+#include "shake_camera.h"
+#include <particle_batch.h>
 
-#include "Components.h"
-#include "GameEvents.h"
+#include "components.h"
+#include "game_events.h"
 
-#include "systems/PhysicsSystem.h"
-#include "systems/InputSystem.h"
-#include "systems/MovementSystem.h"
-#include "systems/CameraSystem.h"
-#include "systems/ParticleSystem.h"
-#include "systems/HealthSystem.h"
-#include "systems/RespawnSystem.h"
-#include "systems/RenderSystem.h"
+#include "systems/physics_system.h"
+#include "systems/input_system.h"
+#include "systems/move_system.h"
+#include "systems/camera_system.h"
+#include "systems/particle_system.h"
+#include "systems/health_system.h"
+#include "systems/respawn_system.h"
+#include "systems/render_system.h"
 
 
 enum class GameState
@@ -59,7 +59,7 @@ using SceneRegistry = registry<TransformComponent,
 	CameraShakeComponent,
 	LifeComponent>;
 
-class Game : public Application
+class Game : public ApplicationBase
 {
 	friend class ScenaLoader;
 
@@ -75,11 +75,11 @@ private:
 	void set_scene_data(const SceneData& data);
 
 private:
-	void on_ball_respawn(const Event& event);
+	void on_ball_respawn(const EventBase& event);
 	void reset_ball();
-	void on_brick_destroyed(const Event& event);
-	void on_brick_respawn(const Event& event);
-	void on_key_press(const Event& event);
+	void on_brick_destroyed(const EventBase& event);
+	void on_brick_respawn(const EventBase& event);
+	void on_key_press(const EventBase& event);
 
 public:
 

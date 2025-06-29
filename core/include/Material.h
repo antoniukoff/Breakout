@@ -1,7 +1,7 @@
 #pragma once
 #include "math/vec3.h"
 #include "math/mat4.h"
-#include "Texture.h"
+#include "texture.h"
 #include <unordered_map>
 #include <string>
 #include <iostream>
