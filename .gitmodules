@@ -1,6 +1,6 @@
 [submodule "core/vendor/imgui/imgui"]
 	path = core/vendor/imgui/imgui
-	url = https://github.com/ocornut/imgui/tree/docking
+	url = https://github.com/ocornut/imgui
 [submodule "core/vendor/stb/stb"]
 	path = core/vendor/stb/stb
 	url = https://github.com/nothings/stb
