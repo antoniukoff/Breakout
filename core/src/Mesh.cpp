@@ -6,27 +6,27 @@
 #include <cassert>
 #include <iostream>
 
-Mesh::Mesh(const std::string& file_path)
+mesh::mesh(const std::string& file_path)
 {
 	parse_obj(file_path);
 }
 
-void Mesh::bind() const
+void mesh::bind() const
 {
 	m_vao.bind();
 }
 
-void Mesh::unbind() const
+void mesh::unbind() const
 {
 	m_vao.unbind();
 }
 
-uint32_t Mesh::get_vertex_count() const
+uint32_t mesh::get_vertex_count() const
 {
 	return m_vertex_count;
 }
 
-void Mesh::parse_obj(const std::string& file_path)
+void mesh::parse_obj(const std::string& file_path)
 {
 	std::ifstream file(file_path);
 	if (!file.is_open())
@@ -35,7 +35,7 @@ void Mesh::parse_obj(const std::string& file_path)
 		return;
 	}
 
-	std::vector<Face> faces;
+	std::vector<face> faces;
 	std::vector<vec3> positions;
 	std::vector<vec2> tex_coords;
 	std::vector<vec3> normals;
@@ -74,7 +74,7 @@ void Mesh::parse_obj(const std::string& file_path)
 			{
 				faces_info.push_back(face_token);
 			}
-			Face face = process_face(faces_info, positions, tex_coords, normals);
+			face face = process_face(faces_info, positions, tex_coords, normals);
 			
 			faces.push_back(face);
 		}
@@ -84,7 +84,7 @@ void Mesh::parse_obj(const std::string& file_path)
 	create_mesh(faces, GL_STATIC_DRAW);
 }
 	
-Face Mesh::process_face(
+face mesh::process_face(
 	const std::vector<std::string>& faces_info, 
 	const std::vector<vec3>& positions,
 	const std::vector<vec2>& uvs,
@@ -93,7 +93,7 @@ Face Mesh::process_face(
 {
 	assert(faces_info.size() == 3);
 
-	Face face;
+	face face;
 
 	for (int i = 0; i < 3; ++i)
 	{
@@ -116,10 +116,10 @@ Face Mesh::process_face(
 	return face;
 }
 
-void Mesh::create_mesh(const std::vector<Face>& faces, uint32_t usage_mode)
+void mesh::create_mesh(const std::vector<face>& faces, uint32_t usage_mode)
 {
 	/// Create Layout
-	VertexLayout layout = {
+	vertex_layout layout = {
 		{0, 3, GL_FLOAT, GL_FALSE},
 		{1, 2, GL_FLOAT, GL_FALSE},
 		{2, 3, GL_FLOAT, GL_FALSE},

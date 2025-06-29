@@ -4,69 +4,54 @@
 #include <Mesh.h>
 #include <Material.h>
 
-struct Transform
+struct cmp_transform
 {
 	vec3 position;
 	float angle;
 	vec3 scale;
 };
 
-ANNOTATE(Transform, 
+ANNOTATE(cmp_transform, 
 	3, 
-	DEFINE_COMPONENT_MEMBER(Transform, 0, vec3, position)
-	DEFINE_COMPONENT_MEMBER(Transform, 1, float, angle)
-	DEFINE_COMPONENT_MEMBER(Transform, 2, vec3, scale)
+	DEFINE_COMPONENT_MEMBER(cmp_transform, 0, vec3, position)
+	DEFINE_COMPONENT_MEMBER(cmp_transform, 1, float, angle)
+	DEFINE_COMPONENT_MEMBER(cmp_transform, 2, vec3, scale)
 	)
-DEFINE_COMPONENT_HANDLE(Transform,
+DEFINE_COMPONENT_HANDLE(cmp_transform,
 	COMPONENT_HANDLE_ACCESSOR(0, vec3, position)
 	COMPONENT_HANDLE_ACCESSOR(1, float, angle)
 	COMPONENT_HANDLE_ACCESSOR(2, vec3, scale)
 )
 
-struct RenderComponent
+struct cmp_render
 {
-	Mesh* mesh;
-	Material material;
+	mesh* mesh;
+	material material;
 };
 
 ANNOTATE(
-	RenderComponent,
+	cmp_render,
 	2,
-	DEFINE_COMPONENT_MEMBER(RenderComponent, 0, Mesh*, mesh)
-	DEFINE_COMPONENT_MEMBER(RenderComponent, 1, Material, material)
+	DEFINE_COMPONENT_MEMBER(cmp_render, 0, mesh*, mesh)
+	DEFINE_COMPONENT_MEMBER(cmp_render, 1, material, material)
 )
 
-DEFINE_COMPONENT_HANDLE(RenderComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, Mesh*, mesh)
-	COMPONENT_HANDLE_ACCESSOR(1, Material, material)
+DEFINE_COMPONENT_HANDLE(cmp_render,
+	COMPONENT_HANDLE_ACCESSOR(0, mesh*, mesh)
+	COMPONENT_HANDLE_ACCESSOR(1, material, material)
 )
 
-struct TagComponent
+struct cmp_tag
 {
 	std::string tag;
 };
 
 ANNOTATE(
-	TagComponent,
+	cmp_tag,
 	1,
-	DEFINE_COMPONENT_MEMBER(TagComponent, 0, std::string, tag)
+	DEFINE_COMPONENT_MEMBER(cmp_tag, 0, std::string, tag)
 )
 
-DEFINE_COMPONENT_HANDLE(TagComponent,
+DEFINE_COMPONENT_HANDLE(cmp_tag,
 	COMPONENT_HANDLE_ACCESSOR(0, std::string, tag)
-)
-
-struct Sample
-{
-	std::vector<Material> mat;
-};
-
-ANNOTATE(
-	Sample,
-	1,
-	DEFINE_COMPONENT_MEMBER(Sample, 0, std::vector<Material>, mat)
-)
-
-DEFINE_COMPONENT_HANDLE(Sample,
-	COMPONENT_HANDLE_ACCESSOR(0, std::vector<Material>, mat)
 )

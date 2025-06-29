@@ -1,8 +1,8 @@
 #pragma once
 
-namespace reflecs::internal
+namespace reflecs::utils
 {
-	namespace constexpr_loop
+	namespace internal
 	{
 		template<uint32_t Iter, template<uint32_t Idx> typename FunctionToExecuteWrapperClass, typename Parent, typename ... Args>
 		struct for_each
@@ -25,15 +25,6 @@ namespace reflecs::internal
 			}
 		};
 
-		template<uint32_t Iter, template<uint32_t N> typename FunctionToExecuteWrapperClass, typename Parent, typename ... Args>
-		inline void execute(Parent* parent, Args&& ... args)
-		{
-			for_each<Iter, FunctionToExecuteWrapperClass, Parent, Args...>::template loop<0>(parent, args...); // Index of starting Pos?
-		}
-	}
-
-	namespace type_utils
-	{
 		template<typename... Ts>
 		struct type_list {};
 
@@ -53,41 +44,47 @@ namespace reflecs::internal
 		{
 			using type = Head;
 		};
+	}
+	
+	template<uint32_t Iter, template<uint32_t N> typename FunctionToExecuteWrapperClass, typename Parent, typename ... Args>
+	inline void unroll_func(Parent* parent, Args&& ... args)
+	{
+		internal::for_each<Iter, FunctionToExecuteWrapperClass, Parent, Args...>::template loop<0>(parent, args...); // Index of starting Pos?
+	}
 
-		/// Get type of component at index
-		template<size_t Idx, typename ... Ts>
-		using component_type_at_index = typename get_type_at_index<Idx, type_list<Ts...>>::type;
+	/// Get type of component at index
+	template<size_t Idx, typename ... Ts>
+	using cmp_type_at_index = typename internal::get_type_at_index<Idx, internal::type_list<Ts...>>::type;
 
-		/**
-		* @brief Returns the index of the component in the component list
-		* @tparam C Component
-		* @tparam Head First component in the list
-		* @tparam Tail Remaining components
-		* @param index Index of the component
-		*/
-		template<typename C, typename Head, typename ... Tail>
-		constexpr size_t get_component_type_id(size_t index = 0)
+	/**
+	* @brief Returns the index of the component in the component list
+	* @tparam C Component
+	* @tparam Head First component in the list
+	* @tparam Tail Remaining components
+	* @param index Index of the component
+	*/
+	template<typename C, typename Head, typename ... Tail>
+	constexpr size_t get_component_type_id(size_t index = 0)
+	{
+		if constexpr (std::is_same<C, Head>::value)
 		{
-			if constexpr (std::is_same<C, Head>::value)
+			return index;
+		}
+		else
+		{
+			if constexpr (sizeof...(Tail) > 0)
 			{
-				return index;
+				return get_component_type_id<C, Tail...>(++index);
 			}
 			else
 			{
-				if constexpr (sizeof...(Tail) > 0)
-				{
-					return get_component_type_id<C, Tail...>(++index);
-				}
-				else
-				{
-					return -1; /// compile-error
-				}
+				return -1; /// compile-error
 			}
 		}
 	}
 }
 
-namespace reflecs::reflect_component
+namespace reflecs::cmp_metadata
 {
 	/// Compile-Time field count
 	template<typename ComponentType>
@@ -110,11 +107,11 @@ namespace reflecs::reflect_component
 }
 
 template<typename T>
-class component_handle;
+class cmp_handle;
 
 #define ANNOTATE(ComponentName, MemberCount, ...)											\
 																								\
-		template<> struct reflecs::reflect_component::get_member_count<ComponentName>			\
+		template<> struct reflecs::cmp_metadata::get_member_count<ComponentName>			\
 		{																						\
 			constexpr static uint32_t count = MemberCount;											\
 		};																						\
@@ -123,13 +120,13 @@ class component_handle;
 																								\
 
 #define DEFINE_COMPONENT_MEMBER(ComponentName, Index, MemberType, MemberName)				\
-		template<> struct reflecs::reflect_component::get_type<ComponentName, Index>			\
+		template<> struct reflecs::cmp_metadata::get_type<ComponentName, Index>			\
 		{																						\
 			using type = MemberType;															\
 		};																						\
 																								\
-	template<> inline typename reflecs::reflect_component::get_pointer_to_member_type<ComponentName, Index>::type   \
-							   reflecs::reflect_component::get_pointer_to_member<ComponentName, Index>()   \
+	template<> inline typename reflecs::cmp_metadata::get_pointer_to_member_type<ComponentName, Index>::type   \
+							   reflecs::cmp_metadata::get_pointer_to_member<ComponentName, Index>()   \
 							   {																		    \
 									return &ComponentName::MemberName;									    \
 							   }																		    \
@@ -142,16 +139,16 @@ class component_handle;
 
 #define DEFINE_COMPONENT_HANDLE(ComponentType, ...)						\
 	template<>															\
-	class component_handle<ComponentType>								\
+	class cmp_handle<ComponentType>										\
 	{																	\
 	public:																\
 		reflecs::component_manager<ComponentType>& mgr;					\
 		entity_id e_id;	     											\
 																		\
 	public:																\
-		component_handle() = default;									\
+		cmp_handle() = default;										    \
 																		\
-		component_handle(reflecs::component_manager<ComponentType>& mgr,\
+		cmp_handle(reflecs::component_manager<ComponentType>& mgr,	    \
 						entity_id e_id)									\
 			: mgr(mgr), e_id(e_id) {}									\
 																		\

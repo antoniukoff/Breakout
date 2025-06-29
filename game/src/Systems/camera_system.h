@@ -5,7 +5,7 @@
 #include <math/vec3.h>
 
 class Game;
-class EventBase;
+class event_base;
 class ShakeCamera;
 
 class CameraSystem : public System
@@ -18,8 +18,8 @@ private:
 	void update_camera_shake(float dt);
 	void smooth_camera_position(float dt);
 	void rotate_around_scene(float dt);
-	void on_collision(const EventBase& event);
-	void on_ball_respawn(const EventBase& event);
+	void on_collision(const event_base& event);
+	void on_ball_respawn(const event_base& event);
 private:
 	uint32_t entity_processing = -1;
 	float rotate_amount = 0.0f;

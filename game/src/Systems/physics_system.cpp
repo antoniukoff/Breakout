@@ -31,9 +31,9 @@ void PhysicsSystem::check_player_level_bounds()
 
 	registry.for_each<TransformComponent, RigidBodyComponent, BoxColliderComponent>([&](
 		entity_id circle,
-		component_handle<TransformComponent>   paddle_transform,
-		component_handle<RigidBodyComponent>   paddle_movement,
-		component_handle<BoxColliderComponent> paddle_collider)
+		cmp_handle<TransformComponent>   paddle_transform,
+		cmp_handle<RigidBodyComponent>   paddle_movement,
+		cmp_handle<BoxColliderComponent> paddle_collider)
 		{
 			float& position_x		= paddle_transform.position().x;
 			float  paddle_extent_x = paddle_collider.half_extents().x;
@@ -48,10 +48,10 @@ void PhysicsSystem::update_ball_box_collision()
 
 	registry.for_each<TransformComponent, RigidBodyComponent, BounceComponent, CircleColliderComponent>([&](
 		entity_id circle,
-		component_handle<TransformComponent> circle_transform,
-		component_handle<RigidBodyComponent> circle_movement,
-		component_handle<BounceComponent> ball_bounce,
-		component_handle<CircleColliderComponent> circle_collider)
+		cmp_handle<TransformComponent> circle_transform,
+		cmp_handle<RigidBodyComponent> circle_movement,
+		cmp_handle<BounceComponent> ball_bounce,
+		cmp_handle<CircleColliderComponent> circle_collider)
 		{
 			/// Ball Data
 			vec3& ball_pos = circle_transform.position();
@@ -61,8 +61,8 @@ void PhysicsSystem::update_ball_box_collision()
 
 			registry.for_each<TransformComponent, BoxColliderComponent>([&](
 				entity_id box,
-				component_handle<TransformComponent> paddle_transform,
-				component_handle<BoxColliderComponent> box_collider)
+				cmp_handle<TransformComponent> paddle_transform,
+				cmp_handle<BoxColliderComponent> box_collider)
 				{
 					/// Bricks and paddle data
 					vec3& box_pos = paddle_transform.position();

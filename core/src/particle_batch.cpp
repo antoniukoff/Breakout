@@ -7,28 +7,28 @@
 struct RenderData
 {
 	mat4 model;
-	Color color;
+	color color;
 };
 
-ParticleBatch::ParticleBatch()
+particle_group::particle_group()
 	: shader("assets/shaders/particle.glsl", "particle")
 {}
 
-ParticleBatch::~ParticleBatch()
+particle_group::~particle_group()
 {
 	delete[] m_particles;
 	glDeleteBuffers(1, &instanced_vbo);
 	glDeleteVertexArrays(1, &vao);
 }
 
-void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&, float dt)> update_func)
+void particle_group::initizalize(uint32_t max_particles, float decay_rate, mesh* mesh, std::function<void(particle&, float dt)> update_func)
 {
 	if (m_particles)
 	{
 		delete[] m_particles;
 	}
 
-	m_particles = new Particle[max_particles];
+	m_particles = new particle[max_particles];
 	m_size = 0;
 	m_mesh = mesh;
 	m_max_marticles = max_particles;
@@ -49,7 +49,7 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 	mesh->get_vbo().bind();
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
 
 	//// Configuring attributes to send mat4 per instance
 	//// Max attribute size to send to the gpu is vec4
@@ -83,7 +83,7 @@ void ParticleBatch::initizalize(uint32_t max_particles, float decay_rate, Mesh* 
 	m_initialized = true;
 }
 
-void ParticleBatch::update(float dt)
+void particle_group::update(float dt)
 {
 	for (uint32_t i = 0; i < m_size; i++)
 	{
@@ -102,7 +102,7 @@ void ParticleBatch::update(float dt)
 	}
 }
 
-void ParticleBatch::draw(Camera& camera, float interval)
+void particle_group::draw(camera& camera, float interval)
 {
 	shader.bind();
 
@@ -118,7 +118,7 @@ void ParticleBatch::draw(Camera& camera, float interval)
 		vec3 interpolated_position = prev_position * (1.0f - interval) + position * interval;
 
 		mat4 model = mat4::translate(interpolated_position) * mat4::scale(vec3{ scale, scale, scale });
-		Color color = p.color;
+		color color = p.color;
 
 		instanced_data.push_back({ model, color });
 	}
@@ -134,7 +134,7 @@ void ParticleBatch::draw(Camera& camera, float interval)
 	glBindVertexArray(0);
 }
 
-void ParticleBatch::add_particle(const vec3& position, const vec3& velocity, const Color& color, float width)
+void particle_group::add_particle(const vec3& position, const vec3& velocity, const color& color, float width)
 {
 	if (m_size >= m_max_marticles)
 	{

@@ -6,7 +6,7 @@
 //////////////////////////////
 /// To be defined by the user
 //////////////////////////////
-extern std::unique_ptr<ApplicationBase> create_application();
+extern std::unique_ptr<application_base> create_application();
 
 int main(int argc, char** argv)
 {

@@ -1,9 +1,9 @@
 #pragma once
 #include <camera.h>
-class ShakeCamera : public Camera
+class ShakeCamera : public camera
 {
 public:
-	void update() override;
+	void update(float dt) override;
 
 	void add_yaw(float delta) {
 		temp_yaw = delta; m_is_dirty = true;

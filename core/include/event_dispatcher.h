@@ -6,13 +6,13 @@
 	
 #include "event_base.h"
 
-class EventDispatcher
+class event_dispatcher
 {
-	using EventCallback = std::function<void(const EventBase&)>;
+	using event_callback = std::function<void(const event_base&)>;
 
 public:
-	EventDispatcher();
-	~EventDispatcher();
+	event_dispatcher();
+	~event_dispatcher();
 
 	template<typename EventType>
 	void subscribe(const std::function<void(const EventType&)>& callback);
@@ -36,19 +36,19 @@ public:
 	void dispatch(const EventType& event);
 
 private:
-	std::unordered_map<size_t, std::vector<EventCallback>> m_listeners;
+	std::unordered_map<size_t, std::vector<event_callback>> m_listeners;
 
-	std::vector<std::pair<size_t, std::unique_ptr<EventBase>>> m_pending_events;
+	std::vector<std::pair<size_t, std::unique_ptr<event_base>>> m_pending_events;
 
 	/// used for handling occasions when pending events dispatch other events
 	/// that recursivey are added to the queue 
-	std::vector<std::pair<size_t, std::unique_ptr<EventBase>>> m_processing_events;
+	std::vector<std::pair<size_t, std::unique_ptr<event_base>>> m_processing_events;
 };
 
 template<typename EventType>
-void EventDispatcher::subscribe(const std::function<void(const EventType&)>&callback)
+void event_dispatcher::subscribe(const std::function<void(const EventType&)>&callback)
 {
-	auto wrapper = [callback](const EventBase& event)
+	auto wrapper = [callback](const event_base& event)
 		{
 			callback(reinterpret_cast<const EventType&>(event));
 		};
@@ -57,7 +57,7 @@ void EventDispatcher::subscribe(const std::function<void(const EventType&)>&call
 }
 
 template<typename EventType>
-void EventDispatcher::dispatch(const EventType& event)
+void event_dispatcher::dispatch(const EventType& event)
 {
 	/// Find if event typeid in the map
 	size_t event_id = typeid(EventType).hash_code();

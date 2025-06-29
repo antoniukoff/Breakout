@@ -3,10 +3,10 @@
 #include <core_events.h>
 #include <math/random.h>
 #include <../vendor/glfw/include/GLFW/glfw3.h>
-#include "resource_manager.h"
+#include "asset_library.h"
 
 Game::Game() 
-	: ApplicationBase(1280, 720, "Breakout")
+	: application_base(1280, 720, "Breakout")
 	, input(*this)
 	, movement(*this)
 	, physics(*this)
@@ -23,7 +23,7 @@ Game::Game()
 	m_dispatcher.subscribe<BallRespawnEvent>(std::bind(&Game::on_ball_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<BrickRespawnEvent>(std::bind(&Game::on_brick_respawn, this, std::placeholders::_1));
 	m_dispatcher.subscribe<BrickDestroyedEvent>(std::bind(&Game::on_brick_destroyed, this, std::placeholders::_1));
-	m_dispatcher.subscribe<KeyPressEvent>(std::bind(&Game::on_key_press, this, std::placeholders::_1));
+	m_dispatcher.subscribe<key_press_evnt>(std::bind(&Game::on_key_press, this, std::placeholders::_1));
 }
 
 void Game::on_update(float dt)
@@ -45,9 +45,9 @@ void Game::on_render(float interval)
 
 void Game::initialize_systems()
 {
-	particles.initizalize(1500, 1.0f, ResourceManager::get()->get_mesh("cube"));
-	line.initizalize(300, 50.0f, ResourceManager::get()->get_mesh("ball"), [](Particle& p, float) {});
-	trail.initizalize(1000, 0.5f, ResourceManager::get()->get_mesh("ball"), [](Particle& p, float)
+	particles.initizalize(1500, 1.0f, asset_library::get()->get_mesh("cube"));
+	line.initizalize(300, 50.0f, asset_library::get()->get_mesh("ball"), [](particle& p, float) {});
+	trail.initizalize(1000, 0.5f, asset_library::get()->get_mesh("ball"), [](particle& p, float)
 		{
 			p.scale *= p.life;
 			p.color.a *= p.life;
@@ -70,7 +70,7 @@ void Game::initialize_level(uint32_t level)
 	std::cout << "\nStarting Level: " << level + 1 << "\nInitial target: " << get_current_difficulty_target() <<" bricks!\n";
 }
 
-void Game::on_ball_respawn(const EventBase& event)
+void Game::on_ball_respawn(const event_base& event)
 {
 	m_scene_data.lives--;
 	if (m_scene_data.lives <= 0)
@@ -84,7 +84,7 @@ void Game::on_ball_respawn(const EventBase& event)
 	}
 }
 
-void Game::on_brick_destroyed(const EventBase& event)
+void Game::on_brick_destroyed(const event_base& event)
 {
 	m_scene_data.bricks_destroyed++;
 	m_scene_data.num_bricks--;
@@ -121,7 +121,7 @@ void Game::on_brick_destroyed(const EventBase& event)
 	}
 }
 
-void Game::on_brick_respawn(const EventBase& event)
+void Game::on_brick_respawn(const event_base& event)
 {
 	const BrickRespawnEvent& e = static_cast<const BrickRespawnEvent&>(event);
 	ScenaLoader::create_brick(*this, e.position);
@@ -129,9 +129,9 @@ void Game::on_brick_respawn(const EventBase& event)
 	m_scene_data.num_bricks++;
 }
 
-void Game::on_key_press(const EventBase& event)
+void Game::on_key_press(const event_base& event)
 {
-	const KeyPressEvent& e = static_cast<const KeyPressEvent&>(event);
+	const key_press_evnt& e = static_cast<const key_press_evnt&>(event);
 	if (e.key == GLFW_KEY_SPACE && e.action == GLFW_PRESS)
 	{
 		if (m_scene_data.state == GameState::GAME_START)
@@ -173,8 +173,8 @@ void Game::reset_ball()
 	vec3  ball_position = paddle_transform.position() + vec3{ 0.0f, 12.5f, 0.0 };
 	float velocity_mag	= ball_rigid_body.velocity().mag();
 
-	float x = Random::get_random_float(-0.45f, 0.45f);
-	float y = Random::get_random_float(0.05f, 0.7f);
+	float x = random::get_random_float(-0.45f, 0.45f);
+	float y = random::get_random_float(0.05f, 0.7f);
 
 	vec3 velocity = vec3::normalize(vec3{ x, y, 0.0f }) * velocity_mag;
 
@@ -182,12 +182,12 @@ void Game::reset_ball()
 	m_registry.add<RigidBodyComponent>(m_scene_data.active_ball_id, velocity);
 }
 
-void Game::set_scene_data(const SceneData& data)
+void Game::set_scene_data(const scene_data& data)
 {
 	m_scene_data = data;
 }
 
-std::unique_ptr<ApplicationBase> create_application()
+std::unique_ptr<application_base> create_application()
 {
 	return std::make_unique<Game>();
 }

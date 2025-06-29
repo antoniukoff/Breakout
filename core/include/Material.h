@@ -6,17 +6,17 @@
 #include <string>
 #include <iostream>
 
-class Shader;
+class shader;
 
-class Material
+class material
 {
 public:
-    Material() = default;
-	Material(Shader* shader, const std::string& name);
-	~Material(){}
+    material() = default;
+	material(shader* shader, const std::string& name);
+	~material(){}
 
     void set_mat(const std::string name, const mat4& mat);
-    void set_texture(const std::string name, const Texture& texture);
+    void set_texture(const std::string name, const texture& texture);
     void set_scalar(const std::string name, float value);
     void set_vec3(const std::string name, const vec3& mat);
     void set_vec4(const std::string name, const vec4& mat);
@@ -27,13 +27,13 @@ public:
     void bind() const;
 
 	const std::string& get_name() const { return name; }
-	const Shader& get_shader_handle() const { return *shader_handle; }
+	const shader& get_shader_handle() const { return *shader_handle; }
 
 private:
-	Shader* shader_handle = nullptr;
+	shader* shader_handle = nullptr;
 	std::string name;
 
-	std::unordered_map<std::string, Texture> texture_map;
+	std::unordered_map<std::string, texture> texture_map;
 	std::unordered_map<std::string, float> float_map;
 	std::unordered_map<std::string, vec3> vec3_map;
 	std::unordered_map<std::string, vec4> vec4_map;

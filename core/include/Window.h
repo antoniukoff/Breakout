@@ -2,20 +2,20 @@
 #include <string>
 
 struct GLFWwindow;
-class EventDispatcher;
+class event_dispatcher;
 
-class Window
+class window
 {
 public:
-	Window(const Window& other) = delete;
-	Window(Window&& other) = delete;
-	Window operator =(const Window& other) = delete;
-	Window operator =(Window&& other) = delete;
+	window(const window& other) = delete;
+	window(window&& other) = delete;
+	window operator =(const window& other) = delete;
+	window operator =(window&& other) = delete;
 
-	Window(float width, float height, const std::string& name);
-	~Window();
+	window(float width, float height, const std::string& name);
+	~window();
 
-	void set_event_dispatcher(EventDispatcher* dispatcher);
+	void set_event_dispatcher(event_dispatcher* dispatcher);
 	void initialize_context(int major, int minor, bool use_core);
 	void poll_events();
 	void swap();

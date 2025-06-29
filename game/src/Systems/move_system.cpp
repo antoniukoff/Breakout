@@ -21,8 +21,8 @@ void MovementSystem::update(float dt)
 
 	registry.for_each<RigidBodyComponent, BounceComponent>([&](
 		entity_id e_id,
-		component_handle<RigidBodyComponent> movement_component,
-		component_handle<BounceComponent> bounce_component)
+		cmp_handle<RigidBodyComponent> movement_component,
+		cmp_handle<BounceComponent> bounce_component)
 		{
 			vec3& velocity = movement_component.velocity();
 
@@ -53,8 +53,8 @@ void MovementSystem::update(float dt)
 
 	registry.for_each<TransformComponent, RigidBodyComponent>([&](
 		entity_id e_id,
-		component_handle<TransformComponent> transform_component,
-		component_handle<RigidBodyComponent> movement_component)
+		cmp_handle<TransformComponent> transform_component,
+		cmp_handle<RigidBodyComponent> movement_component)
 		{
 			auto& velocity = movement_component.velocity();
 			auto& angular  = movement_component.angular_velocity();
@@ -71,10 +71,10 @@ void MovementSystem::update(float dt)
 		});
 }
 
-void MovementSystem::on_diffuculty_increased_event(const EventBase& event)
+void MovementSystem::on_diffuculty_increased_event(const event_base& event)
 {
 	auto& registry = game_handle->get_registry();
-	registry.for_each<RigidBodyComponent>([](entity_id e, component_handle<RigidBodyComponent> rigid_body)
+	registry.for_each<RigidBodyComponent>([](entity_id e, cmp_handle<RigidBodyComponent> rigid_body)
 		{
 			vec3& velocity = rigid_body.velocity();
 			velocity *= 1.1f;

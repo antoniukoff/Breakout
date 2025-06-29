@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 
-class TextureUnit
+class texture_unit
 {
 public:
-	TextureUnit();
+	texture_unit();
 	bool has_bound_texture(int texture_type, int texture_id = -1) const;
 	void assign_texture(int texture_type, int texture_id);
 private:

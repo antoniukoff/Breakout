@@ -4,15 +4,15 @@
 #include <algorithm>
 
 
-VertexLayout::VertexLayout(std::initializer_list<VertexAttribute> attributes)
+vertex_layout::vertex_layout(std::initializer_list<vertex_attribute> attributes)
 	: m_attributes(attributes)
 {
 	create_layout();
 }
 
-void VertexLayout::create_layout()
+void vertex_layout::create_layout()
 {
-	std::sort(m_attributes.begin(), m_attributes.end(), [](const VertexAttribute& a1, const VertexAttribute& a2)
+	std::sort(m_attributes.begin(), m_attributes.end(), [](const vertex_attribute& a1, const vertex_attribute& a2)
 		{
 			return a1.location < a2.location;
 		});

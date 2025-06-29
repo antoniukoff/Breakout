@@ -27,7 +27,7 @@ enum class GameState
 	GAME_END
 };
 
-struct SceneData
+struct scene_data
 {
 	uint32_t current_level = 0;
 	uint32_t current_difficulty = 0;
@@ -50,16 +50,16 @@ struct SceneData
 	vec3 target_pos;
 };
 
-using SceneRegistry = registry<TransformComponent,
+using SceneRegistry = reflecs::registry<TransformComponent,
 	BoxColliderComponent,
 	CircleColliderComponent,
 	RigidBodyComponent,
 	BounceComponent,
-	RenderComponent,
+	cmp_render,
 	CameraShakeComponent,
 	LifeComponent>;
 
-class Game : public ApplicationBase
+class Game : public application_base
 {
 	friend class ScenaLoader;
 
@@ -72,24 +72,24 @@ private:
 	void initialize_level(uint32_t level);
 	void initialize_systems();
 	void reset();
-	void set_scene_data(const SceneData& data);
+	void set_scene_data(const scene_data& data);
 
 private:
-	void on_ball_respawn(const EventBase& event);
+	void on_ball_respawn(const event_base& event);
 	void reset_ball();
-	void on_brick_destroyed(const EventBase& event);
-	void on_brick_respawn(const EventBase& event);
-	void on_key_press(const EventBase& event);
+	void on_brick_destroyed(const event_base& event);
+	void on_brick_respawn(const event_base& event);
+	void on_key_press(const event_base& event);
 
 public:
 
 	inline SceneRegistry&   get_registry()						  { return m_registry; }
 	inline ShakeCamera&     get_active_camera()					  { return m_camera; }
-	inline EventDispatcher& get_dispatcher()					  { return m_dispatcher; }
-	inline ParticleBatch&   get_particle_batch()				  { return particles; }
-	inline ParticleBatch&   get_trail_batch()					  { return trail; }
-	inline ParticleBatch&   get_line_batch()					  { return line; }
-	inline SceneData&		get_scene_data()					  { return m_scene_data; }
+	inline event_dispatcher& get_dispatcher()					  { return m_dispatcher; }
+	inline particle_group&   get_particle_batch()				  { return particles; }
+	inline particle_group&   get_trail_batch()					  { return trail; }
+	inline particle_group&   get_line_batch()					  { return line; }
+	inline scene_data&		get_scene_data()					  { return m_scene_data; }
 	inline const entity_id  get_paddle_id()	const				  { return m_scene_data.paddle_id; }
 	inline const entity_id  get_ball_id()	const				  { return m_scene_data.active_ball_id; }
 	inline const int        get_current_difficulty_target() const { return m_scene_data.difficulty_threashhold[m_scene_data.current_level][m_scene_data.current_difficulty]; }
@@ -102,10 +102,10 @@ private:
 	SceneRegistry m_registry;
 	ShakeCamera m_camera;
 
-	ParticleBatch particles;
-	ParticleBatch line;
-	ParticleBatch trail;
-	SceneData m_scene_data;
+	particle_group particles;
+	particle_group line;
+	particle_group trail;
+	scene_data m_scene_data;
 
 	PhysicsSystem physics;
 	InputSystem input;

@@ -4,21 +4,21 @@
 #include "color.h"
 #include "shader.h"
 
-class Mesh;
-class Camera;
+class mesh;
+class camera;
 
-class Particle 
+class particle 
 {
 public:
 	vec3 position;
 	vec3 prev_position;
 	vec3 velocity;
-	Color color;
+	color color;
 	float life = 0.0f;
 	float scale = 0.0f;	
 };
 
-inline void default_particle_update(Particle& particle, float dt)
+inline void default_particle_update(particle& particle, float dt)
 {
 	const float gravity = 115; 
 
@@ -29,18 +29,18 @@ inline void default_particle_update(Particle& particle, float dt)
 	particle.color.a = (unsigned char)(particle.life * 255.0f);
 }
 
-class ParticleBatch
+class particle_group
 {
 public:
-	ParticleBatch();
-	~ParticleBatch();
+	particle_group();
+	~particle_group();
 
-	void initizalize(uint32_t max_particles, float decay_rate, Mesh* mesh, std::function<void(Particle&, float)> update_func = default_particle_update);
+	void initizalize(uint32_t max_particles, float decay_rate, mesh* mesh, std::function<void(particle&, float)> update_func = default_particle_update);
 	void update(float dt);
-	void draw(Camera& camera, float interval);
+	void draw(camera& camera, float interval);
 	void add_particle(const vec3& position,
 		const vec3& velocity,
-		const Color& color,
+		const color& color,
 		float scale);
 
 
@@ -52,13 +52,13 @@ private:
 	uint32_t  m_size = 0;
 	uint32_t  m_max_marticles = 0;
 	float	  m_decay_rate = 0.1f;
-	Mesh*     m_mesh = nullptr;
-	Particle* m_particles = nullptr;
-	std::function<void(Particle&, float)> m_update_func;
+	mesh*     m_mesh = nullptr;
+	particle* m_particles = nullptr;
+	std::function<void(particle&, float)> m_update_func;
 
 	/// Draw Data
 	uint32_t vao = 0;
 	uint32_t instanced_vbo = 0;
-	Shader shader;
+	shader shader;
 };
 

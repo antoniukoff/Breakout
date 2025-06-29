@@ -21,14 +21,14 @@ namespace reflecs
 			constexpr uint32_t component_size = sizeof(C);
 			constexpr uint32_t buffer_size = g_container_size * component_size;
 			m_component_pool.mem_buffer[0] = malloc(buffer_size);
-			internal::constexpr_loop::execute<member_count - 1, generate_buffers_wrapper>(this, m_component_pool.mem_buffer, g_container_size);
+			utils::unroll_func<member_count - 1, generate_buffers_wrapper>(this, m_component_pool.mem_buffer, g_container_size);
 		}
 
 		~component_manager()
 		{
 			for (uint32_t i = 1; i < m_component_pool.size; ++i)
 			{
-				internal::constexpr_loop::execute<member_count, destroy_trivial_wrapper>(this, i);
+				utils::unroll_func<member_count, destroy_trivial_wrapper>(this, i);
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace reflecs
 			C component = C(std::forward<Args>(args)...);
 
 			/// Add the component data to the member pools at their new instance
-			internal::constexpr_loop::execute<member_count, add_component_data_wrappper>(this, instance_to_add, component);
+			utils::unroll_func<member_count, add_component_data_wrappper>(this, instance_to_add, component);
 		}
 
 		bool contains(entity_id e_id)
@@ -85,9 +85,9 @@ namespace reflecs
 		*
 		* @param e_id Entity ID
 		*/
-		component_handle<C> retrieve(entity_id e_id)
+		cmp_handle<C> retrieve(entity_id e_id)
 		{
-			return component_handle<C>(*this, e_id);
+			return cmp_handle<C>(*this, e_id);
 		}
 
 		/*
@@ -100,7 +100,7 @@ namespace reflecs
 		auto& get_member_buffer(entity_id e_id)
 		{
 			component_instance instance = look_up(e_id);
-			using data_type = typename reflecs::reflect_component::get_type<C, Idx>::type;
+			using data_type = typename reflecs::cmp_metadata::get_type<C, Idx>::type;
 
 			data_type* arr = static_cast<data_type*>(m_component_pool.mem_buffer[Idx]);
 			return arr[instance];
@@ -123,7 +123,7 @@ namespace reflecs
 
 			/// If exists, iterate over all members and reassign the last component data to the position of the removing instance  
 			component_instance instance_to_reassign = m_component_pool.size - 1;
-			internal::constexpr_loop::execute<member_count, remove_component_data_wrapper>(this, instance_to_remove, instance_to_reassign);
+			utils::unroll_func<member_count, remove_component_data_wrapper>(this, instance_to_remove, instance_to_reassign);
 
 			/// Assign the entity's instance to 0
 			m_entities_to_components[e_id] = 0;
@@ -153,7 +153,7 @@ namespace reflecs
 		template<uint32_t Idx>
 		void destroy_trivial(component_instance instance)
 		{
-			using data_type = typename reflecs::reflect_component::get_type<C, Idx>::type;
+			using data_type = typename reflecs::cmp_metadata::get_type<C, Idx>::type;
 			if constexpr (!std::is_trivially_destructible_v<data_type>) 
 			{
 				data_type* arr = static_cast<data_type*>(m_component_pool.mem_buffer[Idx]);
@@ -198,7 +198,7 @@ namespace reflecs
 		template<uint32_t Idx>
 		void generate_buffers(void* buffer[], size_t num_elements)
 		{
-			using data_type = typename reflecs::reflect_component::get_type<C, Idx>::type;
+			using data_type = typename reflecs::cmp_metadata::get_type<C, Idx>::type;
 			buffer[Idx + 1] = static_cast<data_type*>(buffer[Idx]) + num_elements;
 #ifdef _DEBUG
 			char* previous_address = (char*)buffer[Idx];
@@ -230,7 +230,7 @@ namespace reflecs
 		template<uint32_t Idx>
 		void count_component_size(uint32_t& bytes)
 		{
-			bytes += sizeof(typename reflecs::reflect_component::get_type<C, Idx>::type);
+			bytes += sizeof(typename reflecs::cmp_metadata::get_type<C, Idx>::type);
 		}
 
 		/**
@@ -255,11 +255,11 @@ namespace reflecs
 		template<uint32_t Idx>
 		void add_component_data(component_instance instance_to_add, C& component)
 		{
-			using data_type = typename reflecs::reflect_component::get_type<C, Idx>::type;
+			using data_type = typename reflecs::cmp_metadata::get_type<C, Idx>::type;
 
 			void* address = (char*)m_component_pool.mem_buffer[Idx] + sizeof(data_type) * instance_to_add;
 		
-			new(address)data_type(component.*reflecs::reflect_component::get_pointer_to_member<C, Idx>());
+			new(address)data_type(component.*reflecs::cmp_metadata::get_pointer_to_member<C, Idx>());
 		}
 
 		/**
@@ -283,7 +283,7 @@ namespace reflecs
 		template<uint32_t Idx>
 		void remove_component_data(component_instance instance_to_remove, component_instance replacing_instance)
 		{
-			using data_type = typename reflecs::reflect_component::get_type<C, Idx>::type;
+			using data_type = typename reflecs::cmp_metadata::get_type<C, Idx>::type;
 			data_type* array_handle = static_cast<data_type*>(m_component_pool.mem_buffer[Idx]);
 
 			array_handle[instance_to_remove] = array_handle[replacing_instance];
@@ -309,9 +309,9 @@ namespace reflecs
 			}
 		};
 
-		constexpr static uint32_t member_count = reflecs::reflect_component::get_member_count<C>::count;
-		component_pool<C, member_count> m_component_pool;
-		std::vector<component_instance> m_entities_to_components;
+		constexpr static uint32_t member_count = reflecs::cmp_metadata::get_member_count<C>::count;
+		component_pool<C, member_count> m_component_pool{};
+		std::vector<component_instance> m_entities_to_components{};
 	};
 }
 

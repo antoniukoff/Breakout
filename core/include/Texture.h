@@ -2,12 +2,12 @@
 #include <vector>
 #include <string>
 
-class Texture
+class texture
 {
 public:
-	Texture() = default;
-	Texture(const std::string& file_name, unsigned int type);
-	~Texture();
+	texture() = default;
+	texture(const std::string& file_name, unsigned int type);
+	~texture();
 
 	inline const unsigned int get_type() const
 	{

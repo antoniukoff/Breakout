@@ -1,12 +1,12 @@
 #pragma once
 
-enum class KeyCode
+enum class key_code
 {
 	W, A, S, D,
 	SPACE, R, T
 };
 
-enum class MouseButton
+enum class mouse_button
 {
 	LEFT, RIGHT
 };

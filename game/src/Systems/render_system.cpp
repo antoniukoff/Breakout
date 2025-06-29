@@ -12,11 +12,11 @@ void RenderSystem::draw(float interval)
 	auto& registry = game_handle->get_registry();
 	auto& camera = game_handle->get_active_camera();
 
-	Renderer::begin_frame(camera, interval);
-	registry.for_each<TransformComponent, RenderComponent>([&](
+	renderer::begin_frame(camera, interval);
+	registry.for_each<TransformComponent, cmp_render>([&](
 		entity_id e_id,
-		component_handle<TransformComponent> transform_component,
-		component_handle<RenderComponent> render_component)
+		cmp_handle<TransformComponent> transform_component,
+		cmp_handle<cmp_render> render_component)
 		{
 			auto& material = render_component.material();
 			auto& mesh = render_component.mesh();
@@ -31,6 +31,6 @@ void RenderSystem::draw(float interval)
 
 			mat4 model = mat4::translate(interpolated_position) * mat4::rotate_z(angle) * mat4::scale(scale);
 
-			Renderer::submit(material, mesh, model);
+			renderer::submit(material, mesh, model);
 		});
 }

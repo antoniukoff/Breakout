@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(const std::string& file_path, const std::string& name)
+shader::shader(const std::string& file_path, const std::string& name)
 	: m_name(name)
 {
 	create_shader(file_path);
@@ -16,17 +16,17 @@ Shader::Shader(const std::string& file_path, const std::string& name)
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
 }
 
-void Shader::bind() const
+void shader::bind() const
 {
 	glUseProgram(m_id);
 }
 
-void Shader::unbind() const
+void shader::unbind() const
 {
 	glUseProgram(0);
 }
 
-void Shader::upload_mat4(const std::string& uniform_name, const mat4& value)
+void shader::upload_mat4(const std::string& uniform_name, const mat4& value)
 {
 	if (int u_id = get_uniform(uniform_name); u_id != -1)
 	{
@@ -34,7 +34,7 @@ void Shader::upload_mat4(const std::string& uniform_name, const mat4& value)
 	}
 }
 
-void Shader::upload_vec4(const std::string& uniform_name, const vec4& value) 
+void shader::upload_vec4(const std::string& uniform_name, const vec4& value) 
 {
 	if (int u_id = get_uniform(uniform_name); u_id != -1)
 	{
@@ -42,7 +42,7 @@ void Shader::upload_vec4(const std::string& uniform_name, const vec4& value)
 	}
 }
 
-void Shader::upload_vec4(const std::string& uniform_name, const vec3& value)
+void shader::upload_vec4(const std::string& uniform_name, const vec3& value)
 {
 	if (int u_id = get_uniform(uniform_name); u_id != -1)
 	{
@@ -51,7 +51,7 @@ void Shader::upload_vec4(const std::string& uniform_name, const vec3& value)
 	}
 }
 
-void Shader::upload_vec3(const std::string& uniform_name, const vec3& value)
+void shader::upload_vec3(const std::string& uniform_name, const vec3& value)
 {
 	if (int u_id = get_uniform(uniform_name); u_id != -1)
 	{
@@ -59,7 +59,7 @@ void Shader::upload_vec3(const std::string& uniform_name, const vec3& value)
 	}
 }
 
-void Shader::upload_float(const std::string& uniform_name, float value)
+void shader::upload_float(const std::string& uniform_name, float value)
 {
 	if (int u_id = get_uniform(uniform_name); u_id != -1)
 	{
@@ -67,12 +67,12 @@ void Shader::upload_float(const std::string& uniform_name, float value)
 	}
 }
 
-unsigned int Shader::get_id() const
+unsigned int shader::get_id() const
 {
 	return m_id;
 }
 
-int Shader::get_uniform(const std::string& name) 
+int shader::get_uniform(const std::string& name) 
 {
 	if (m_uniform_map.contains(name))
 	{
@@ -89,7 +89,7 @@ int Shader::get_uniform(const std::string& name)
 	return u_id;
 }
 
-void Shader::create_shader(const std::string& file_path)
+void shader::create_shader(const std::string& file_path)
 {
 	auto [vertex, fragment] = parse_shader(file_path);
 	unsigned int program = glCreateProgram();
@@ -108,7 +108,7 @@ void Shader::create_shader(const std::string& file_path)
 	m_id = program;
 }
 
-std::tuple<std::string, std::string> Shader::parse_shader(const std::string& file_path)
+std::tuple<std::string, std::string> shader::parse_shader(const std::string& file_path)
 {
 	std::ifstream file(file_path);
 
@@ -152,7 +152,7 @@ std::tuple<std::string, std::string> Shader::parse_shader(const std::string& fil
 	return { ss[0].str(), ss[1].str() };
 }
 
-int Shader::compile_shader(unsigned int type, const std::string& source)
+int shader::compile_shader(unsigned int type, const std::string& source)
 {
 	unsigned int id = glCreateShader(type);
 	const char* src = source.c_str();
@@ -176,7 +176,7 @@ int Shader::compile_shader(unsigned int type, const std::string& source)
 	return id;
 }
 
-void Shader::upload_texture(const std::string& sampler_name, Texture& texture)
+void shader::upload_texture(const std::string& sampler_name, texture& texture)
 {
 	/*auto texture_id   = texture.get_id();
 	auto texture_type = texture.get_type();
@@ -205,7 +205,7 @@ void Shader::upload_texture(const std::string& sampler_name, Texture& texture)
 	glUniform1i(sampler_id, unit_index);*/
 }
 
-unsigned int Shader::find_available_texture_unit(int texture_type)
+unsigned int shader::find_available_texture_unit(int texture_type)
 {
 	/*for (int i = 0; i < m_texture_units.size(); ++i)
 	{

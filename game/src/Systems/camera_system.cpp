@@ -63,8 +63,8 @@ void CameraSystem::update_camera_shake(float dt)
 	/// fade out the camera shake over time
 	float strength = intensity * (1.0f - time_elapsed / shake_duration);
 
-	float yaw_offset = Random::get_random_float(-0.5f, 0.5f) * strength;
-	float pitch_offset = Random::get_random_float(-0.5f, 0.5f) * strength;
+	float yaw_offset = random::get_random_float(-0.5f, 0.5f) * strength;
+	float pitch_offset = random::get_random_float(-0.5f, 0.5f) * strength;
 
 	camera.add_yaw(yaw_offset);
 	camera.add_pitch(pitch_offset);
@@ -135,7 +135,7 @@ void CameraSystem::reset()
 	entity_processing = -1;
 }
 
-void CameraSystem::on_collision(const EventBase& event)
+void CameraSystem::on_collision(const event_base& event)
 {
 	if (entity_processing != -1)
 	{
@@ -145,7 +145,7 @@ void CameraSystem::on_collision(const EventBase& event)
 	entity_processing = e.entity_id;
 }
 
-void CameraSystem::on_ball_respawn(const EventBase& event)
+void CameraSystem::on_ball_respawn(const event_base& event)
 {
 	reset();
 }

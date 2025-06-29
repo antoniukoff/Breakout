@@ -12,13 +12,13 @@ HealthSystem::HealthSystem(Game& game)
 	dispacther.subscribe<CollisionEvent>(std::bind(&HealthSystem::on_collision_event, this, std::placeholders::_1));
 }
 
-void HealthSystem::on_collision_event(const EventBase& event)
+void HealthSystem::on_collision_event(const event_base& event)
 {
 	const CollisionEvent& ce = static_cast<const CollisionEvent&>(event);
 	auto& registry = game_handle->get_registry();
 	if (registry.has<LifeComponent>(ce.entity_id))
 	{
-		auto [health_component, render_component] = registry.unpack<LifeComponent, RenderComponent>(ce.entity_id);
+		auto [health_component, render_component] = registry.unpack<LifeComponent, cmp_render>(ce.entity_id);
 		auto& curr_health = health_component.current_health();
 		auto max_health = health_component.max_health();
 		curr_health--;

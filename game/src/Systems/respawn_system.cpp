@@ -47,7 +47,7 @@ void RespawnSystem::on_brick_destroyed(const BrickDestroyedEvent& event)
 	m_available_positions.push(event.position);
 }
 
-void RespawnSystem::on_difficulty_increased(const EventBase& event)
+void RespawnSystem::on_difficulty_increased(const event_base& event)
 {
 	float min_respawn_amount = 7.5f;
 

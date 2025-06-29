@@ -1,11 +1,11 @@
-#include "resource_manager.h"
+#include "asset_library.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-std::unique_ptr<ResourceManager> ResourceManager::s_instance = nullptr;
+std::unique_ptr<asset_library> asset_library::s_instance = nullptr;
 
-void ResourceManager::initialize(const std::string file_path)
+void asset_library::initialize(const std::string file_path)
 {
 	if (s_instance)
 	{
@@ -15,7 +15,7 @@ void ResourceManager::initialize(const std::string file_path)
 		s_instance->textures.clear();
 	}
 
-	s_instance = std::make_unique<ResourceManager>();
+	s_instance = std::make_unique<asset_library>();
 
 	std::ifstream file(file_path);
 	if (!file.is_open())
@@ -56,7 +56,7 @@ void ResourceManager::initialize(const std::string file_path)
 			std::string shader;
 
 			stream >> name >> shader;
-			Material* material = s_instance->load_material(name, shader);
+			material* material = s_instance->load_material(name, shader);
 			
 			std::string type;
 			while (stream >> type)
@@ -89,18 +89,18 @@ void ResourceManager::initialize(const std::string file_path)
 	}
 }
 
-Material* ResourceManager::load_material(const std::string& name, const std::string& shader_name)
+material* asset_library::load_material(const std::string& name, const std::string& shader_name)
 {
-	Shader* shader = shaders[shader_name].get();
+	shader* shader = shaders[shader_name].get();
 	if (!shader)
 	{
 		std::cout << "Could not find shader - " << shader_name << " - while creating material: " << name << std::endl;
 	}
-	materials[name] = std::make_unique<Material>(shader, name);
+	materials[name] = std::make_unique<material>(shader, name);
 	return materials[name].get();
 }
 
-void ResourceManager::list_assets()
+void asset_library::list_assets()
 {
 	std::cout << "Active Materials: \n";
 	for (const auto& [name, _] : s_instance->materials)
@@ -115,7 +115,7 @@ void ResourceManager::list_assets()
 	}
 }
 
-Mesh* ResourceManager::get_mesh(const std::string& name)
+mesh* asset_library::get_mesh(const std::string& name)
 {
 	if (!meshes.contains(name))
 	{
@@ -124,7 +124,7 @@ Mesh* ResourceManager::get_mesh(const std::string& name)
 	return meshes.at(name).get();
 }
 
-Shader* ResourceManager::get_shader(const std::string& name)
+shader* asset_library::get_shader(const std::string& name)
 {
 	if (!shaders.contains(name))
 	{
@@ -133,7 +133,7 @@ Shader* ResourceManager::get_shader(const std::string& name)
 	return shaders.at(name).get();
 }
 
-Material* ResourceManager::get_material(const std::string& name)
+material* asset_library::get_material(const std::string& name)
 {
 	if (!materials.contains(name))
 	{
@@ -142,25 +142,25 @@ Material* ResourceManager::get_material(const std::string& name)
 	return materials.at(name).get();
 }
 
-Material ResourceManager::get_material_instance(const std::string& name)
+material asset_library::get_material_instance(const std::string& name)
 {
 	return *get_material(name);
 }
 
-ResourceManager& ResourceManager::get()
+asset_library& asset_library::get()
 {
 	return *s_instance;
 }
 
-Mesh* ResourceManager::load_mesh(const std::string& name, const std::string& file_path)
+mesh* asset_library::load_mesh(const std::string& name, const std::string& file_path)
 {
-	meshes[name] = std::make_unique<Mesh>(file_path);
+	meshes[name] = std::make_unique<mesh>(file_path);
 	return meshes[name].get();
 }
 
-Shader* ResourceManager::load_shader(const std::string& name, const std::string& file_path)
+shader* asset_library::load_shader(const std::string& name, const std::string& file_path)
 {
-	shaders[name] = std::make_unique<Shader>(file_path, name);
+	shaders[name] = std::make_unique<shader>(file_path, name);
 	return shaders[name].get();
 }
 

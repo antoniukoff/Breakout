@@ -3,24 +3,24 @@
 #include <vector>
 #include <GL/glew.h>
 
-VertexBuffer::VertexBuffer()
+vertex_buffer::vertex_buffer()
 {
 	glGenBuffers(1, &m_id);
 }
 
-VertexBuffer::~VertexBuffer()
+vertex_buffer::~vertex_buffer()
 {
 	glDeleteBuffers(1, &m_id);
 }
 
-void VertexBuffer::upload_data(const std::vector<float>& vertices)
+void vertex_buffer::upload_data(const std::vector<float>& vertices)
 {
 	bind();
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), vertices.data(), GL_DYNAMIC_DRAW);
 	unbind();
 }
 
-void VertexBuffer::upload_data(const std::vector<Face>& faces)
+void vertex_buffer::upload_data(const std::vector<face>& faces)
 {
 	bind();
 	uint32_t bytes = sizeof(faces[0]) * faces.size();
@@ -28,12 +28,12 @@ void VertexBuffer::upload_data(const std::vector<Face>& faces)
 	unbind();
 }
 
-void VertexBuffer::bind() const
+void vertex_buffer::bind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 }
 
-void VertexBuffer::unbind()
+void vertex_buffer::unbind()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

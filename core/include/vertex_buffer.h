@@ -3,26 +3,26 @@
 #include "math/vec3.h"
 #include "math/vec2.h"
 
-struct Vertex
+struct vertex
 {
     vec3 position;
     vec2 uv;
     vec3 normal;
 };
 
-struct Face
+struct face
 {
-    Vertex v[3];
+    vertex v[3];
 };
 
-class VertexBuffer
+class vertex_buffer
 {
 public:
-    VertexBuffer();
-    ~VertexBuffer();
+    vertex_buffer();
+    ~vertex_buffer();
 
     void upload_data(const std::vector<float>& vertices);
-    void upload_data(const std::vector<Face>& faces);
+    void upload_data(const std::vector<face>& faces);
     void bind() const;
     void unbind();
 

@@ -13,7 +13,7 @@ struct CollisionData
 };
 
 class Game;
-class EventBase;
+class event_base;
 
 class PhysicsSystem : public System
 {

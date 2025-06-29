@@ -3,7 +3,7 @@
 #include "math/vec3.h"
 #include "math/mat4.h"
 
-struct CameraParams
+struct camera_params
 {
 	vec3 from = { 0.0f, 0.0f, 0.5f };
 	vec3 at   = { 0.0f, 0.0f, 0.0f };
@@ -11,10 +11,10 @@ struct CameraParams
 	float fov = 90.0f, near = 0.1f, far = 1000.0f;
 };
 
-class Camera
+class camera
 {
 public:
-	Camera(CameraParams params = CameraParams());
+	camera(camera_params params = camera_params());
 
 	virtual void update(float dt);
 
@@ -35,7 +35,7 @@ private:
 	void init_projection(float aspect_ratio, float fov, float near, float far);
 
 protected:
-	CameraParams m_params;
+	camera_params m_params;
 
 	/// Rotation and movement
 	float yaw = 0.0f, pitch = 0.0f;

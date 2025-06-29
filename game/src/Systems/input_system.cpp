@@ -96,7 +96,7 @@ void InputSystem::update_initial_movement_dir(float dt)
 	}
 
 	auto& registry = game_handle->get_registry();
-	registry.for_each<RigidBodyComponent>([&](entity_id e, component_handle<RigidBodyComponent> rigid_body)
+	registry.for_each<RigidBodyComponent>([&](entity_id e, cmp_handle<RigidBodyComponent> rigid_body)
 		{
 			vec3& velocity = rigid_body.velocity();
 			mat4 rotation = mat4::rotate_z(angle);

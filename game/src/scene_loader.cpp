@@ -2,13 +2,13 @@
 #include "level_data.h"
 #include "game.h"
 #include <math/random.h>
-#include "resource_manager.h"
+#include "asset_library.h"
 
-static SceneData data;
+static scene_data data;
 
 void ScenaLoader::load_scene(Game& game, uint32_t level)
 {
-	data = SceneData();
+	data = scene_data();
 
 	ScenaLoader::create_arena(game);
 	ScenaLoader::parse_level(game, g_levels[level]);
@@ -76,14 +76,14 @@ void ScenaLoader::create_arena(Game& game)
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 
-	auto back = ResourceManager::get()->get_mesh("cube");
-	auto walls = ResourceManager::get()->get_mesh("paddle");
-	auto material = ResourceManager::get()->get_material("shiny_material");
+	auto back = asset_library::get()->get_mesh("cube");
+	auto walls = asset_library::get()->get_mesh("paddle");
+	auto material = asset_library::get()->get_material("shiny_material");
 
 	//// Arena 
 	vec3 arena_position = vec3{ 0.0f, 0.0f, z_depth };
 	registry.add<TransformComponent>(e, arena_position, arena_scale);
-	registry.add<RenderComponent>(e, back, material);
+	registry.add<cmp_render>(e, back, material);
 	////
 
 	data.target_pos.y = arena_scale.y - 50.0f;
@@ -98,7 +98,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, horizontal_wall_position, horizontal_wall_scale);
 	registry.add<BoxColliderComponent>(e, horizontal_bounds);
-	registry.add<RenderComponent>(e, walls, material);
+	registry.add<cmp_render>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 
 	horizontal_wall_position.x = -horizontal_wall_position.x;
@@ -106,7 +106,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, horizontal_wall_position, horizontal_wall_scale);
 	registry.add<BoxColliderComponent>(e, horizontal_bounds);
-	registry.add<RenderComponent>(e, walls, material);
+	registry.add<cmp_render>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 	////
 
@@ -118,7 +118,7 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, vertical_wall_position, vertical_wall_scale);
 	registry.add<BoxColliderComponent>(e, vertical_bounds);
-	registry.add<RenderComponent>(e, walls, material);
+	registry.add<cmp_render>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 
 	vertical_wall_position.y = -vertical_wall_position.y;
@@ -126,20 +126,20 @@ void ScenaLoader::create_arena(Game& game)
 	e = registry.create_entity();
 	registry.add<TransformComponent>(e, vertical_wall_position, vertical_wall_scale);
 	registry.add<BoxColliderComponent>(e, vertical_bounds);
-	registry.add<RenderComponent>(e, walls, material);
+	registry.add<cmp_render>(e, walls, material);
 	registry.add<CameraShakeComponent>(e);
 	////
 }
 
 void ScenaLoader::create_brick(Game& game, vec3 position)
 {
-	auto paddle = ResourceManager::get()->get_mesh("paddle");
-	auto material = ResourceManager::get()->get_material("shiny_material");
+	auto paddle = asset_library::get().get_mesh("paddle");
+	auto material = asset_library::get().get_material("shiny_material");
 
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position, brick_scale);
-	registry.add<RenderComponent>(e, paddle, material);
+	registry.add<cmp_render>(e, paddle, material);
 	registry.add<BoxColliderComponent>(e, vec2{ brick_scale.x * 2.0f, brick_scale.y * 2.0f });
 	registry.add<LifeComponent>(e, 1);
 
@@ -148,13 +148,13 @@ void ScenaLoader::create_brick(Game& game, vec3 position)
 
 void ScenaLoader::create_solid_brick(Game& game, vec3 position)
 {
-	auto paddle = ResourceManager::get()->get_mesh("paddle");
-	auto material = ResourceManager::get()->get_material("matte_material");
+	auto paddle = asset_library::get()->get_mesh("paddle");
+	auto material = asset_library::get()->get_material("matte_material");
 
 	auto& registry = game.get_registry();
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position, brick_scale);
-	registry.add<RenderComponent>(e, paddle, material);
+	registry.add<cmp_render>(e, paddle, material);
 	registry.add<BoxColliderComponent>(e, vec2{ brick_scale.x * 2.0f, brick_scale.y * 2.0f });
 	registry.add<CameraShakeComponent>(e);
 }
@@ -163,14 +163,14 @@ void ScenaLoader::create_paddle(Game& game, vec3 position)
 {
 	auto& registry = game.get_registry();
 
-	auto paddle = ResourceManager::get()->get_mesh("paddle");
-	auto material = ResourceManager::get()->get_material("shiny_material");
+	auto paddle = asset_library::get()->get_mesh("paddle");
+	auto material = asset_library::get()->get_material("shiny_material");
 
 	entity_id paddle_id = registry.create_entity();
 	registry.add<TransformComponent>(paddle_id, position, paddle_scale);
 	registry.add<RigidBodyComponent>(paddle_id);
 	registry.add<BoxColliderComponent>(paddle_id, vec2{ 2.0f * paddle_scale.x, 2.0f * paddle_scale.y });
-	registry.add<RenderComponent>(paddle_id, paddle, material);
+	registry.add<cmp_render>(paddle_id, paddle, material);
 
 	data.paddle_id = paddle_id;
 
@@ -182,18 +182,18 @@ void ScenaLoader::create_ball(Game& game, vec3 position)
 {
 	auto& registry = game.get_registry();
 
-	auto ball = ResourceManager::get()->get_mesh("ball");
-	auto material = ResourceManager::get()->get_material("shiny_material");
+	auto ball = asset_library::get()->get_mesh("ball");
+	auto material = asset_library::get()->get_material("shiny_material");
 
 	auto e = registry.create_entity();
 	registry.add<TransformComponent>(e, position);
-	float x = Random::get_random_float(-0.45f, 0.45f);
-	float y = Random::get_random_float(0.05f, 0.7f);
+	float x = random::get_random_float(-0.45f, 0.45f);
+	float y = random::get_random_float(0.05f, 0.7f);
 	vec3 velocity = vec3::normalize({ x, y, 0.0f }) * 40.0f;
 	registry.add<RigidBodyComponent>(e, velocity);
 	registry.add<BounceComponent>(e);
 	registry.add<CircleColliderComponent>(e, 1.0f);
-	registry.add<RenderComponent>(e, ball, material);
+	registry.add<cmp_render>(e, ball, material);
 
 	data.active_ball_id = e;
 }

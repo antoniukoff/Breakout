@@ -5,19 +5,19 @@
 #include <stb/stb_image.h>
 
 
-Texture::Texture(const std::string& file_name, unsigned int type)
+texture::texture(const std::string& file_name, unsigned int type)
 	: m_type(type)
 {
 	load_texture(file_name);
 }
 
 
-Texture::~Texture()
+texture::~texture()
 {
 	glDeleteTextures(1, &m_id);
 }
 
-void Texture::load_texture(const std::string& file_name)
+void texture::load_texture(const std::string& file_name)
 {
 	glGenTextures(1, &m_id);
 	glBindTexture(m_type, m_id);

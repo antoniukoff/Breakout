@@ -8,41 +8,37 @@
 
 #include <color.h>
 
-enum class UISelectable
+enum class entt_type
 {
 	None, Entity, Light
 };
 
 
-class Enigma3D : public ApplicationBase
+class editor : public application_base
 {
 public:
-	Enigma3D();
-	~Enigma3D();
+	editor();
+	~editor();
 
 	void init_ui();
-
 	void init_scene_buffer();
-
-	void create_scene_lights();
-
-	void create_entity();
 
 	void on_update(float dt) override;
 	void on_render(float interval) override;
 
+	void create_scene_lights();
 	void render_ui();
 
-	void on_key_press(KeyPressEvent event);
-
 private:
-	reflecs::registry<Sample, Transform, RenderComponent, TagComponent> m_registry;
-	Camera m_scene_camera;
+	void ui_begin_frame();
+	std::pair<entt_type, uint32_t> render_entity_panel();
+	void render_component_inspector_panel(entt_type type, uint32_t entity);
 
-	UISelectable m_entity_type;
+	reflecs::registry<cmp_transform, cmp_render, cmp_tag> m_registry;
+	camera m_scene_camera;
+	std::pair<entt_type, uint32_t> selected_entity{};
 
-	uint32_t buffer_id;
-	uint32_t m_selected_entity = -1;
-	std::vector<uint32_t> entity_count;
+
+	uint32_t buffer_id{};
 };
 

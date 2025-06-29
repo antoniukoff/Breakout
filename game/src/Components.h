@@ -131,22 +131,22 @@ DEFINE_COMPONENT_HANDLE(BounceComponent,
 	COMPONENT_HANDLE_ACCESSOR(3, float, elapsed_time)
 )
 
-struct RenderComponent
+struct cmp_render
 {
-	Mesh* mesh;
-	Material* material;
+	mesh* mesh;
+	material* material;
 };
 
 ANNOTATE(
-	RenderComponent,
+	cmp_render,
 	2,
-	DEFINE_COMPONENT_MEMBER(RenderComponent, 0, Mesh*, mesh)
-	DEFINE_COMPONENT_MEMBER(RenderComponent, 1, Material*, material)
+	DEFINE_COMPONENT_MEMBER(cmp_render, 0, mesh*, mesh)
+	DEFINE_COMPONENT_MEMBER(cmp_render, 1, material*, material)
 )
 
-DEFINE_COMPONENT_HANDLE(RenderComponent,
-	COMPONENT_HANDLE_ACCESSOR(0, Mesh*, mesh)
-	COMPONENT_HANDLE_ACCESSOR(1, Material*, material)
+DEFINE_COMPONENT_HANDLE(cmp_render,
+	COMPONENT_HANDLE_ACCESSOR(0, mesh*, mesh)
+	COMPONENT_HANDLE_ACCESSOR(1, material*, material)
 )
 
 struct CameraShakeComponent

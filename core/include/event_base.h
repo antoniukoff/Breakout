@@ -1,5 +1,5 @@
 #pragma once
-class EventBase
+class event_base
 {
 };
 

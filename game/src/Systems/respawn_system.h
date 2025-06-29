@@ -6,7 +6,7 @@
 #include <queue>
 
 class Game;
-class EventBase;
+class event_base;
 
 class RespawnSystem : public System
 {
@@ -17,7 +17,7 @@ public:
 	
 private:
 	void on_brick_destroyed(const BrickDestroyedEvent& event);
-	void on_difficulty_increased(const EventBase& event);
+	void on_difficulty_increased(const event_base& event);
 
 private:
 	const float m_max_respawn_time = 20.0f;

@@ -1,37 +1,37 @@
 #include "Material.h"
 #include "shader.h"
 
-Material::Material(Shader* shader, const std::string& name)
+material::material(shader* shader, const std::string& name)
 	: shader_handle(shader)
 	, name(name)
 {}
 
-void Material::set_mat(const std::string name, const mat4& mat)
+void material::set_mat(const std::string name, const mat4& mat)
 {
 	mat4_map[name] = mat;
 }
 
-void Material::set_texture(const std::string name, const Texture& texture)
+void material::set_texture(const std::string name, const texture& texture)
 {
 	texture_map[name] = texture;
 }
 
-void Material::set_scalar(const std::string name, float value)
+void material::set_scalar(const std::string name, float value)
 {
 	float_map[name] = value;
 }
 
-void Material::set_vec3(const std::string name, const vec3& vec3)
+void material::set_vec3(const std::string name, const vec3& vec3)
 {
 	vec3_map[name] = vec3;
 }
 
-void Material::set_vec4(const std::string name, const vec4& vec4)
+void material::set_vec4(const std::string name, const vec4& vec4)
 {
 	vec4_map[name] = vec4;
 }
 
-void Material::bind() const
+void material::bind() const
 {
 	shader_handle->bind();
 

@@ -7,16 +7,16 @@
 #include <unordered_map>
 #include <string>
 
-class Shader
+class shader
 {
 public:
-	Shader() = default;
-	Shader(const std::string& file_path, const std::string& name);
+	shader() = default;
+	shader(const std::string& file_path, const std::string& name);
 
 	void bind() const;
 	void unbind() const;
 
-	void upload_texture(const std::string& sampler_name, Texture& texture);
+	void upload_texture(const std::string& sampler_name, texture& texture);
 	void upload_mat4(const std::string& uniform_name, const mat4& value);
 	void upload_vec4(const std::string& uniform_name, const vec4& value);
 	void upload_vec4(const std::string& uniform_name, const vec3& value);

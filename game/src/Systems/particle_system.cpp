@@ -48,14 +48,14 @@ void ParticleSystem::draw_shooting_line(float dt)
 {
 	auto& registry = game_handle->get_registry();
 	registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent >([&](entity_id e,
-		component_handle<TransformComponent> transform, 
-		component_handle<RigidBodyComponent> rigid_body,
-		component_handle<CircleColliderComponent> _)
+		cmp_handle<TransformComponent> transform, 
+		cmp_handle<RigidBodyComponent> rigid_body,
+		cmp_handle<CircleColliderComponent> _)
 		{
 			vec3 ball_pos = transform.position();
 			vec3 ball_vel = rigid_body.velocity();
 
-			Color particle_color;
+			color particle_color;
 			particle_color.r = (unsigned char)63;
 			particle_color.g = (unsigned char)75;
 			particle_color.b = (unsigned char)59;
@@ -79,14 +79,14 @@ void ParticleSystem::draw_trail()
 {
 	auto& registry = game_handle->get_registry();
 	registry.for_each<TransformComponent, RigidBodyComponent, CircleColliderComponent>([&](entity_id e,
-		component_handle<TransformComponent> transform,
-		component_handle<RigidBodyComponent> rigid_body,
-		component_handle<CircleColliderComponent> _)
+		cmp_handle<TransformComponent> transform,
+		cmp_handle<RigidBodyComponent> rigid_body,
+		cmp_handle<CircleColliderComponent> _)
 		{
 			vec3 ball_pos = transform.position();
 			vec3 ball_vel = rigid_body.velocity();
 
-			Color particle_color;
+			color particle_color;
 			particle_color.r = (unsigned char)154;
 			particle_color.g = (unsigned char)136;
 			particle_color.b = (unsigned char)115;
@@ -104,7 +104,7 @@ void ParticleSystem::process_emitters(float dt)
 	for (int i = 0; i < m_emitters.size(); i++)
 	{
 		float& duration = m_emitters[i].first;
-		Particle& particle = m_emitters[i].second;
+		particle& particle = m_emitters[i].second;
 
 		duration -= dt;
 		if (duration <= 0.0f)
@@ -115,11 +115,11 @@ void ParticleSystem::process_emitters(float dt)
 			continue;
 		}
 
-		float rand_x = Random::get_random_float(-20.0f, 20.0f);
-		float rand_y = Random::get_random_float(-20.0f, 20.0f);
-		float rand_z = Random::get_random_float(60.0f, 75.0f);
+		float rand_x = random::get_random_float(-20.0f, 20.0f);
+		float rand_y = random::get_random_float(-20.0f, 20.0f);
+		float rand_z = random::get_random_float(60.0f, 75.0f);
 
-		float rand_scale = Random::get_random_float(0.25f, 0.5f);
+		float rand_scale = random::get_random_float(0.25f, 0.5f);
 
 		vec3 particle_velocity = vec3{ rand_x, rand_y, rand_z } + particle.velocity;
 
@@ -142,31 +142,31 @@ void ParticleSystem::draw(float interval)
 }
 
 
-void ParticleSystem::on_collision(const EventBase& event)
+void ParticleSystem::on_collision(const event_base& event)
 {
 	const CollisionEvent& e = static_cast<const CollisionEvent&>(event);
 
-	uint32_t amount = (uint32_t)Random::get_random_float(25.0f, 50.0f);
+	uint32_t amount = (uint32_t)random::get_random_float(25.0f, 50.0f);
 
 	for (uint32_t i = 0; i < amount; i++)
 	{
-		float rand_x = Random::get_random_float(-20.0f, 20.0f);
-		float rand_y = Random::get_random_float(-20.0f, 20.0f);
-		float rand_z = Random::get_random_float(40.0f, 60.0f);
+		float rand_x = random::get_random_float(-20.0f, 20.0f);
+		float rand_y = random::get_random_float(-20.0f, 20.0f);
+		float rand_z = random::get_random_float(40.0f, 60.0f);
 
-		Color rand_color = Random::get_random_color();
+		color rand_color = random::get_random_color();
 
 		patricle_handle->add_particle(e.position, { rand_x, rand_y, rand_z }, rand_color, 0.25f);
 	}
 }
 
-void ParticleSystem::on_brick_destroyed(const EventBase& event)
+void ParticleSystem::on_brick_destroyed(const event_base& event)
 {
 	const BrickDestroyedEvent& e = static_cast<const BrickDestroyedEvent&>(event);
 
-	Color rand_color = Random::get_random_color();
+	color rand_color = random::get_random_color();
 
-	Particle p;
+	particle p;
 	p.color = rand_color;
 	p.position = e.position;
 
@@ -174,13 +174,13 @@ void ParticleSystem::on_brick_destroyed(const EventBase& event)
 	m_emitters.push_back({ duration, p });
 }
 
-void ParticleSystem::on_brick_respawn(const EventBase& event)
+void ParticleSystem::on_brick_respawn(const event_base& event)
 {
 	const BrickRespawnEvent& e = static_cast<const BrickRespawnEvent&>(event);
 
-	Color rand_color = Random::get_random_color();
+	color rand_color = random::get_random_color();
 
-	Particle p;
+	particle p;
 	p.color = rand_color;
 	p.position = e.position;
 
@@ -188,15 +188,15 @@ void ParticleSystem::on_brick_respawn(const EventBase& event)
 	m_emitters.push_back({ duration, p });
 }
 
-void ParticleSystem::on_game_won(const EventBase& event)
+void ParticleSystem::on_game_won(const event_base& event)
 {
 	auto& registry = game_handle->get_registry();
-	registry.for_each<TransformComponent>([&](entity_id e, component_handle<TransformComponent> transform)
+	registry.for_each<TransformComponent>([&](entity_id e, cmp_handle<TransformComponent> transform)
 		{
 			vec3 position = transform.position();
-			Color rand_color = Random::get_random_color();
+			color rand_color = random::get_random_color();
 
-			Particle p;
+			particle p;
 			p.color = rand_color;
 			p.position = position;
 			p.velocity = vec3{ 0.0f, 0.0f, 20.0f };

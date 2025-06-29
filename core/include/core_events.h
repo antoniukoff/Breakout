@@ -1,20 +1,18 @@
 #pragma once
 #include "event_base.h"
 
-class WindowCloseEvent : public EventBase
+class window_close_evnt : public event_base
 {
-public:
-	WindowCloseEvent() = default;
 };
 
-class KeyPressEvent : public EventBase
+class key_press_evnt : public event_base
 {
 public:
 	int key;
 	int action;
 };
 
-class MousePressEvent : public EventBase
+class mouse_press_evnt : public event_base
 {
 public:
 	int button;

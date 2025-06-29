@@ -2,7 +2,7 @@
 #include "system.h"
 
 class Game;
-class EventBase;
+class event_base;
 
 class HealthSystem : public System
 {
@@ -11,6 +11,6 @@ public:
 
 	void update(float dt) override {};
 private:
-	void on_collision_event(const EventBase& event);
+	void on_collision_event(const event_base& event);
 };
 

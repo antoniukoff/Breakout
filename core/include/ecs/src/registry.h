@@ -19,10 +19,10 @@ namespace reflecs
 		using signature_map = std::unordered_map<bit_mask, std::vector<entity_id>>;
 
 	private:
-		std::tuple<component_manager<Cs>...> m_component_pools; // Tuple of component pools
-		std::queue<entity_id> m_available_ids; // Stores available ids
-		std::vector<bit_mask> m_entities_to_signatures; // Maps entities to their assigned components
-		signature_map m_entities; // Maps component signatures to entities containing them them
+		std::tuple<component_manager<Cs>...> m_component_pools{};		// Tuple of component pools
+		std::queue<entity_id> m_available_ids{};						// Stores available ids
+		std::vector<bit_mask> m_entities_to_signatures{g_max_entities}; // Maps entities to their assigned components
+		signature_map m_signature_to_entites{};						    // Maps component signatures to entities containing them 
 
 	public:
 		registry()
@@ -40,7 +40,7 @@ namespace reflecs
 		{
 			if (m_available_ids.empty())
 			{
-				return g_max_entities;
+				return -1;
 			}
 
 			size_t new_id = m_available_ids.front();
@@ -54,7 +54,7 @@ namespace reflecs
 		*/
 		void destroy(entity_id e)
 		{
-			internal::constexpr_loop::execute<m_registered_components, remove_entity_wrapper>(this, e, m_entities_to_signatures[e]);
+			utils::unroll_func<m_registered_components, remove_entity_wrapper>(this, e, m_entities_to_signatures[e]);
 			m_available_ids.push(e);
 		}
 
@@ -112,9 +112,9 @@ namespace reflecs
 				new_queue.push(i);
 			}
 			std::swap(m_available_ids, new_queue);
-			m_entities.clear();
+			m_signature_to_entites.clear();
 
-			internal::constexpr_loop::execute<m_registered_components, reset_wrapper>(this);
+			utils::unroll_func<m_registered_components, reset_wrapper>(this);
 		}
 
 		template<typename C>
@@ -137,7 +137,7 @@ namespace reflecs
 		{
 			static bit_mask target_mask = create_signature<Cs...>();
 
-			for (auto& [bit_mask, entity_vec] : m_entities)
+			for (auto& [bit_mask, entity_vec] : m_signature_to_entites)
 			{
 				if ((bit_mask & target_mask) != target_mask)
 				{
@@ -175,10 +175,10 @@ namespace reflecs
 		void update_mask(entity_id e_id, bool add)
 		{
 			auto s = m_entities_to_signatures[e_id];
-			m_entities[s].erase(std::remove(m_entities[s].begin(), m_entities[s].end(), e_id), m_entities[s].end());
-			s.set(internal::type_utils::get_component_type_id<C, Cs...>(), add);
+			m_signature_to_entites[s].erase(std::remove(m_signature_to_entites[s].begin(), m_signature_to_entites[s].end(), e_id), m_signature_to_entites[s].end());
+			s.set(utils::get_component_type_id<C, Cs...>(), add);
 			m_entities_to_signatures[e_id] = s;
-			m_entities[s].push_back(e_id);
+			m_signature_to_entites[s].push_back(e_id);
 		}
 		/**
 		* @brief Creates a bit mask for the given set of components
@@ -190,7 +190,7 @@ namespace reflecs
 		{
 			bit_mask signatures;
 
-			(signatures.set(internal::type_utils::get_component_type_id<Ts, Cs...>()), ...); // fold expresion since C++ 17; applies same operation for all template aruments 
+			(signatures.set(utils::get_component_type_id<Ts, Cs...>()), ...); // fold expresion since C++ 17; applies same operation for all template aruments 
 			return signatures;
 		}
 
@@ -201,7 +201,7 @@ namespace reflecs
 		* @tparam C Component
 		*/
 		template<typename C>
-		component_handle<C> create_handle(entity_id e_id)
+		cmp_handle<C> create_handle(entity_id e_id)
 		{
 			component_manager<C>& mgr = retrieve_pool<C>();
 
@@ -230,7 +230,7 @@ namespace reflecs
 		{
 			if (bit_mask[index])
 			{
-				remove<internal::type_utils::component_type_at_index<index, Cs...>>(e_id);
+				remove<utils::cmp_type_at_index<index, Cs...>>(e_id);
 			}
 		}
 

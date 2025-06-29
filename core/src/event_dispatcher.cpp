@@ -1,10 +1,10 @@
 #include "event_dispatcher.h"
 
-EventDispatcher::EventDispatcher()
+event_dispatcher::event_dispatcher()
 {
 
 }
 
-EventDispatcher::~EventDispatcher()
+event_dispatcher::~event_dispatcher()
 {
 }

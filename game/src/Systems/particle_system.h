@@ -7,11 +7,11 @@
 #include <particle_batch.h>
 
 class Game;
-class EventBase;
+class event_base;
 
 class ParticleSystem : public System
 {
-	using emitters = std::vector<std::pair<float, Particle>>;
+	using emitters = std::vector<std::pair<float, particle>>;
 public:
 	ParticleSystem(Game& game);
 	void update(float dt) override;
@@ -21,16 +21,16 @@ public:
 	void reset();
 	void draw(float interval);
 private:
-	void on_collision(const EventBase& event);
-	void on_brick_destroyed(const EventBase& event);
-	void on_brick_respawn(const EventBase& event);
-	void on_game_won(const EventBase& event);
+	void on_collision(const event_base& event);
+	void on_brick_destroyed(const event_base& event);
+	void on_brick_respawn(const event_base& event);
+	void on_game_won(const event_base& event);
 
 private:
 	emitters m_emitters;
-	ParticleBatch* line_handle;
-	ParticleBatch* trail_handle;
-	ParticleBatch* patricle_handle;
+	particle_group* line_handle;
+	particle_group* trail_handle;
+	particle_group* patricle_handle;
 
 };
 

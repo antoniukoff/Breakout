@@ -3,35 +3,35 @@
 #include <string>
 #include <math/vec3.h>
 
-class CollisionEvent : public EventBase
+class CollisionEvent : public event_base
 {
 public:
 	uint32_t entity_id;
 	vec3 position;
 };
 
-class BrickDestroyedEvent : public EventBase
+class BrickDestroyedEvent : public event_base
 {
 public:
 	vec3 position;
 };
 
-class GameStarted : public EventBase
+class GameStarted : public event_base
 {};
 
-class BallRespawnEvent : public EventBase
+class BallRespawnEvent : public event_base
 {};
 
-class DifficultyIncreasedEvent : public EventBase
+class DifficultyIncreasedEvent : public event_base
 {};
 
-class BrickRespawnEvent : public EventBase
+class BrickRespawnEvent : public event_base
 {
 public:
 	vec3 position;
 };
 
-class GameWonEvent : public EventBase
+class GameWonEvent : public event_base
 {};
 
 

@@ -1,6 +1,6 @@
 #include "shake_camera.h"
 
-void ShakeCamera::update()
+void ShakeCamera::update(float dt)
 {
 	if (!m_is_dirty)
 	{
